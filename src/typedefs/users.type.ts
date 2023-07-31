@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Profile } from './profile.type';
+import { Role } from './role.type';
 
 @ObjectType()
 export class User {
@@ -8,6 +9,9 @@ export class User {
 
   @Field()
   email?: string;
+
+  @Field()
+  facebookId?: string;
 
   @Field()
   password: string;
@@ -23,4 +27,8 @@ export class User {
 
   @Field(() => Profile, {nullable: true})
   profile: Profile;
+
+  @Field(() => [Role], {nullable: true})
+  roles: Role[];
+
 }

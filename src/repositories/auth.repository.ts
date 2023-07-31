@@ -8,10 +8,12 @@ import { HttpException } from '@exceptions/httpException';
 import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import { ProfileEntity } from '@/entities/profile.entity';
+import { SocialAuthInput } from '@/typedefs/auth.type';
+import { authenticateFacebook } from '@/utils/passport';
 
 const createToken = (user: User): TokenData => {
   const dataStoredInToken: DataStoredInToken = { id: user.id };
-  const expiresIn: number = 60 * 60;
+  const expiresIn: number = 30 * 24 * 60 * 60; // 30 days
 
   return { expiresIn, token: sign(dataStoredInToken, SECRET_KEY, { expiresIn }) };
 };
@@ -53,4 +55,10 @@ export class AuthRepository {
 
     return findUser;
   }
+
+  // public async facebookLogin(userData: SocialAuthInput): Promise<{ cookie: string; tokenData: TokenData; findUser: User }> {
+  //     const { } =  await authenticateFacebook(userData);
+
+  // }
+
 }

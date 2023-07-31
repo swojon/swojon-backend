@@ -1,10 +1,11 @@
-import { Arg, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Authorized, Mutation, Query, Resolver } from 'type-graphql';
 import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserRepository } from '@repositories/users.repository';
 import { User } from '@typedefs/users.type';
 
 @Resolver()
 export class UserResolver extends UserRepository {
+  @Authorized(["ADMIN"])
   @Query(() => [User], {
     description: 'User find list',
   })
@@ -13,6 +14,7 @@ export class UserResolver extends UserRepository {
     return users;
   }
 
+  @Authorized()
   @Query(() => User, {
     description: 'User find by id',
   })
@@ -29,6 +31,7 @@ export class UserResolver extends UserRepository {
     return user;
   }
 
+  @Authorized()
   @Mutation(() => User, {
     description: 'User update',
   })
@@ -37,6 +40,25 @@ export class UserResolver extends UserRepository {
     return user;
   }
 
+  //Mutation for userRoleUpdate
+  // @Authorized()
+  @Mutation(() => User, {
+    description: 'User update role',
+  })
+  async addUserRole(@Arg('userId') userId: number, @Arg('roleId') roleId: number): Promise<User> {
+    const user: User = await this.userRoleUpdate(userId, roleId);
+    return user;
+  }
+
+  @Mutation(() => User, {
+    description: 'User remove role',
+  })
+  async removeUserRole(@Arg('userId') userId: number, @Arg('roleId') roleId: number): Promise<User> {
+    const user: User = await this.userRoleRemove(userId, roleId);
+    return user;
+  }
+
+  @Authorized()
   @Mutation(() => User, {
     description: 'User delete',
   })

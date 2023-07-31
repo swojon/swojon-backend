@@ -5,6 +5,8 @@ import { SECRET_KEY } from '@config';
 import { UserEntity } from '@entities/users.entity';
 import { HttpException } from '@exceptions/httpException';
 import { RequestWithUser, DataStoredInToken } from '@interfaces/auth.interface';
+import { Role } from '@/interfaces/role.interface';
+import { RoleEntity } from '@/entities/role.entity';
 
 const getAuthorization = req => {
   const cookie = req.cookies['Authorization'];
@@ -33,9 +35,22 @@ export const AuthMiddleware = async req => {
   }
 };
 
-export const AuthCheckerMiddleware: AuthChecker<RequestWithUser> = async ({ context: { user } }) => {
+export const AuthCheckerMiddleware: AuthChecker<RequestWithUser> = async ({ context: { user } }, roles) => {
+
   if (!user) {
     throw new HttpException(404, 'Authentication token missing');
+  }
+
+  if (roles.length === 0) {
+    return true;
+  }
+
+  const findUser: UserEntity = await UserEntity.findOne({ where: { id: user.id }, relations: ['roles'] });
+
+  const userRolesNames = findUser.roles.map(role => role.name);
+
+  if (!userRolesNames.some(role => roles.includes(role))) {
+    throw new HttpException(401, "You don't have permission to access this resource");
   }
 
   return true;

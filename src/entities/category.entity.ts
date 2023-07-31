@@ -17,7 +17,6 @@ export class CategoryEntity extends BaseEntity{
     @Column({nullable: true})
     parentCategoryId: number;
 
-
     //column for slug, unique, not empty
     @Column()
     @IsNotEmpty()

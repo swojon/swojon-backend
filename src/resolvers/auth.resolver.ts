@@ -3,7 +3,7 @@ import { CreateUserDto } from '@dtos/users.dto';
 import { AuthRepository } from '@repositories/auth.repository';
 import { User } from '@typedefs/users.type';
 // import { TokenData } from '@/interfaces/auth.interface';
-import { TokenData } from '@/typedefs/auth.type';
+import { TokenData, TokenUserData } from '@/typedefs/auth.type';
 
 @Resolver()
 export class AuthResolver extends AuthRepository {
@@ -15,12 +15,12 @@ export class AuthResolver extends AuthRepository {
     return user;
   }
 
-  @Mutation(() => TokenData, {
+  @Mutation(() => TokenUserData, {
     description: 'User login',
   })
-  async login(@Arg('userData') userData: CreateUserDto): Promise<TokenData> {
-    const { tokenData } = await this.userLogIn(userData);
-    return tokenData;
+  async login(@Arg('userData') userData: CreateUserDto): Promise<{}> {
+    const { tokenData, findUser} = await this.userLogIn(userData);
+    return {...findUser, ...tokenData};
   }
 
   @Authorized()
@@ -31,4 +31,5 @@ export class AuthResolver extends AuthRepository {
     const user = await this.userLogOut(userData.id);
     return user;
   }
+
 }

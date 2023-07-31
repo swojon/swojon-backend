@@ -26,3 +26,5 @@ export class FollowEntity extends BaseEntity{
     dateFollowed: Date;
 
 }
+
+
