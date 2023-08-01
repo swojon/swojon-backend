@@ -22,7 +22,7 @@ export class FollowEntity extends BaseEntity{
     isDeleted: boolean;
 
     //column for date joined, not empty
-    @Column({nullable: true})
+    @Column({default: new Date()})
     dateFollowed: Date;
 
 }

@@ -65,41 +65,7 @@ export class App {
     this.app.use(cookieParser());
   }
 
-//   //init graphql server
-//   private async initGraphQLServer(resolvers) {
-
-
-//         const schema = await buildSchema({
-//             resolvers: resolvers,
-//             authChecker: AuthCheckerMiddleware,
-//           });
-//         console.log(schema)
-// s
-//         try{
-//           const graphQLSchema = graphql.buildSchema(schema);
-//         }
-//         catch(err){
-//           console.log(err)
-//         }
-//           console.log('initGraphQLServer')
-//           this.app.use('/graphql', graphqlHTTP({
-//             schema: schema,
-//             graphiql: true,
-//             context: async ({ req }) => {
-//               try {
-//                 const user = await AuthMiddleware(req);
-//                 return { user };
-//               } catch (error) {
-//                 throw new Error(error);
-//               }
-//             }
-//           }));
-
-
-
-
-//   }
-
+  //init apollo server
   private async initApolloServer(resolvers) {
     const schema = await buildSchema({
       resolvers: resolvers,
