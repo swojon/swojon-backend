@@ -14,7 +14,7 @@ export class CommunityMemberEntity extends BaseEntity{
     user: UserEntity;
 
     //many to one relationship with community
-    @ManyToOne(() => CommunityEntity)
+    @ManyToOne(() => CommunityEntity, (community) => community.members )
     community: CommunityEntity;
 
     //column for role, not empty
