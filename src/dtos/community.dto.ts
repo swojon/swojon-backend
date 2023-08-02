@@ -95,4 +95,40 @@ export class UserCommunityDTO {
 
 }
 
+@InputType()
+export class CommunityMemberCreateDTO {
+  @Field()
+  userId: number;
 
+  @Field()
+  communityId: number;
+
+}
+
+@InputType()
+export class CommunityMemberUpdateDTO{
+  @Field({ nullable: true})
+  role?: string;
+
+  @Field({ nullable: true})
+  status?: string;
+
+  @Field({ nullable: true})
+  isApproved?: boolean;
+
+  @Field({ nullable: true})
+  isBanned?: boolean;
+
+  @Field({ nullable: true})
+  isMuted?: boolean;
+
+  @Field({ nullable: true})
+  isBlocked?: boolean;
+
+  @Field({ nullable: true})
+  isDeleted?: boolean;
+
+  @Field({ nullable: true})
+  dateJoined?: Date;
+
+}

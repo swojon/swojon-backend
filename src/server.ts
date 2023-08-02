@@ -7,12 +7,13 @@ import { ProfileResolver } from './resolvers/profile.resolver';
 import { RoleResolver } from './resolvers/role.resolver';
 import { FollowResolver } from './resolvers/follow.resolver';
 import { CommunityResolver } from './resolvers/community.resolver';
+import { CommunityMemberResolver } from './resolvers/communityMember.resolver';
 
 ValidateEnv();
 
 const app = new App([
   AuthResolver, UserResolver, ProfileResolver, RoleResolver, FollowResolver,
-  CommunityResolver
+  CommunityResolver, CommunityMemberResolver
 ]);
 
 app.listen();

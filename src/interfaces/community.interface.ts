@@ -30,3 +30,8 @@ export interface CommunityMembers {
   members?: CommunityMember[];
   count?: number;
 }
+
+export interface MemberCommunityList {
+  items?: CommunityMember[];
+  count?: number;
+}

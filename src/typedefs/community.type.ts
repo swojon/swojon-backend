@@ -9,7 +9,7 @@ export class Community {
   @Field()
   name?: string;
 
-  @Field()
+  @Field({ nullable: true})
   slug?: string;
 
   @Field({ nullable: true})
@@ -70,8 +70,11 @@ export class CommunityMember {
   @Field()
   isDeleted?: boolean;
 
-  @Field()
+  @Field({ nullable: true})
   dateJoined?: Date;
+
+  @Field({ nullable: true})
+  role?: string;
 
 }
 
@@ -79,6 +82,16 @@ export class CommunityMember {
 export class CommunityMembers {
   @Field(()=>[CommunityMember])
   members?: CommunityMember[];
+
+  @Field({ nullable: true})
+  count?: number;
+}
+
+
+@ObjectType()
+export class MemberCommunityList {
+  @Field(()=>[CommunityMember])
+  items?: CommunityMember[];
 
   @Field({ nullable: true})
   count?: number;

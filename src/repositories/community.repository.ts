@@ -6,6 +6,7 @@ import { HttpException } from "@/exceptions/httpException";
 import { Communities } from "@/interfaces/community.interface";
 
 import { Follower } from "@/interfaces/Follower.interface";
+import { Community } from "@/typedefs/community.type";
 import { EntityRepository } from "typeorm";
 
 
@@ -30,14 +31,18 @@ export class CommunityRepository{
               select: ["id", "name", "slug", "location", "longitude", "latitude",
                "description", "banner", "isLive", "isApproved", "isFeatured",
                 "isSponsored", "isVerified", "members"],
-              relations: ['members'],
+              relations: ['members', 'members.user' ],
             }
         );
         // console.log(communities[0])
 
         const communities_list: Communities = {
           count: communities[1],
-          items: communities[0]
+          items: communities[0].map((community):Community => {
+            community["memberCount"] = community.members.length;
+            return community;
+          })
+
         }
 
         return communities_list
