@@ -1,5 +1,5 @@
 import { IsNotEmpty } from "class-validator";
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
 
@@ -14,8 +14,8 @@ export class CategoryEntity extends BaseEntity{
     name: string;
 
     //parent category foreign key
-    @Column({nullable: true})
-    parentCategoryId: number;
+    @ManyToOne(type => CategoryEntity, category => category.parentCategory, {onDelete: 'CASCADE'})
+    parentCategory: CategoryEntity;
 
     //column for slug, unique, not empty
     @Column()
