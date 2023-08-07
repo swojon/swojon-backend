@@ -1,15 +1,18 @@
 import { hash, compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { EntityRepository } from 'typeorm';
-import { SECRET_KEY } from '@config';
+import { COOKIE_SECRET, SECRET_KEY } from '@config';
 import { CreateUserDto } from '@dtos/users.dto';
 import { UserEntity } from '@entities/users.entity';
 import { HttpException } from '@exceptions/httpException';
-import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
+import { DataStoredInToken, MyContext, TokenData } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import { ProfileEntity } from '@/entities/profile.entity';
-import { SocialAuthInput } from '@/typedefs/auth.type';
-import { authenticateFacebook } from '@/utils/passport';
+import cookieParser from 'cookie-parser';
+// import { cookies } from 'next/headers';
+
+// import { SocialAuthInput } from '@/typedefs/auth.type';
+// import { authenticateFacebook } from '@/utils/passport';
 
 const createToken = (user: User): TokenData => {
   const dataStoredInToken: DataStoredInToken = { id: user.id };
@@ -36,16 +39,23 @@ export class AuthRepository {
     return createUserData;
   }
 
-  public async userLogIn(userData: CreateUserDto): Promise<{ cookie: string; tokenData: TokenData; findUser: User }> {
+  public async userLogIn(userData: CreateUserDto, ctx:MyContext): Promise<{ cookie: string; tokenData: TokenData; findUser: User }> {
     const findUser: User = await UserEntity.findOne({ where: { email: userData.email } });
-    if (!findUser) throw new HttpException(409, `This email ${userData.email} was not found`);
+    if (!findUser) throw new HttpException(409, `Something went wrong! Please try again`);
 
     const isPasswordMatching: boolean = await compare(userData.password, findUser.password);
-    if (!isPasswordMatching) throw new HttpException(409, 'Password is not matching');
+    if (!isPasswordMatching) throw new HttpException(409, 'Something went wrong! Please try again');
 
-    const tokenData = createToken(findUser);
-    const cookie = createCookie(tokenData);
-
+    ctx.req.session!.userId = findUser.id;
+    const tokenData = {
+      ...createToken(findUser), sessionId: ctx.req.sessionID, sessionMaxAge: ctx.req.session!.cookie.maxAge
+    };
+    let cookie_gen = cookieParser.signedCookie(ctx.req.sessionID, COOKIE_SECRET)
+    console.log(cookie_gen)
+    // ctx.req.session.
+    console.log("cookie", ctx.req.session.cookie)
+    // ctx.req.session.s
+     const cookie = createCookie(tokenData);
     return { cookie, tokenData, findUser };
   }
 

@@ -9,6 +9,7 @@ export class TokenData {
   @Field()
   expiresIn: number;
 
+
 }
 
 @ObjectType()
@@ -18,6 +19,14 @@ export class TokenUserData extends User {
 
   @Field()
   expiresIn: number;
+
+  @Field({ nullable: true })
+  sessionId?: string;
+
+  @Field({ nullable: true })
+  sessionMaxAge?: number;
+
+
 }
 
 @ObjectType()

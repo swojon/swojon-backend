@@ -4,6 +4,7 @@ import { AuthRepository } from '@repositories/auth.repository';
 import { User } from '@typedefs/users.type';
 // import { TokenData } from '@/interfaces/auth.interface';
 import { TokenData, TokenUserData } from '@/typedefs/auth.type';
+import { MyContext } from '@/interfaces/auth.interface';
 
 @Resolver()
 export class AuthResolver extends AuthRepository {
@@ -18,8 +19,8 @@ export class AuthResolver extends AuthRepository {
   @Mutation(() => TokenUserData, {
     description: 'User login',
   })
-  async login(@Arg('userData') userData: CreateUserDto): Promise<{}> {
-    const { tokenData, findUser} = await this.userLogIn(userData);
+  async login(@Arg('userData') userData: CreateUserDto, @Ctx() ctx: MyContext): Promise<{}> {
+    const { tokenData, findUser} = await this.userLogIn(userData, ctx);
     return {...findUser, ...tokenData};
   }
 
