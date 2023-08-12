@@ -1,7 +1,9 @@
-import { CreateMessageDTO } from "@/dtos/chat.dto";
+import { CreateMessageDTO, ListChatRoomArgs } from "@/dtos/chat.dto";
+import { MyContext } from "@/interfaces/auth.interface";
 import { ChatMessageRepository } from "@/repositories/chat.repository";
-import { Chat, ChatRooms, Chats } from "@/typedefs/chat.type";
-import { Arg, Authorized, Mutation, Query, Resolver } from "type-graphql";
+import { Chat, ChatRoomWithMessage, ChatRooms, ChatRoomsWithMessage, Chats } from "@/typedefs/chat.type";
+import { Arg, Args, Authorized, Ctx, Mutation, PubSub, Publisher, Query, Resolver } from "type-graphql";
+import { TOPICS_ENUM } from "./subscription.resolver";
 
 
 @Resolver()
@@ -20,16 +22,19 @@ export class ChatResolver extends ChatMessageRepository {
   @Mutation(() => Chat, {
     description: 'Send Chat Message',
   })
-  async sendChatMessage(@Arg('chatData') chatData: CreateMessageDTO): Promise<Chat> {
-    const chatMessage = await this.messageSend(chatData);
+  async sendChatMessage(@Arg('chatData') chatData: CreateMessageDTO, @Ctx() ctx:MyContext, @PubSub(TOPICS_ENUM.NEW_CHAT_MESSAGE) publish: Publisher<Chat>): Promise<Chat> {
+    const senderId = chatData.senderId?chatData.senderId: ctx.req.session!.userId;
+    const chatMessage = await this.messageSend(chatData, senderId);
+    await publish(chatMessage);
     return chatMessage;
   }
 
   @Authorized()
-  @Query(() => ChatRooms, {
-    description: "List All Chat Rooms of a User",
+  @Query(() => ChatRoomsWithMessage, {
+    description: "List All Chat Rooms of a User with message",
   })
-  async listChatRooms(@Arg('userId') userId:number): Promise<ChatRooms> {
+  async listChatRooms(@Ctx() ctx:MyContext, @Args(){userId}: ListChatRoomArgs): Promise<ChatRoomsWithMessage> {
+    if (!userId) userId = ctx.req.session!.userId;
     const chatRooms = await this.chatRoomList(userId);
     return chatRooms;
   }

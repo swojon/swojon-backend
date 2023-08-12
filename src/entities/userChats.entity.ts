@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { ListingEntity } from "./listing.entity";
 
@@ -31,7 +31,7 @@ export class ChatRoomMemberEntity extends BaseEntity{
   user: UserEntity;
 
   //many to one relationship with chat room
-  @ManyToOne(() => ChatRoomEntity)
+  @ManyToOne(() => ChatRoomEntity, {onDelete: "CASCADE"})
   chatRoom: ChatRoomEntity;
 
 }

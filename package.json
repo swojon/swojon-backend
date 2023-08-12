@@ -5,7 +5,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "start": "npm run build && cross-env NODE_ENV=production node dist/server.js",
+    "start": "npm run build && cross-env NODE_ENV=production node dist/app.js",
     "dev": "cross-env NODE_ENV=development nodemon",
     "build": "swc src -d dist --source-maps --copy-files",
     "build:tsc": "tsc && tsc-alias",
@@ -16,6 +16,7 @@
     "deploy:dev": "pm2 start ecosystem.config.js --only dev"
   },
   "dependencies": {
+    "@graphql-tools/schema": "^10.0.0",
     "@types/express-session": "1.17.0",
     "apollo-server-core": "^3.10.0",
     "apollo-server-express": "^3.10.0",
@@ -31,6 +32,8 @@
     "express-graphql": "^0.12.0",
     "express-session": "^1.17.3",
     "graphql": "^15.8.0",
+    "graphql-subscriptions": "^2.0.0",
+    "graphql-ws": "^5.14.0",
     "helmet": "^5.1.1",
     "hpp": "^0.2.3",
     "ioredis": "^5.3.2",
@@ -41,11 +44,13 @@
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
     "socket.io": "^4.7.2",
+    "subscriptions-transport-ws": "^0.11.0",
     "type-graphql": "^1.1.1",
     "typedi": "^0.10.0",
     "typeorm": "^0.2.45",
     "winston": "^3.8.1",
-    "winston-daily-rotate-file": "^4.7.1"
+    "winston-daily-rotate-file": "^4.7.1",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.57",
