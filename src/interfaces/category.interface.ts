@@ -4,7 +4,8 @@ export interface Category {
   slug?: string;
   description?: string;
   banner?: string;
-  parentCategoryId?: Category;
+  parentCategory?: Category;
+  children?: Category[] |null;
   isLive?: boolean;
   isApproved?: boolean;
   isFeatured?: boolean;
@@ -14,5 +15,4 @@ export interface Category {
 
 export interface Categories {
   items?: Category[];
-  count?: number;
 }

@@ -1,8 +1,9 @@
 import { Field, ObjectType } from "type-graphql";
+import { Category } from "./category.type";
 
 
 @ObjectType()
-export class Category {
+export class Brand {
   @Field()
   id?: number;
 
@@ -16,34 +17,28 @@ export class Category {
   description?: string;
 
   @Field({ nullable: true})
-  banner?: string;
+  logo?: string;
 
   @Field({ nullable: true})
   parentCategory?:Category;
 
   @Field(()=> [Category], {nullable: true})
-  children?:Category[]
-
-  @Field({ nullable: true})
-  isLive?: boolean;
-
-  @Field({ nullable: true})
-  isApproved?: boolean;
+  categories?:Category[]
 
   @Field({ nullable: true})
   isFeatured?: boolean;
 
   @Field({ nullable: true})
-  isSponsored?: boolean;
-
-  @Field({ nullable: true})
-  isGlobal?: boolean;
+  isDeleted?: boolean;
 
 }
 
 
 @ObjectType()
-export class Categories {
-  @Field(type => [Category])
-  items?: Category[];
+export class Brands {
+  @Field(type => [Brand])
+  items?: Brand[];
+
+  @Field()
+  count: number
 }

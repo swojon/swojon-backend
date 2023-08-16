@@ -1,6 +1,6 @@
 import { BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "./users.entity";
-import { ListingEntity } from "./listing.entity";
+import { ProductEntity } from "./product.entity";
 
 
 //entity for saving user chats
@@ -15,8 +15,8 @@ export class ChatRoomEntity extends BaseEntity{
     chatName: string;
 
     //column for product context
-    @ManyToOne(() => ListingEntity, {nullable: true})
-    context: ListingEntity;
+    @ManyToOne(() => ProductEntity, {nullable: true})
+    context: ProductEntity;
 
 }
 

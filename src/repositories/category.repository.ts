@@ -10,20 +10,31 @@ import { EntityRepository } from "typeorm";
 export class CategoryRepository{
 
   public async categoryList(): Promise<Categories> {
-    const categories = await CategoryEntity.findAndCount(
+    const getCategoryTree = (categories:CategoryEntity[], target: Category|null):Category[] =>{
+
+      let cats = categories.filter(cat => target === null? cat.parentCategory === null: cat.parentCategory?.id === target.id)
+      const categoryList:Category[] = []
+
+      cats.forEach(cat => {
+        categoryList.push({
+          ...cat,
+          children: getCategoryTree(categories, cat)
+        })
+      });
+
+      return categoryList
+    }
+    const findCategories = await CategoryEntity.findAndCount(
       {
         select: ["id", "name", "slug", "description", "banner",
           "isLive", "isApproved", "isFeatured", "isSponsored", "isGlobal", "parentCategory"],
         relations: ['parentCategory'],
       }
     );
+    const categoryList = findCategories[0]
+    const categoryTree: Category[] =  getCategoryTree(categoryList, null)
 
-    const categories_list: Categories = {
-      count: categories[1],
-      items: categories[0]
-    }
-
-    return categories_list;
+    return {items: categoryTree}
 
   }
 

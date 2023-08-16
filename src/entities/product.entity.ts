@@ -2,13 +2,13 @@
 import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { CommunityEntity } from "./community.entity";
-import { ListingMediaEntity } from "./listingMedia.entity";
+import { ListingMediaEntity } from "./productMedia.entity";
 import { on } from "events";
 import { CategoryEntity } from "./category.entity";
 
 //entity for listing
 @Entity()
-export class ListingEntity extends BaseEntity{
+export class ProductEntity extends BaseEntity{
 
     //column for id, primary key, generated
     @PrimaryGeneratedColumn()
