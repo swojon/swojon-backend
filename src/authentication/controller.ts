@@ -4,9 +4,10 @@ import { compare } from "bcrypt";
 import { Request, Response } from "express";
 
 export const login = async (req:Request, res:Response) => {
+
   const { email, password } = req.body;
   console.log(email, password)
-  if (!email || !password) throw new HttpException(409, `Please provide email and password`);
+  if (!email || !password) return res.status(409).json({message: "Please provide email and password"});;
   const findUser:UserEntity = await UserEntity.findOne({ where: { email } });
   if (!findUser) return res.status(409).json({message: "User doesn't exist"});
 
