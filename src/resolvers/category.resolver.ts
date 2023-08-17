@@ -7,7 +7,7 @@ import { Arg, Args, Authorized, Mutation, Query, Resolver } from "type-graphql";
 @Resolver()
 export class CategoryResolver extends CategoryRepository{
 
-  @Authorized()
+  // @Authorized()
   @Query(() => Categories, {
     description: 'List All Categories',
   })
@@ -16,7 +16,7 @@ export class CategoryResolver extends CategoryRepository{
       return categories;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Category, {
     description: 'Create Category',
   })
@@ -25,7 +25,7 @@ export class CategoryResolver extends CategoryRepository{
     return category;
   }
 
-  @Authorized()
+  // @Authorized()
   @Query(() => Category, {
     description: "Get Category by Id, slug or name",
   })
@@ -34,7 +34,7 @@ export class CategoryResolver extends CategoryRepository{
     return category;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Category, {
     description: 'Remove Category',
   })
@@ -43,7 +43,7 @@ export class CategoryResolver extends CategoryRepository{
     return category;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Category, {
     description: 'Update Category',
   })
