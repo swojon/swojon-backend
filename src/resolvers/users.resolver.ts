@@ -5,7 +5,7 @@ import { User } from '@typedefs/users.type';
 
 @Resolver()
 export class UserResolver extends UserRepository {
-  @Authorized(["ADMIN"])
+  // @Authorized(["ADMIN"])
   @Query(() => [User], {
     description: 'User find list',
   })
@@ -14,7 +14,7 @@ export class UserResolver extends UserRepository {
     return users;
   }
 
-  @Authorized()
+  // @Authorized()
   @Query(() => User, {
     description: 'User find by id',
   })
@@ -31,7 +31,7 @@ export class UserResolver extends UserRepository {
     return user;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => User, {
     description: 'User update',
   })
@@ -58,7 +58,7 @@ export class UserResolver extends UserRepository {
     return user;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => User, {
     description: 'User delete',
   })

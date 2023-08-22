@@ -7,7 +7,7 @@ import { Arg, Args, Authorized, Mutation, Query, Resolver } from "type-graphql";
 @Resolver()
 export class BrandResolver extends BrandRepository{
 
-  @Authorized()
+  // @Authorized()
   @Query(() => Brands, {
     description: 'List All Brands',
   })
@@ -16,9 +16,9 @@ export class BrandResolver extends BrandRepository{
       return brands;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Brand, {
-    description: 'Create Category',
+    description: 'Create Brand',
   })
   async createBrand(@Arg('brandData') brandData : BrandCreateDTO): Promise<Brand> {
     const brand: Brand = await this.brandAdd(brandData);
@@ -34,7 +34,7 @@ export class BrandResolver extends BrandRepository{
   //   return category;
   // }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(()=>Brand, {
     description: "Add category of brand"
   })
@@ -42,8 +42,8 @@ export class BrandResolver extends BrandRepository{
     const brand: Brand = await this.brandCategoryAdd(inputData.brandId, inputData.categoryIds)
     return brand
   }
-
-  @Authorized()
+//
+  // @Authorized()
   @Mutation(()=>Brand, {
     description: "Remove category of brand"
   })
@@ -53,7 +53,7 @@ export class BrandResolver extends BrandRepository{
   }
 
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Brand, {
     description: 'Remove Category',
   })
@@ -62,7 +62,7 @@ export class BrandResolver extends BrandRepository{
     return brand;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Brand, {
     description: 'Update Brand',
   })
