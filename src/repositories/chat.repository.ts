@@ -71,6 +71,26 @@ export class ChatMessageRepository{
       return chatRooms;
   }
 
+  public async chatRoomListAdmin(): Promise<ChatRoomsWithMessage>{
+    // const findUser: UserEntity = await UserEntity.findOne({ where: { id: userId} });
+    // if (!findUser) throw new HttpException(409, "User doesn't exist");
+
+    // const chatRoomMembers:any = await ChatRoomMemberEntity.createQueryBuilder("chat_room_member_entity")
+    //                                   .select(["chat_room_member_entity.chatRoom"])
+    //                                   .leftJoinAndSelect('chat_room_member_entity.chatRoom', 'chatRoom')
+    //                                   .where("chat_room_member_entity.userId = :id", { id: userId }).getManyAndCount()
+
+    const chatRoomMembers: [ChatRoomMemberEntity[], number ] =  await ChatRoomMemberEntity.findAndCount({ relations:["chatRoom", "user"] });
+    console.log(chatRoomMembers);
+
+    // const chatRoomMessages:any  = await ChatMessageEntity.find({ where: { chatRoom: In(chatRoomMembers) } }) //not efficient, what if a user have vast amount of message?
+    const chatRooms: ChatRooms = {
+      items: await Promise.all( chatRoomMembers[0].map(async chatRoomMember => ({ ...chatRoomMember.chatRoom, messages: await ChatMessageEntity.find({ where: { chatRoom: chatRoomMember.chatRoom }, relations:["sender"]}) }) ) ),
+      count: chatRoomMembers[1],
+    }
+    return chatRooms;
+}
+
 
 //   public async chatRoomList(userId: number): Promise<ChatRoomsWithMessage>{
 //     const findUser: UserEntity = await UserEntity.findOne({ where: { id: userId} });

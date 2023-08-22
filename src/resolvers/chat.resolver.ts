@@ -39,4 +39,15 @@ export class ChatResolver extends ChatMessageRepository {
     return chatRooms;
   }
 
+
+ // @Authorized() Only admin & Moderator can access this
+ @Query(() => ChatRoomsWithMessage, {
+  description: "List All Chat Rooms of a User with message",
+  })
+  async listChatRoomsAdmin(@Args(){userId}: ListChatRoomArgs): Promise<ChatRoomsWithMessage> {
+
+    const chatRooms = await this.chatRoomListAdmin();
+    return chatRooms;
+  }
+
 }
