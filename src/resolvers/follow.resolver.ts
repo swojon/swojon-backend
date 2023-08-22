@@ -5,7 +5,7 @@ import { Follow, Followers } from '@/typedefs/follow.type';
 
 @Resolver()
 export class FollowResolver extends FollowRepository {
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Followers, {
     description: 'List All Followerer',
   })
@@ -15,7 +15,7 @@ export class FollowResolver extends FollowRepository {
 
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Followers, {
     description: 'List All Following',
   })
@@ -24,7 +24,7 @@ export class FollowResolver extends FollowRepository {
     return following;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Follow, {
     description: 'Follow user',
   })
@@ -33,7 +33,7 @@ export class FollowResolver extends FollowRepository {
     return follow;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Follow, {
     description: 'Unfollow user',
   })

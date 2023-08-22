@@ -7,7 +7,7 @@ import { CommunityArgs, CommunityCreateDTO, CommunityUpdateDTO } from '@/dtos/co
 @Resolver()
 export class CommunityResolver extends CommunityRepository {
 
-  @Authorized()
+  // @Authorized()
   @Query(() => Communities, {
     description: 'List All Communities',
   })
@@ -16,7 +16,7 @@ export class CommunityResolver extends CommunityRepository {
     return communities;
   }
 
-  @Authorized()
+  // @Authorized()
   @Query(() => Community, {
     description: "Get Community by Id, slug or name",
   })
@@ -25,7 +25,7 @@ export class CommunityResolver extends CommunityRepository {
     return community;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Community, {
     description: 'Create Community',
   })
@@ -34,7 +34,7 @@ export class CommunityResolver extends CommunityRepository {
     return community;
   }
 
-  @Authorized()
+  // @Authorized()
   @Query(() => Community, {
     description: 'Find Community by Id',
   })
@@ -43,7 +43,7 @@ export class CommunityResolver extends CommunityRepository {
     return community;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Community, {
     description: 'Update Community',
   })

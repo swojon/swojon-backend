@@ -9,7 +9,7 @@ import { TOPICS_ENUM } from "./subscription.resolver";
 @Resolver()
 export class ChatResolver extends ChatMessageRepository {
 
-  @Authorized()
+  // @Authorized()
   @Query(() => Chats, {
     description: 'List All Chat Messages',
   })
@@ -18,7 +18,7 @@ export class ChatResolver extends ChatMessageRepository {
     return chatMessages;
   }
 
-  @Authorized()
+  // @Authorized()
   @Mutation(() => Chat, {
     description: 'Send Chat Message',
   })
@@ -29,7 +29,7 @@ export class ChatResolver extends ChatMessageRepository {
     return chatMessage;
   }
 
-  @Authorized()
+  // @Authorized()
   @Query(() => ChatRoomsWithMessage, {
     description: "List All Chat Rooms of a User with message",
   })
