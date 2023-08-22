@@ -44,7 +44,7 @@ export class ChatResolver extends ChatMessageRepository {
  @Query(() => ChatRoomsWithMessage, {
   description: "List All Chat Rooms of a User with message",
   })
-  async listChatRoomsAdmin(@Args(){userId}: ListChatRoomArgs): Promise<ChatRoomsWithMessage> {
+  async listChatRoomsAdmin(): Promise<ChatRoomsWithMessage> {
 
     const chatRooms = await this.chatRoomListAdmin();
     return chatRooms;
