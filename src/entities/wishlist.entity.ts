@@ -1,7 +1,7 @@
 import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { CommunityEntity } from "./community.entity";
-import { ProductEntity } from "./product.entity";
+import { ListingEntity } from "./listing.entity";
 
 
 //entity for saving the medias of a listing
@@ -18,8 +18,8 @@ export class WishListEntity extends BaseEntity{
     user: UserEntity;
 
     //many to one relationship with listing
-    @ManyToOne(() => ProductEntity)
-    listing: ProductEntity;
+    @ManyToOne(() => ListingEntity)
+    listing: ListingEntity;
 
     //column for isDeleted, not empty
     @Column({default: false})

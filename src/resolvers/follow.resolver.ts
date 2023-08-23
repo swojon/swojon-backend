@@ -6,7 +6,7 @@ import { Follow, Followers } from '@/typedefs/follow.type';
 @Resolver()
 export class FollowResolver extends FollowRepository {
   // @Authorized()
-  @Mutation(() => Followers, {
+  @Query(() => Followers, {
     description: 'List All Followerer',
   })
   async listFollowers(@Arg('userId') userId: number): Promise<Followers> {
@@ -16,7 +16,7 @@ export class FollowResolver extends FollowRepository {
   }
 
   // @Authorized()
-  @Mutation(() => Followers, {
+  @Query(() => Followers, {
     description: 'List All Following',
   })
   async listFollowing(@Arg('userId') userId: number): Promise<Followers> {

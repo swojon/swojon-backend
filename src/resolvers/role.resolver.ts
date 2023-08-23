@@ -10,7 +10,7 @@ import { CreateRoleDTO } from '@/dtos/role.dto';
 export class RoleResolver extends RoleRepository {
   // @Authorized()
   @Query(() => [Role], {
-    description: 'List ALl Role',
+    description: 'List All Role',
   })
   async getRoles(): Promise<Role[]> {
     const roles: Role[] = await this.roleFindAll();

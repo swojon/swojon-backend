@@ -1,7 +1,7 @@
 import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { CommunityEntity } from "./community.entity";
-import { ProductEntity } from "./product.entity";
+import { ListingEntity } from "./listing.entity";
 
 //entty for review of a seller
 @Entity()
@@ -19,8 +19,8 @@ export class SellerReviewEntity extends BaseEntity{
       seller: UserEntity;
 
       //relation with listing
-      @ManyToOne(() => ProductEntity)
-      listing: ProductEntity;
+      @ManyToOne(() => ListingEntity)
+      listing: ListingEntity;
 
       //column for review, not empty
       @Column()

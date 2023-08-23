@@ -1,14 +1,13 @@
 
-import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { CommunityEntity } from "./community.entity";
-import { ListingMediaEntity } from "./productMedia.entity";
-import { on } from "events";
 import { CategoryEntity } from "./category.entity";
+import { BrandEntity } from "./brand.entity";
 
 //entity for listing
 @Entity()
-export class ProductEntity extends BaseEntity{
+export class ListingEntity extends BaseEntity{
 
     //column for id, primary key, generated
     @PrimaryGeneratedColumn()
@@ -20,33 +19,35 @@ export class ProductEntity extends BaseEntity{
 
     //one listing can belong to many communities
     @ManyToMany(() => CommunityEntity)
-    @JoinColumn()
+    @JoinTable()
     communities: CommunityEntity[];
-
 
     //column for title, not empty
     @Column()
     title: string;
 
     //column for description, not empty
-    @Column()
+    @Column({nullable:true})
     description: string;
+
+    // @Column({type: "jsonb"})
+    // metadata: {};
 
     //column for price, not empty
     @Column()
     price: number;
 
     //column for location, not empty
-    @Column()
+    @Column({nullable:true})
     location: string;
 
     //column for latitude, not empty
-    @Column()
-    latitude: number;
+    @Column({nullable:true})
+    latitude: string;
 
     //column for longitude, not empty
-    @Column()
-    longitude: number;
+    @Column({nullable:true})
+    longitude: string;
 
     //column for isLive, not empty
     @Column({default: false})
@@ -56,46 +57,25 @@ export class ProductEntity extends BaseEntity{
     @Column({default: false})
     isFeatured: boolean;
 
-    //column for isSponsored, not empty
-    @Column({default: false})
-    isSponsored: boolean;
+    @ManyToOne(() => CategoryEntity)
+    category: CategoryEntity;
 
-    //image for listing, a posting can contain multiple images from listingMedia
-    //one to many relationship with listingMedia
-    @OneToMany(
-        () => ListingMediaEntity,
-        (listingMedia: ListingMediaEntity) => listingMedia.listing,
-        {cascade: true}
-    )
-    listingMedia: ListingMediaEntity[];
+    @ManyToOne(()=> BrandEntity, {nullable:true})
+    brand:BrandEntity;
 
-    //column for isApproved, not empty
     @Column({default: false})
     isApproved: boolean;
 
-    //column for isDeleted, not empty
     @Column({default: false})
     isDeleted: boolean;
 
-    //column for date created, not empty
-    @Column({nullable: true})
+    @CreateDateColumn()
     dateCreated: Date;
 
-    //column for date updated, not empty
-    @Column({nullable: true})
-    dateUpdated: Date;
-
-    //column for date deleted, not empty
     @Column({nullable: true})
     dateDeleted: Date;
 
-   @ManyToOne(() => CategoryEntity)
-    category: CategoryEntity;
-
-    //column for isSold, not empty
     @Column({default: false})
     isSold: boolean;
-
-
 
 }

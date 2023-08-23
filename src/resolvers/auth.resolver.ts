@@ -1,4 +1,4 @@
-import { Authorized, Arg, Ctx, Mutation, Resolver } from 'type-graphql';
+import { Authorized, Arg, Ctx, Mutation, Resolver, Query } from 'type-graphql';
 import { CreateUserDto } from '@dtos/users.dto';
 import { AuthRepository } from '@repositories/auth.repository';
 import { User } from '@typedefs/users.type';
@@ -16,7 +16,7 @@ export class AuthResolver extends AuthRepository {
     return user;
   }
 
-  @Mutation(() => TokenUserData, {
+  @Query(() => TokenUserData, {
     description: 'User login',
   })
   async login(@Arg('userData') userData: CreateUserDto, @Ctx() ctx: MyContext): Promise<{}> {
@@ -25,7 +25,7 @@ export class AuthResolver extends AuthRepository {
   }
 
   @Authorized()
-  @Mutation(() => User, {
+  @Query(() => User, {
     description: 'User logout',
   })
   async logout(@Ctx('user') userData: any): Promise<User> {
