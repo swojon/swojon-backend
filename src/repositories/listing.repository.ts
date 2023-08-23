@@ -27,6 +27,8 @@ export class ListingRepository{
     let communities: CommunityEntity[] = [];
     let brand: BrandEntity|null = null;
     const findUser: UserEntity = await UserEntity.findOne({ where: { id: userId} });
+    if (!findUser)  throw new HttpException(409, `User with id ${userId} does not exist`);
+
 
     if (listingData.brandId){
       console.log(listingData.brandId)
