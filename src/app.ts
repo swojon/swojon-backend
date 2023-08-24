@@ -43,6 +43,7 @@ import { SubscriptionResolver } from './resolvers/subscription.resolver';
 import { UserResolver } from './resolvers/users.resolver';
 import { BrandResolver } from './resolvers/brand.resolver';
 import { ListingResolver } from './resolvers/listing.resolver';
+import { FavoriteResolver } from './resolvers/favorite.resolver';
 // const redis = new Redis({
 //   port: 6379,
 //   host: 'localhost',
@@ -95,7 +96,7 @@ const schema = await buildSchema({
   resolvers: [
     AuthResolver, CategoryResolver, ProfileResolver, RoleResolver, FollowResolver,
     CommunityResolver, CommunityMemberResolver, CategoryResolver, ChatResolver,
-     SubscriptionResolver, UserResolver, BrandResolver, ListingResolver
+     SubscriptionResolver, UserResolver, BrandResolver, ListingResolver, FavoriteResolver,
 
   ],
   pubSub: pubSub,

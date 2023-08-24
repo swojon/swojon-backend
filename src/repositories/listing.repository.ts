@@ -7,7 +7,6 @@ import { ListingEntity } from "@/entities/listing.entity";
 import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Listing, Listings } from "@/interfaces/listing.interface";
-
 import { EntityRepository, In } from "typeorm";
 
 
@@ -91,44 +90,43 @@ export class ListingRepository{
 
   }
 
-  // public async brandCategoryAdd(brandId:number, categorieIds:number[]): Promise<Brand>{
-  //   const findBrand:BrandEntity = await BrandEntity.findOne({
-  //     where: {id: brandId},
-  //     relations: ["categories"]
-  //   })
-  //   const CategoriesIdToAdd:number[] = categorieIds.filter(catId => findBrand.categories.filter(cat=> cat.id !== catId))
-  //   // console.log(CategoriesIdToAdd)
-  //   if (!CategoriesIdToAdd) throw new HttpException(409, "No Categories To Add")
-  //   console.log(CategoriesIdToAdd)
+  public async listingCommunityAdd(listingId:number, communityIds:number[]): Promise<Listing>{
+    const findListing:ListingEntity = await ListingEntity.findOne({
+      where: {id: listingId},
+      relations: ["communities"]
+    })
+    const communitiesToAdd:number[] = communityIds.filter(comId => findListing.communities.filter(com=> com.id !== comId))
+    // console.log(communitiesToAdd)
+    if (!communitiesToAdd) throw new HttpException(409, "No Categories To Add")
+    console.log(communitiesToAdd)
 
-  //   const CategoriesToAdd: CategoryEntity[] = await CategoryEntity.find({where: {id: In(CategoriesIdToAdd)}});
-  //   // console.log(CategoriesToAdd)
-  //   console.log(CategoriesToAdd)
-  //   findBrand.categories = [...findBrand.categories, ...CategoriesToAdd]
-  //   const SavedBrand = await BrandEntity.save(findBrand)
+    const communitiesEntityToAd: CommunityEntity[] = await CommunityEntity.find({where: {id: In(communitiesToAdd)}});
+    // console.log(communitiesEntityToAd)
+    console.log(communitiesEntityToAd)
+    findListing.communities = [...findListing.communities, ...communitiesEntityToAd]
+    const savedListing = await ListingEntity.save(findListing)
+    return savedListing
+  }
 
-  //   return SavedBrand
-  // }
-
-  // public async brandCategoryRemove(brandId: number, categories:number[]):Promise<Brand>{
-  //   const findBrand:BrandEntity = await BrandEntity.findOne({
-  //     where: {id: brandId},
-  //     relations: ["categories"]
-  //   })
-  //   findBrand.categories = findBrand.categories.filter(cat => !categories.includes(cat.id))
-  //   const SavedBrand = await BrandEntity.save(findBrand)
-  //   return SavedBrand
-  // }
+  public async listingCommunityRemove(listingId:number, communityIds:number[]):Promise<Listing>{
+    const findListing:ListingEntity = await ListingEntity.findOne({
+      where: {id: listingId},
+      relations: ["communities"]
+    })
+    findListing.communities = findListing.communities.filter(com => !communityIds.includes(com.id))
+    const savedListing = await ListingEntity.save(findListing)
+    return savedListing
+  }
 
 
-  // public async brandRemove(brandId: number): Promise<Brand> {
-  //   const findBrand: BrandEntity = await BrandEntity.findOne({ where: { id: brandId } });
-  //   if (!findBrand) throw new HttpException(409, `Brand with id ${brandId} does not exist`);
+  public async listingRemove(listingId: number): Promise<Listing> {
+    const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId } });
+    if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
 
-  //   await CategoryEntity.delete({ id: brandId });
+    await ListingEntity.delete({ id: listingId });
 
-  //   return findBrand;
-  // }
+    return findListing;
+  }
 
   // public async categoryFind(categoryArgs: CategoryArgs): Promise<CategoryEntity> {
   //   const findCategory: CategoryEntity = await CategoryEntity.findOne(

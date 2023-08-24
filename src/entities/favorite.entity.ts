@@ -1,8 +1,7 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
-import { CommunityEntity } from "./community.entity";
 import { ListingEntity } from "./listing.entity";
-// import { ListingEntity } from "./listing.entity";
+
 
 
 //entity for saving the medias of a listing
@@ -25,7 +24,7 @@ export class FavoriteEntity extends BaseEntity{
     isDeleted: boolean;
 
     //column for date created, not empty
-    @Column({nullable: true})
+    @CreateDateColumn()
     dateCreated: Date;
 
     //column for date updated, not empty

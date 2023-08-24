@@ -1,4 +1,4 @@
-import { ListingCreateDTO, ListingUpdateDTO } from "@/dtos/listing.dto";
+import { ListingCommunityInputDTO, ListingCreateDTO, ListingUpdateDTO } from "@/dtos/listing.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { ListingRepository } from "@/repositories/listing.repository";
 import { Listing, Listings } from "@/typedefs/listing.type";
@@ -26,15 +26,29 @@ export class ListingResolver extends ListingRepository{
     return listing;
   }
 
+  @Mutation(()=>Listing, {
+    description: "Add Communities to listing"
+  })
+  async addCommunityToListing(@Arg('inputData') inputData: ListingCommunityInputDTO): Promise<Listing> {
+      const listing: Listing  = await this.listingCommunityAdd(inputData.listingId, inputData.communityIds)
+      return listing
+  }
 
+  @Mutation(()=>Listing, {
+    description: "Remove Communities from listing"
+  })
+  async removeCommunityToListing(@Arg('inputData') inputData: ListingCommunityInputDTO): Promise<Listing> {
+      const listing: Listing  = await this.listingCommunityRemove(inputData.listingId, inputData.communityIds)
+      return listing
+  }
   // // @Authorized()
-  // @Mutation(() => Listing, {
-  //   description: 'Remove Listing',
-  // })
-  // async removeListing(@Arg('listingId') listingId: number): Promise<Listing> {
-  //   const listing: Listing = await this.listingRemove(listingId);
-  //   return listing;
-  // }
+  @Mutation(() => Listing, {
+    description: 'Remove Listing',
+  })
+  async removeListing(@Arg('listingId') listingId: number): Promise<Listing> {
+    const listing: Listing = await this.listingRemove(listingId);
+    return listing;
+  }
 
   // @Authorized()
   @Mutation(() => Listing, {

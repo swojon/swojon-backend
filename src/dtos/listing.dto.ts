@@ -75,3 +75,14 @@ export class ListingMediaCreateDTO{
 
 }
 
+
+
+@InputType()
+export class ListingCommunityInputDTO{
+  @Field()
+  listingId : number
+
+  @Field(()=>[Number], {nullable:true})
+  communityIds: number[]
+
+}
