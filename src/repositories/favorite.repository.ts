@@ -1,13 +1,8 @@
 import { FavoriteEntity } from "@/entities/favorite.entity";
-import { FollowEntity } from "@/entities/follow.entity";
 import { ListingEntity } from "@/entities/listing.entity";
 import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Favorite, FavoritedUsers, FavoriteListings } from "@/interfaces/favorite.interface";
-import { Follow, Following } from "@/interfaces/follow.interface";
-import { Follower } from "@/interfaces/Follower.interface";
-import { Listing } from "@/typedefs/listing.type";
-import { create } from "domain";
 import { EntityRepository } from "typeorm";
 
 
@@ -85,24 +80,6 @@ export class FavoriteRepository{
       items: findFavorites
     }
     return favorites;
-  }
-
-
-  public async followingList(userId: number): Promise<Follower>{
-    const follow = await FollowEntity.createQueryBuilder("follow_entity")
-            .select(["follow_entity.id", "follow_entity.isDeleted", "follow_entity.dateFollowed", "follow_entity.followedUserId", "follow_entity.userId"])
-            .leftJoinAndSelect('follow_entity.followedUser', 'user')
-           .where("follow_entity.userId = :id", { id: userId }).printSql().getManyAndCount()
-
-    const findFollowing :UserEntity[] = follow[0].map((follow) => follow.followedUser);
-    const count: number = follow[1];
-
-    const follower: Follower = {
-      count: count,
-      items: findFollowing
-    }
-
-    return follower;
   }
 
 }

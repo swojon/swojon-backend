@@ -1,7 +1,7 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "./users.entity";
-import { CommunityEntity } from "./community.entity";
 import { ListingEntity } from "./listing.entity";
+import { Float } from "type-graphql";
 
 //entty for review of a seller
 @Entity()
@@ -13,7 +13,7 @@ export class SellerReviewEntity extends BaseEntity{
 
       //many to one relationship with user
       @ManyToOne(() => UserEntity)
-      user: UserEntity;
+      reviewer: UserEntity;
 
       @ManyToOne(() => UserEntity)
       seller: UserEntity;
@@ -23,11 +23,11 @@ export class SellerReviewEntity extends BaseEntity{
       listing: ListingEntity;
 
       //column for review, not empty
-      @Column()
+      @Column({nullable:true})
       review: string;
 
       //column for rating, not empty
-      @Column()
+      @Column({type: "decimal", precision: 10, scale: 2, default: 0})
       rating: number;
 
       //column for isDeleted, not empty
@@ -35,11 +35,11 @@ export class SellerReviewEntity extends BaseEntity{
       isDeleted: boolean;
 
       //column for date created, not empty
-      @Column({nullable: true})
+      @CreateDateColumn()
       dateCreated: Date;
 
       //column for date updated, not empty
-      @Column({nullable: true})
+      @UpdateDateColumn()
       dateUpdated: Date;
 
     }
