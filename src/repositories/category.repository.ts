@@ -1,10 +1,9 @@
 import { CategoryArgs, CategoryCreateDTO, CategoryUpdateDTO } from "@/dtos/category.dto";
-import { CategoryEntity } from "@/entities/category.entity";
+import { CategoryEntity, Status } from "@/entities/category.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Categories, Category } from "@/interfaces/category.interface";
+import { registerEnumType } from "type-graphql";
 import { EntityRepository } from "typeorm";
-
-
 
 @EntityRepository(CategoryEntity)
 export class CategoryRepository{
@@ -27,7 +26,7 @@ export class CategoryRepository{
     const findCategories = await CategoryEntity.findAndCount(
       {
         select: ["id", "name", "slug", "description", "banner",
-          "isLive", "isApproved", "isFeatured", "isSponsored", "isGlobal", "parentCategory"],
+          "status", "isFeatured", "isSponsored", "isGlobal", "parentCategory"],
         relations: ['parentCategory'],
       }
     );

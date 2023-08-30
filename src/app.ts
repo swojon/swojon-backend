@@ -45,6 +45,7 @@ import { BrandResolver } from './resolvers/brand.resolver';
 import { ListingResolver } from './resolvers/listing.resolver';
 import { FavoriteResolver } from './resolvers/favorite.resolver';
 import { SellerReviewResolver } from './resolvers/sellerReview.resolver';
+import { LocationResolver } from './resolvers/location.resolver';
 // const redis = new Redis({
 //   port: 6379,
 //   host: 'localhost',
@@ -96,7 +97,7 @@ console.log("Initializing apollo server")
 const schema = await buildSchema({
   resolvers: [
     AuthResolver, CategoryResolver, ProfileResolver, RoleResolver, FollowResolver,
-    CommunityResolver, CommunityMemberResolver, CategoryResolver, ChatResolver,
+    CommunityResolver, CommunityMemberResolver, CategoryResolver, LocationResolver, ChatResolver,
      SubscriptionResolver, UserResolver, BrandResolver, ListingResolver, FavoriteResolver,
     SellerReviewResolver,
   ],

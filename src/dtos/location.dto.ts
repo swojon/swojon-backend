@@ -1,13 +1,8 @@
-import { Status } from "@/entities/category.entity";
-import { ArgsType, Field, InputType, registerEnumType } from "type-graphql";
+import { ArgsType, Field, InputType } from "type-graphql";
 
-registerEnumType(Status, {
-  name: "Status",
-  description: "ENUM for Category Status"
-})
 
 @InputType()
-export class CategoryCreateDTO {
+export class LocationCreateDTO {
     @Field()
     name: string;
 
@@ -21,11 +16,11 @@ export class CategoryCreateDTO {
     banner?: string;
 
     @Field({ nullable: true})
-    parentCategoryId?: number;
+    parentLocationId?: number;
 }
 
 @InputType()
-export class CategoryUpdateDTO {
+export class LocationUpdateDTO {
     @Field({ nullable: true})
     name?: string;
 
@@ -39,10 +34,10 @@ export class CategoryUpdateDTO {
     banner?: string;
 
     @Field({ nullable: true})
-    parentCategoryId?: number;
+    parentLocationId?: number;
 
-    @Field(type=>Status, { nullable: true})
-    status?: Status;
+    @Field({ nullable: true})
+    isLive?: boolean;
 
     @Field({ nullable: true})
     isApproved?: boolean;
@@ -60,7 +55,7 @@ export class CategoryUpdateDTO {
 
 
 @ArgsType()
-export class CategoryArgs {
+export class LocationArgs {
   @Field({ nullable: true})
   id?: number;
 

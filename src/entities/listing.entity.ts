@@ -4,6 +4,13 @@ import { UserEntity } from "./users.entity";
 import { CommunityEntity } from "./community.entity";
 import { CategoryEntity } from "./category.entity";
 import { BrandEntity } from "./brand.entity";
+import { LocationEntity } from "./location.entity";
+
+export enum Status {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected"
+}
 
 //entity for listing
 @Entity()
@@ -38,8 +45,8 @@ export class ListingEntity extends BaseEntity{
     price: number;
 
     //column for location, not empty
-    @Column({nullable:true})
-    location: string;
+    @ManyToOne(()=>LocationEntity, {nullable:true})
+    location: LocationEntity;
 
     //column for latitude, not empty
     @Column({nullable:true})
@@ -49,7 +56,6 @@ export class ListingEntity extends BaseEntity{
     @Column({nullable:true})
     longitude: string;
 
-    //column for isLive, not empty
     @Column({default: false})
     isLive: boolean;
 
@@ -63,8 +69,15 @@ export class ListingEntity extends BaseEntity{
     @ManyToOne(()=> BrandEntity, {nullable:true})
     brand:BrandEntity;
 
-    @Column({default: false})
-    isApproved: boolean;
+    @Column({
+      type:"enum",
+      enum: Status,
+      default:Status.PENDING
+    })
+    status: Status;
+
+    @Column({nullable:true})
+    rejectReason: string;
 
     @Column({default: false})
     isDeleted: boolean;

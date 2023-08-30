@@ -1,14 +1,10 @@
 import { IsNotEmpty } from "class-validator";
 import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-export enum Status {
-  PENDING = "pending",
-  APPROVED = "approved",
-  REJECTED = "rejected"
-}
+
 
 @Entity()
-export class CategoryEntity extends BaseEntity{
+export class LocationEntity extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -17,9 +13,9 @@ export class CategoryEntity extends BaseEntity{
     @IsNotEmpty()
     name: string;
 
-    //parent category foreign key
-    @ManyToOne(type => CategoryEntity, category => category.parentCategory, {onDelete: 'CASCADE'})
-    parentCategory: CategoryEntity;
+    //parent location foreign key
+    @ManyToOne(type => LocationEntity, location => location.parentLocation, {onDelete: 'CASCADE'})
+    parentLocation: LocationEntity;
 
     //column for slug, unique, not empty
     @Column()
@@ -34,15 +30,11 @@ export class CategoryEntity extends BaseEntity{
     @Column({nullable: true})
     banner: string;
 
-    @Column({
-      type:"enum",
-      enum: Status,
-      default:Status.PENDING
-    })
-    status: Status;
+    @Column({default: false})
+    isLive: boolean;
 
-    @Column({nullable:true})
-    rejectReason: string;
+    @Column({default: false})
+    isApproved: boolean;
 
     @Column({default: false})
     isFeatured: boolean;

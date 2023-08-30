@@ -1,3 +1,5 @@
+import { Status } from "@/entities/category.entity";
+
 export interface Category {
   id?: number;
   name?: string;
@@ -6,7 +8,7 @@ export interface Category {
   banner?: string;
   parentCategory?: Category;
   children?: Category[] |null;
-  isLive?: boolean;
+  status?: Status;
   isApproved?: boolean;
   isFeatured?: boolean;
   isSponsored?: boolean;

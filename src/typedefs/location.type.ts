@@ -1,15 +1,8 @@
-import { Status } from "@/entities/category.entity";
-import { Field, ObjectType, registerEnumType } from "type-graphql";
-
-
-registerEnumType(Status, {
-  name: "Status",
-  description: "ENUM for Category Status"
-})
+import { Field, ObjectType } from "type-graphql";
 
 
 @ObjectType()
-export class Category {
+export class Location {
   @Field()
   id?: number;
 
@@ -26,13 +19,13 @@ export class Category {
   banner?: string;
 
   @Field({ nullable: true})
-  parentCategory?:Category;
+  parentLocation?:Location;
 
-  @Field(()=> [Category], {nullable: true})
-  children?:Category[]
+  @Field(()=> [Location], {nullable: true})
+  children?:Location[]
 
-  @Field(type=>Status, { nullable: true})
-  status?: Status ;
+  @Field({ nullable: true})
+  isLive?: boolean;
 
   @Field({ nullable: true})
   isApproved?: boolean;
@@ -50,7 +43,7 @@ export class Category {
 
 
 @ObjectType()
-export class Categories {
-  @Field(type => [Category])
-  items?: Category[];
+export class Locations {
+  @Field(type => [Location])
+  items?: Location[];
 }
