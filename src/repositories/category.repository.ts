@@ -82,6 +82,13 @@ export class CategoryRepository{
     const category: CategoryEntity = await CategoryEntity.findOne({ where: { id: categoryId } });
     if (!category) throw new HttpException(409, `Category with id ${categoryId} does not exist`);
 
+    if (categoryData.parentCategoryId){
+      const parentCategory:CategoryEntity = await CategoryEntity.findOne({where: {id: categoryData.parentCategoryId}})
+      if (!parentCategory) throw new HttpException(409, `Parent Category with id ${categoryId} does not exist`);
+      delete categoryData.parentCategoryId
+      categoryData["parentCategory"] = parentCategory
+    }
+
     await CategoryEntity.update({ id: categoryId }, categoryData);
 
     const updatedCategory: CategoryEntity = await CategoryEntity.findOne({ where: { id: categoryId }, relations: ['parentCategory'] });
