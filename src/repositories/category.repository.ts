@@ -9,8 +9,6 @@ import { EntityRepository, LessThan, MoreThan } from "typeorm";
 export class CategoryRepository{
 
   public async categoryList(paging: PagingArgs ): Promise<Categories> {
-
-
     const getCategoryTree = (categories:CategoryEntity[], target: Category|null):Category[] =>{
       let cats = categories.filter(cat => target === null? cat.parentCategory === null: cat.parentCategory?.id === target.id)
       const categoryList:Category[] = []
@@ -55,14 +53,14 @@ export class CategoryRepository{
     const findCategories = await sql.getManyAndCount()
 
     const categoryList = findCategories[0]
-    const categoryTree: Category[] =  getCategoryTree(categoryList, null)
+    // const categoryTree: Category[] =  getCategoryTree(categoryList, null)
 
     const hasMore = categoryList.length === limit;
 
     // const prevCursor = paging.starting_after? paging.starting_after: paging.ending_before? paging.ending_before: null
     // const nextCursor = categoryList[categoryList.length -1].id
 
-    return {items: categoryTree, hasMore: hasMore}
+    return {items: categoryList, hasMore: hasMore}
 
   }
 
