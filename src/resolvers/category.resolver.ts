@@ -1,5 +1,5 @@
 
-import { CategoryArgs, CategoryCreateDTO, CategoryUpdateDTO } from "@/dtos/category.dto";
+import { CategoryArgs, CategoryCreateDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
 import { CategoryRepository } from "@/repositories/category.repository";
 import { Categories, Category } from "@/typedefs/category.type";
 import { Arg, Args, Authorized, Mutation, Query, Resolver } from "type-graphql";
@@ -11,8 +11,8 @@ export class CategoryResolver extends CategoryRepository{
   @Query(() => Categories, {
     description: 'List All Categories',
   })
-  async listCategories(): Promise<Categories> {
-      const categories: Categories = await this.categoryList();
+  async listCategories(@Args() paging: PagingArgs): Promise<Categories> {
+      const categories: Categories = await this.categoryList(paging);
       return categories;
   }
 

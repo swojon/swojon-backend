@@ -7,7 +7,6 @@ registerEnumType(Status, {
   description: "ENUM for Category Status"
 })
 
-
 @ObjectType()
 export class Category {
   @Field()
@@ -53,4 +52,8 @@ export class Category {
 export class Categories {
   @Field(type => [Category])
   items?: Category[];
+
+  @Field({nullable:true})
+  hasMore?:boolean;
+
 }

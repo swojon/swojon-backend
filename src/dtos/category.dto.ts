@@ -70,3 +70,15 @@ export class CategoryArgs {
   @Field({ nullable: true})
   slug?: string;
 }
+
+@ArgsType()
+export class PagingArgs{
+  @Field({ nullable: true})
+  ending_before?:number;
+
+  @Field({ nullable: true})
+  starting_after?:number;
+
+  @Field({ nullable: true})
+  limit?:number;
+}
