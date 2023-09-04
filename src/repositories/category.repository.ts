@@ -9,18 +9,7 @@ import { EntityRepository, LessThan, MoreThan } from "typeorm";
 export class CategoryRepository{
 
   public async categoryList(paging: PagingArgs ): Promise<Categories> {
-    const getCategoryTree = (categories:CategoryEntity[], target: Category|null):Category[] =>{
-      let cats = categories.filter(cat => target === null? cat.parentCategory === null: cat.parentCategory?.id === target.id)
-      const categoryList:Category[] = []
 
-      cats.forEach(cat => {
-        categoryList.push({
-          ...cat,
-          children: getCategoryTree(categories, cat)
-        })
-      });
-      return categoryList
-    }
 
     // const findCategories : [CategoryEntity[], number] = await CategoryEntity.findAndCount(
     //   {
@@ -35,6 +24,7 @@ export class CategoryRepository{
     let sql = CategoryEntity.createQueryBuilder("category_entity")
                     .select(["category_entity.id", "category_entity.name", "category_entity.slug", "category_entity.description", "category_entity.banner", "category_entity.status", "category_entity.isFeatured", "category_entity.isSponsored", "category_entity.isGlobal"])
                     .leftJoinAndSelect('category_entity.parentCategory', 'parentCategory')
+                    .orderBy('category_entity.id', 'ASC')
 
     if (paging.starting_after){
       sql = sql.where("category_entity.id > :starting_after", {starting_after: paging.starting_after})
