@@ -58,6 +58,12 @@ export class CategoryUpdateDTO {
 
 }
 
+@InputType()
+export class CategoryRemoveDTO {
+  @Field(() => [Number])
+  categoryIds: number[]
+
+}
 
 @ArgsType()
 export class CategoryArgs {

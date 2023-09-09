@@ -13,6 +13,8 @@ export interface Category {
   isFeatured?: boolean;
   isSponsored?: boolean;
   isGlobal?: boolean;
+  isDeleted?: boolean;
+
 }
 
 export interface Categories {

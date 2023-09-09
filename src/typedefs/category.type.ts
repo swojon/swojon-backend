@@ -45,6 +45,9 @@ export class Category {
   @Field({ nullable: true})
   isGlobal?: boolean;
 
+  @Field({ nullable: true})
+  isDeleted?: boolean;
+
 }
 
 

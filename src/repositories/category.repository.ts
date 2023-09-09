@@ -1,9 +1,9 @@
-import { CategoryArgs, CategoryCreateDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
+import { CategoryArgs, CategoryCreateDTO, CategoryRemoveDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
 import { CategoryEntity, Status } from "@/entities/category.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Categories, Category } from "@/interfaces/category.interface";
 import { registerEnumType } from "type-graphql";
-import { EntityRepository, LessThan, MoreThan } from "typeorm";
+import { EntityRepository, In, LessThan, MoreThan, UpdateResult } from "typeorm";
 
 @EntityRepository(CategoryEntity)
 export class CategoryRepository{
@@ -22,7 +22,9 @@ export class CategoryRepository{
     // );
 
     let sql = CategoryEntity.createQueryBuilder("category_entity")
-                    .select(["category_entity.id", "category_entity.name", "category_entity.slug", "category_entity.description", "category_entity.banner", "category_entity.status", "category_entity.isFeatured", "category_entity.isSponsored", "category_entity.isGlobal"])
+                    .select(["category_entity.id", "category_entity.name", "category_entity.slug", "category_entity.description",
+                             "category_entity.banner", "category_entity.status", "category_entity.isFeatured",
+                             "category_entity.isSponsored", "category_entity.isGlobal",  "category_entity.isDeleted"])
                     .leftJoinAndSelect('category_entity.parentCategory', 'parentCategory')
                     .orderBy('category_entity.id', 'ASC')
 
@@ -79,6 +81,17 @@ export class CategoryRepository{
 
     return findCategory;
   }
+
+  public async categoriesRemove(categoryData: CategoryRemoveDTO): Promise<Categories> {
+    const categoryIds = categoryData.categoryIds
+    const updatedResult: UpdateResult = await CategoryEntity.update({id: In(categoryData.categoryIds)}, { isDeleted: true });
+    const findCategories: CategoryEntity[] = await CategoryEntity.find({
+      select: ["id", "name", "slug", "description", "banner", 'status', 'isDeleted', 'isFeatured', 'isGlobal', 'isDeleted'],
+      relations: ["parentCategory"],
+      where: {id: In(categoryData.categoryIds)}
+    })
+    return {items: findCategories}
+}
 
   public async categoryFind(categoryArgs: CategoryArgs): Promise<CategoryEntity> {
     const findCategory: CategoryEntity = await CategoryEntity.findOne(

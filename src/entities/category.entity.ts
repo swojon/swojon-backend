@@ -53,4 +53,7 @@ export class CategoryEntity extends BaseEntity{
     @Column({default: false})
     isGlobal: boolean;
 
+    @Column ({default: false})
+    isDeleted: boolean;
+
 }

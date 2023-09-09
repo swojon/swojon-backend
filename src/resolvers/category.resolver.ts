@@ -1,5 +1,5 @@
 
-import { CategoryArgs, CategoryCreateDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
+import { CategoryArgs, CategoryCreateDTO, CategoryRemoveDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
 import { CategoryRepository } from "@/repositories/category.repository";
 import { Categories, Category } from "@/typedefs/category.type";
 import { Arg, Args, Authorized, Mutation, Query, Resolver } from "type-graphql";
@@ -42,6 +42,16 @@ export class CategoryResolver extends CategoryRepository{
     const category: Category = await this.categoryRemove(categoryId);
     return category;
   }
+
+  // @Authorized()
+  @Mutation(() => Categories, {
+    description: 'Remove Categories',
+  })
+  async removeCategories(@Arg('categoryData') categoryData: CategoryRemoveDTO): Promise<Categories> {
+    const categories: Categories = await this.categoriesRemove(categoryData);
+    return categories;
+  }
+
 
   // @Authorized()
   @Mutation(() => Category, {
