@@ -57,16 +57,24 @@ export class BrandRepository{
 
     await BrandEntity.update({ id: brandId }, brandData);
 
-    const updatedBrand: CategoryEntity = await CategoryEntity.findOne({ where: { id: brandId }, relations: ['categories'] });
+    // const updatedBrand: CategoryEntity = await CategoryEntity.findOne({ where: { id: brandId }, relations: ['categories'] });
+    const updatedBrand: BrandEntity = await BrandEntity.createQueryBuilder('br')
+                              .select(["br.id", "br.name", "br.slug", "br.description",
+                                      "br.logo", "br.isFeatured", "br.isDeleted"])
+                              .leftJoinAndSelect('br.categories', 'categories')
+                              .where("br.id = :id", { id: brandId })
+                              .getOne()
     return updatedBrand;
 
   }
 
   public async brandCategoryAdd(brandId:number, categorieIds:number[]): Promise<Brand>{
-    const findBrand:BrandEntity = await BrandEntity.findOne({
-      where: {id: brandId},
-      relations: ["categories"]
-    })
+    const findBrand:BrandEntity = await BrandEntity.createQueryBuilder('br')
+                            .select(["br.id", "br.name", "br.slug", "br.description",
+                                    "br.logo", "br.isFeatured", "br.isDeleted"])
+                            .leftJoinAndSelect('br.categories', 'categories')
+                            .where("br.id = :id", { id: brandId })
+                            .getOne()
     const CategoriesIdToAdd:number[] = categorieIds.filter(catId => findBrand.categories.filter(cat=> cat.id !== catId))
     // console.log(CategoriesIdToAdd)
     if (!CategoriesIdToAdd) throw new HttpException(409, "No Categories To Add")
@@ -82,10 +90,13 @@ export class BrandRepository{
   }
 
   public async brandCategoryRemove(brandId: number, categories:number[]):Promise<Brand>{
-    const findBrand:BrandEntity = await BrandEntity.findOne({
-      where: {id: brandId},
-      relations: ["categories"]
-    })
+    const findBrand:BrandEntity = await BrandEntity.createQueryBuilder('br')
+    .select(["br.id", "br.name", "br.slug", "br.description",
+            "br.logo", "br.isFeatured", "br.isDeleted"])
+    .leftJoinAndSelect('br.categories', 'categories')
+    .where("br.id = :id", { id: brandId })
+    .getOne()
+
     findBrand.categories = findBrand.categories.filter(cat => !categories.includes(cat.id))
     const SavedBrand = await BrandEntity.save(findBrand)
     return SavedBrand
@@ -93,7 +104,13 @@ export class BrandRepository{
 
 
   public async brandRemove(brandId: number): Promise<Brand> {
-    const findBrand: BrandEntity = await BrandEntity.findOne({ where: { id: brandId } });
+    const findBrand: BrandEntity = await BrandEntity.createQueryBuilder('br')
+                              .select(["br.id", "br.name", "br.slug", "br.description",
+                                      "br.logo", "br.isFeatured", "br.isDeleted"])
+                              .leftJoinAndSelect('br.categories', 'categories')
+                              .where("br.id = :id", { id: brandId })
+                              .getOne()
+
     if (!findBrand) throw new HttpException(409, `Brand with id ${brandId} does not exist`);
 
     await CategoryEntity.delete({ id: brandId });
@@ -102,15 +119,17 @@ export class BrandRepository{
   }
 
   public async brandsRemove(brandData: BrandRemoveDTO): Promise<Brands> {
-    // const brandIds = brandData.brandIds
+    const brandIds = brandData.brandIds
     const updatedResult: UpdateResult = await BrandEntity.update({id: In(brandData.brandIds)}, { isDeleted: true });
-    const findBrands: BrandEntity[] = await BrandEntity.find({
-      select: ["id", "name", "slug", "description", "logo",  'isDeleted', 'isFeatured'],
-      relations: ["parentCategory", "categories"],
-      where: {id: In(brandData.brandIds)}
-    })
+    const findBrands: BrandEntity[] =  await BrandEntity.createQueryBuilder('br')
+                      .select(["br.id", "br.name", "br.slug", "br.description",
+                              "br.logo", "br.isFeatured", "br.isDeleted"])
+                      .leftJoinAndSelect('br.categories', 'categories')
+                      .where('br.id In (:...brandIds)', { brandIds })
+                      .getMany();
+
     return {items: findBrands}
-}
+  }
 
   public async categoryFind(categoryArgs: CategoryArgs): Promise<CategoryEntity> {
     const findCategory: CategoryEntity = await CategoryEntity.findOne(
