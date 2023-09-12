@@ -1,5 +1,6 @@
 
-import { BrandCategoryInput, BrandCreateDTO, BrandUpdateDTO } from "@/dtos/brand.dto";
+import { BrandCategoryInput, BrandCreateDTO, BrandRemoveDTO, BrandUpdateDTO } from "@/dtos/brand.dto";
+import { PagingArgs } from "@/dtos/category.dto";
 import { BrandRepository } from "@/repositories/brand.repository";
 import { Brand, Brands } from "@/typedefs/brand.type";
 import { Arg, Args, Authorized, Mutation, Query, Resolver } from "type-graphql";
@@ -11,8 +12,8 @@ export class BrandResolver extends BrandRepository{
   @Query(() => Brands, {
     description: 'List All Brands',
   })
-  async listBrands(): Promise<Brands> {
-      const brands: Brands = await this.brandList();
+  async listBrands(@Args() paging: PagingArgs): Promise<Brands> {
+      const brands: Brands = await this.brandList(paging);
       return brands;
   }
 
@@ -55,12 +56,21 @@ export class BrandResolver extends BrandRepository{
 
   // @Authorized()
   @Mutation(() => Brand, {
-    description: 'Remove Category',
+    description: 'Remove Brand',
   })
-  async removeCategory(@Arg('brandId') brandId: number): Promise<Brand> {
+  async removeBrand(@Arg('brandId') brandId: number): Promise<Brand> {
     const brand: Brand = await this.brandRemove(brandId);
     return brand;
   }
+
+  @Mutation(() => Brands, {
+    description: 'Remove Categories',
+  })
+  async removeBrands(@Arg('brandData') brandData: BrandRemoveDTO): Promise<Brands> {
+    const brands: Brands = await this.brandsRemove(brandData);
+    return brands;
+  }
+
 
   // @Authorized()
   @Mutation(() => Brand, {

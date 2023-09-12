@@ -40,16 +40,10 @@ export class LocationUpdateDTO {
     isLive?: boolean;
 
     @Field({ nullable: true})
-    isApproved?: boolean;
+    isDeleted?: boolean;
 
     @Field({ nullable: true})
     isFeatured?: boolean;
-
-    @Field({ nullable: true})
-    isSponsored?: boolean;
-
-    @Field({ nullable: true})
-    isGlobal?: boolean;
 
 }
 

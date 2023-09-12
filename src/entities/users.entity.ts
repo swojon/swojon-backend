@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsEmpty, IsNotEmpty } from 'class-validator';
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany, JoinTable } from 'typeorm';
 import { User } from '@interfaces/users.interface';
 import { ProfileEntity } from './profile.entity';
@@ -14,6 +14,9 @@ export class UserEntity extends BaseEntity implements User {
   @IsNotEmpty()
   @Unique(['email'])
   email: string;
+
+  @Column({nullable: true})
+  username: string;
 
   @Column()
   @IsNotEmpty()

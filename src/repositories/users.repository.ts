@@ -3,24 +3,87 @@ import { EntityRepository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserEntity } from '@entities/users.entity';
 import { HttpException } from '@exceptions/httpException';
-import { User } from '@interfaces/users.interface';
+import { User, UserWithMeta } from '@interfaces/users.interface';
 import { ProfileEntity } from '@/entities/profile.entity';
 import { RoleEntity } from '@/entities/role.entity';
 import { Role } from '@/interfaces/role.interface';
+import { FollowEntity } from '@/entities/follow.entity';
+import { Community } from '@/interfaces/community.interface';
+import { CommunityMemberEntity } from '@/entities/communityMember.entity';
+import { ListingEntity } from '@/entities/listing.entity';
+
+
 
 @EntityRepository(UserEntity)
 export class UserRepository {
-  public async userFindAll(): Promise<User[]> {
-    const users: User[] = await UserEntity.createQueryBuilder("user").leftJoinAndSelect("user.profile", "profile").leftJoinAndSelect("user.roles", "roles").getMany();
-    // console.log(users)
-    return users;
+  public async userList(): Promise<UserWithMeta[]> {
+    const users: User[]= await UserEntity.createQueryBuilder("user")
+                                .leftJoinAndSelect("user.profile", "profile")
+                                .leftJoinAndSelect("user.roles", "roles")
+                                .getMany();
+
+    const userIds: number[] = users.map((user) => user.id)
+
+    const followingCounts = await FollowEntity
+            .createQueryBuilder('f')
+            .select('f.userId', 'userId')
+            .addSelect('COUNT(f.id)', 'followingCount')
+            .where('f.userId IN (:...userIds)', { userIds })
+            .groupBy('f.userId')
+            .getRawMany();
+
+    const followerCounts = await FollowEntity
+            .createQueryBuilder('f')
+            .select('f.followedUserId', 'followedUserId')
+            .addSelect('COUNT(f.id)', 'followerCount')
+            .where('f.followedUserId IN (:...userIds)', { userIds })
+            .groupBy('f.followedUserId')
+            .getRawMany();
+
+    const listingCounts = await ListingEntity
+          .createQueryBuilder('li')
+          .select('li.userId', 'userId')
+          .addSelect('COUNT(li.id)', 'listingCount')
+          .where('li.userId IN (:...userIds)', { userIds })
+          .groupBy('li.userId')
+          .getRawMany();
+
+    const communities = await CommunityMemberEntity.createQueryBuilder('cm')
+                              .select("cm.id")
+                              .leftJoinAndSelect('cm.user', 'user')
+                              .leftJoinAndSelect('cm.community', 'community')
+                              .where('cm.userId In (:...userIds)', { userIds })
+                              .getMany();
+
+    const returningUsers: UserWithMeta[] = users.map((user) =>  {
+      const followingCount = followingCounts.find(fe => fe.userId === user.id)?.followingCount
+      const followerCount = followerCounts.find(fe => fe.followedUserId === user.id)?.followerCount
+      const listingCount = listingCounts.find(li => li.userId === user.id)?.listingCount
+      return {
+        ...user ,
+        followerCount : followerCount? followerCount : 0 ,
+        followingCount : followingCount? followingCount : 0,
+        listingCount : listingCount? listingCount : 0,
+        communities : communities.filter(item => item.user.id == user.id).map(item => item.community)
+      }
+    })
+
+    return returningUsers;
   }
 
-  public async userFindById(userId: number): Promise<User> {
-    const user: User = await UserEntity.findOne({ where: { id: userId }, relations: ['profiles', 'roles']});
+  public async userFindById(userId: number): Promise<UserWithMeta> {
+    const user: User = await UserEntity.findOne({ where: { id: userId }, relations: ['profile', 'roles']});
     if (!user) throw new HttpException(409, "User doesn't exist");
+    const followerCount:number = await FollowEntity.count({where: {followedUser: user}})
+    const followingCount:number = await FollowEntity.count({where: {user: user}})
+    const communities: Community[] = await CommunityMemberEntity.find({
+                    where: {user: user},
+                    relations: ["community"]
+                  })
+    const listingCount: number = await ListingEntity.count({where: {user: user}})
+
     console.log(user)
-    return user;
+    return {...user, followerCount, followingCount, communities, listingCount };
   }
 
   public async userCreate(userData: CreateUserDto): Promise<User> {
@@ -41,11 +104,13 @@ export class UserRepository {
       const hashedPassword = await hash(userData.password, 10);
       await UserEntity.update(userId, { ...userData, password: hashedPassword });
     }
+    const to_update = {}
+    userData.isApproved? to_update["isApproved"] = userData.isApproved : null
+    userData.isStaff? to_update["isStaff"] = userData.isStaff : null
+    userData.isSuperAdmin? to_update["isSuperAdmin"]= userData.isSuperAdmin : null
+    userData.username? to_update["username"]= userData.username : null
 
-    userData.isApproved? await UserEntity.update(userId, { ...userData, isApproved: userData.isApproved }): null
-    userData.isStaff? await UserEntity.update(userId, { ...userData, isStaff: userData.isStaff }): null
-    userData.isSuperAdmin? await UserEntity.update(userId, { ...userData, isSuperAdmin: userData.isSuperAdmin }): null
-
+    await UserEntity.update(userId,  to_update)
     const updateUser: User = await UserEntity.findOne({ where: { id: userId } });
     return updateUser;
   }

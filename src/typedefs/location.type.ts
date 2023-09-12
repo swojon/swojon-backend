@@ -21,23 +21,14 @@ export class Location {
   @Field({ nullable: true})
   parentLocation?:Location;
 
-  @Field(()=> [Location], {nullable: true})
-  children?:Location[]
-
   @Field({ nullable: true})
-  isLive?: boolean;
-
-  @Field({ nullable: true})
-  isApproved?: boolean;
+  isDeleted?: boolean;
 
   @Field({ nullable: true})
   isFeatured?: boolean;
 
   @Field({ nullable: true})
-  isSponsored?: boolean;
-
-  @Field({ nullable: true})
-  isGlobal?: boolean;
+  isLive?: boolean;
 
 }
 

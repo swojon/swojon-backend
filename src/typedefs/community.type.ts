@@ -6,7 +6,7 @@ export class Community {
   @Field()
   id?: number;
 
-  @Field()
+  @Field({ nullable: true})
   name?: string;
 
   @Field({ nullable: true})
@@ -33,10 +33,10 @@ export class Community {
   @Field()
   dateUpdated?: Date;
 
-  @Field()
+  @Field(() => User)
   createdBy?: User;
 
-  @Field()
+  @Field(() => User)
   updatedBy?: User;
 
   @Field({ nullable: true})
@@ -64,7 +64,7 @@ export class CommunityMember {
   @Field()
   community?: Community;
 
-  @Field()
+  @Field(() => User)
   user?: User;
 
   @Field()

@@ -5,12 +5,9 @@ export interface Location {
   description?: string;
   banner?: string;
   parentLocation?: Location;
-  children?: Location[] |null;
-  isLive?: boolean;
-  isApproved?: boolean;
   isFeatured?: boolean;
-  isSponsored?: boolean;
-  isGlobal?: boolean;
+  isDeleted?: boolean;
+  isLive?: boolean;
 }
 
 export interface Locations {

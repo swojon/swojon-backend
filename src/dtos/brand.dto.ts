@@ -51,3 +51,9 @@ export class BrandCategoryInput{
 
 }
 
+@InputType()
+export class BrandRemoveDTO {
+  @Field(() => [Number])
+  brandIds: number[]
+
+}

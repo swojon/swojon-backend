@@ -31,18 +31,13 @@ export class LocationEntity extends BaseEntity{
     banner: string;
 
     @Column({default: false})
-    isLive: boolean;
-
-    @Column({default: false})
-    isApproved: boolean;
+    isDeleted: boolean;
 
     @Column({default: false})
     isFeatured: boolean;
 
-    @Column({default: false})
-    isSponsored: boolean;
+    @Column({default: true})
+    isLive: boolean;
 
-    @Column({default: false})
-    isGlobal: boolean;
 
 }

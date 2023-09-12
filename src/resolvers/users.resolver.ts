@@ -1,25 +1,25 @@
 import { Arg, Authorized, Mutation, Query, Resolver } from 'type-graphql';
 import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserRepository } from '@repositories/users.repository';
-import { User } from '@typedefs/users.type';
+import { User, UserWithMeta } from '@typedefs/users.type';
 
 @Resolver()
 export class UserResolver extends UserRepository {
   // @Authorized(["ADMIN"])
-  @Query(() => [User], {
-    description: 'User find list',
+  @Query(() => [UserWithMeta], {
+    description: 'List All Users',
   })
-  async getUsers(): Promise<User[]> {
-    const users: User[] = await this.userFindAll();
+  async listUsers(): Promise<UserWithMeta[]> {
+    const users: UserWithMeta[] = await this.userList();
     return users;
   }
 
   // @Authorized()
-  @Query(() => User, {
+  @Query(() => UserWithMeta, {
     description: 'User find by id',
   })
-  async getUserById(@Arg('userId') userId: number): Promise<User> {
-    const user: User = await this.userFindById(userId);
+  async getUserById(@Arg('userId') userId: number): Promise<UserWithMeta> {
+    const user: UserWithMeta = await this.userFindById(userId);
     return user;
   }
 

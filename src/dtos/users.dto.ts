@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, MinLength, MaxLength, maxLength } from 'class-validator';
 import { InputType, Field } from 'type-graphql';
 import { User } from '@typedefs/users.type';
 
@@ -10,6 +10,12 @@ export class CreateUserDto implements Partial<User> {
 
   @Field()
   @IsString()
+  @MinLength(5)
+  @MaxLength(30)
+  username: string;
+
+  @Field()
+  @IsString()
   @IsNotEmpty()
   @MinLength(9)
   @MaxLength(32)
@@ -18,7 +24,7 @@ export class CreateUserDto implements Partial<User> {
 
 @InputType()
 export class UpdateUserDto implements Partial<User> {
-  @Field()
+  @Field({nullable: true})
   @IsString()
   @IsNotEmpty()
   @MinLength(9)
@@ -26,15 +32,21 @@ export class UpdateUserDto implements Partial<User> {
   password?: string;
 
   //field for isApproved boolean
-  @Field()
+  @Field({nullable: true})
   isApproved?: boolean;
 
   //field for isStaff boolean
-  @Field()
+  @Field({nullable: true})
   isStaff?: boolean;
 
   //field for isSuperAdmin boolean
-  @Field()
+  @Field({nullable: true})
   isSuperAdmin?: boolean;
 
+
+  @Field({nullable: true})
+  @IsString()
+  @MinLength(5)
+  @MaxLength(30)
+  username?: string;
 }

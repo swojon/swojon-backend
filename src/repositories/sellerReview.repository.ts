@@ -51,11 +51,13 @@ export class SellerReviewRepository{
 
   public async listingReviewList(listingId: number): Promise<Reviews>{
 
-    const review:[SellerReviewEntity[], number] = await SellerReviewEntity.createQueryBuilder("seller_review_entity")
+    const review:[SellerReviewEntity[], number] = await SellerReviewEntity
+                  .createQueryBuilder("seller_review_entity")
                   .select(["seller_review_entity.id","seller_review_entity.dateCreated",  "seller_review_entity.isDeleted", "seller_review_entity.review", "seller_review_entity.rating",  "seller_review_entity.listingId"])
                   .leftJoinAndSelect('seller_review_entity.reviewer', 'reviewer')
                   .leftJoinAndSelect('seller_review_entity.seller', 'seller')
-                  .where("seller_review_entity.listingId = :id", { id: listingId }).printSql().getManyAndCount()
+                  .where("seller_review_entity.listingId = :id", { id: listingId })
+                  .getManyAndCount()
 
     const reviews: Reviews = {
       count: review[1],
@@ -67,11 +69,13 @@ export class SellerReviewRepository{
 
   public async sellerReviewList(userId: number): Promise<Reviews>{
 
-    const review:[SellerReviewEntity[], number] = await SellerReviewEntity.createQueryBuilder("seller_review_entity")
-                  .select(["seller_review_entity.id","seller_review_entity.dateCreated",  "seller_review_entity.isDeleted", "seller_review_entity.review", "seller_review_entity.rating",  "seller_review_entity.listingId"])
+    const review:[SellerReviewEntity[], number] = await SellerReviewEntity
+                  .createQueryBuilder("seller_review_entity")
+                  .select(["seller_review_entity.id","seller_review_entity.dateCreated",  "seller_review_entity.isDeleted", "seller_review_entity.review", "seller_review_entity.rating"])
                   .leftJoinAndSelect('seller_review_entity.reviewer', 'reviewer')
                   .leftJoinAndSelect('seller_review_entity.seller', 'seller')
                   .leftJoinAndSelect('seller_review_entity.listing', 'listing')
+                  .leftJoinAndSelect('seller_review.listing.location', 'listing.location')
                   .where("seller_review_entity.sellerId = :id", { id: userId }).printSql().getManyAndCount()
 
     const reviews: Reviews = {
@@ -85,10 +89,11 @@ export class SellerReviewRepository{
   public async userReviewList(userId: number): Promise<Reviews>{
 
     const review:[SellerReviewEntity[], number] = await SellerReviewEntity.createQueryBuilder("seller_review_entity")
-                  .select(["seller_review_entity.id","seller_review_entity.dateCreated",  "seller_review_entity.isDeleted", "seller_review_entity.review", "seller_review_entity.rating",  "seller_review_entity.listingId"])
+                  .select(["seller_review_entity.id","seller_review_entity.dateCreated",  "seller_review_entity.isDeleted", "seller_review_entity.review", "seller_review_entity.rating"])
                   .leftJoinAndSelect('seller_review_entity.reviewer', 'reviewer')
                   .leftJoinAndSelect('seller_review_entity.seller', 'seller')
                   .leftJoinAndSelect('seller_review_entity.listing', 'listing')
+                  .leftJoinAndSelect('seller_review.listing.location', 'listing.location')
                   .where("seller_review_entity.reviewerId = :id", { id: userId }).printSql().getManyAndCount()
 
     const reviews: Reviews = {

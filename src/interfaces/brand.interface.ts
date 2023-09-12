@@ -13,5 +13,5 @@ export interface Brand {
 
 export interface Brands{
   items: Brand[];
-  count: number;
+  hasMore?:boolean;
 }

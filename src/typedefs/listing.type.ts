@@ -3,6 +3,7 @@ import { Category } from "./category.type";
 import { User } from "./users.type";
 import { Community } from "./community.type";
 import { Brand } from "./brand.type";
+import { Location } from "./location.type";
 
 
 @ObjectType()
@@ -25,8 +26,8 @@ export class Listing {
   @Field()
   price?: number
 
-  @Field({nullable:true})
-  location?: string;
+  @Field(() => Location, {nullable:true})
+  location?: Location;
 
   @Field({nullable:true})
   latitude?: string;

@@ -1,25 +1,42 @@
-import { BrandCreateDTO, BrandUpdateDTO } from "@/dtos/brand.dto";
-import { CategoryArgs, CategoryCreateDTO, CategoryUpdateDTO } from "@/dtos/category.dto";
+import { BrandCreateDTO, BrandRemoveDTO, BrandUpdateDTO } from "@/dtos/brand.dto";
+import { CategoryArgs, CategoryCreateDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
 import { BrandEntity } from "@/entities/brand.entity";
 import { CategoryEntity } from "@/entities/category.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Brand, Brands } from "@/interfaces/brand.interface";
 import { Categories, Category } from "@/interfaces/category.interface";
 
-import { EntityRepository, In } from "typeorm";
+import { EntityRepository, In, UpdateResult } from "typeorm";
 
 
 
 @EntityRepository(BrandEntity)
 export class BrandRepository{
 
-  public async brandList(): Promise<Brands>{
-    const findBrandsAndCount: [BrandEntity[], number] = await BrandEntity.findAndCount({relations:['categories']})
+  public async brandList(paging: PagingArgs): Promise<Brands>{
+    // const findBrandsAndCount: [BrandEntity[], number] = await BrandEntity.findAndCount({relations:['categories']})
+    let sql = BrandEntity.createQueryBuilder("br")
+        .select(["br.id", "br.name", "br.slug", "br.description",
+                "br.logo", "br.isFeatured", "br.isDeleted"])
+        .leftJoinAndSelect('br.categories', 'categories')
+        .orderBy('br.id', 'ASC')
 
-    return {
-      items: findBrandsAndCount[0],
-      count: findBrandsAndCount[1]
+    if (paging.starting_after){
+    sql = sql.where("br.id > :starting_after", {starting_after: paging.starting_after})
+    }else if (paging.ending_before){
+    sql = sql.where("br.id < :ending_before", {ending_before: paging.ending_before} )
     }
+
+    const limit:number = Math.min(100, paging.limit?paging.limit: 100)
+    sql = sql.limit(limit)
+
+    const findBrands = await sql.getManyAndCount()
+
+    const hasMore = findBrands[0].length === limit;
+
+
+    return {items: findBrands[0], hasMore: hasMore}
+
   }
 
   public async brandAdd(brandData: BrandCreateDTO): Promise<Brand>{
@@ -83,6 +100,17 @@ export class BrandRepository{
 
     return findBrand;
   }
+
+  public async brandsRemove(brandData: BrandRemoveDTO): Promise<Brands> {
+    // const brandIds = brandData.brandIds
+    const updatedResult: UpdateResult = await BrandEntity.update({id: In(brandData.brandIds)}, { isDeleted: true });
+    const findBrands: BrandEntity[] = await BrandEntity.find({
+      select: ["id", "name", "slug", "description", "logo",  'isDeleted', 'isFeatured'],
+      relations: ["parentCategory", "categories"],
+      where: {id: In(brandData.brandIds)}
+    })
+    return {items: findBrands}
+}
 
   public async categoryFind(categoryArgs: CategoryArgs): Promise<CategoryEntity> {
     const findCategory: CategoryEntity = await CategoryEntity.findOne(

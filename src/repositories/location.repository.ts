@@ -10,31 +10,31 @@ import { EntityRepository } from "typeorm";
 export class LocationRepository{
 
   public async locationList(): Promise<Locations> {
-    const getLocationTree = (locations:LocationEntity[], target: Location|null):Location[] =>{
+    // const getLocationTree = (locations:LocationEntity[], target: Location|null):Location[] =>{
 
-      let locs = locations.filter(cat => target === null? cat.parentLocation === null: cat.parentLocation?.id === target.id)
-      const locationList:Location[] = []
+    //   let locs = locations.filter(cat => target === null? cat.parentLocation === null: cat.parentLocation?.id === target.id)
+    //   const locationList:Location[] = []
 
-      locs.forEach(cat => {
-        locationList.push({
-          ...cat,
-          children: getLocationTree(locations, cat)
-        })
-      });
+    //   locs.forEach(cat => {
+    //     locationList.push({
+    //       ...cat,
+    //       children: getLocationTree(locations, cat)
+    //     })
+    //   });
 
-      return locationList
-    }
+    //   return locationList
+    // }
     const findLocations = await LocationEntity.findAndCount(
       {
         select: ["id", "name", "slug", "description", "banner",
-          "isLive", "isApproved", "isFeatured", "isSponsored", "isGlobal", "parentLocation"],
+          "isLive", "isDeleted", "isFeatured", "parentLocation"],
         relations: ['parentLocation'],
       }
     );
     const locationList = findLocations[0]
-    const locationTree: Location[] =  getLocationTree(locationList, null)
+    // const locationTree: Location[] =  getLocationTree(locationList, null)
 
-    return {items: locationTree}
+    return {items: locationList}
 
   }
 

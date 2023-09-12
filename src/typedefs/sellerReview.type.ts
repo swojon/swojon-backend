@@ -38,5 +38,5 @@ export class Reviews {
   items?: Review[];
 
   @Field()
-  count: number
+  count?: number
 }

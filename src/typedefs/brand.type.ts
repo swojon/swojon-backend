@@ -19,9 +19,6 @@ export class Brand {
   @Field({ nullable: true})
   logo?: string;
 
-  @Field({ nullable: true})
-  parentCategory?:Category;
-
   @Field(()=> [Category], {nullable: true})
   categories?:Category[]
 
@@ -40,5 +37,5 @@ export class Brands {
   items?: Brand[];
 
   @Field()
-  count: number
+  hasMore?: boolean
 }

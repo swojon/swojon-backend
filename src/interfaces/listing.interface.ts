@@ -2,6 +2,7 @@ import { Brand } from "@/typedefs/brand.type";
 import { Category } from "./category.interface";
 import { Community } from "./community.interface";
 import { User } from "./users.interface";
+import { Location } from "./location.interface";
 
 export interface Listing {
   id?: number;
@@ -10,7 +11,7 @@ export interface Listing {
   brand?:Brand|null;
   user?:User;
   price?:number;
-  location?:string;
+  location?:Location;
   latitude?:string;
   longitude?:string;
   isLive?:boolean;
