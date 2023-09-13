@@ -2,6 +2,7 @@ import { IsNotEmpty } from "class-validator";
 import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { CommunityMemberEntity } from "./communityMember.entity";
+import { LocationEntity } from "./location.entity";
 
 
 @Entity()
@@ -20,9 +21,10 @@ export class CommunityEntity extends BaseEntity{
     @IsNotEmpty()
     slug: string;
 
-    //community location
-    @Column({nullable: true})
-    location: string;
+    //column for location, not empty
+    @ManyToOne(()=>LocationEntity, {nullable:true})
+    location: LocationEntity;
+
 
     //location latitude
     @Column({nullable: true})
@@ -44,16 +46,10 @@ export class CommunityEntity extends BaseEntity{
     isLive: boolean;
 
     @Column({default: false})
-    isApproved: boolean;
-
-    @Column({default: false})
     isFeatured: boolean;
 
     @Column({default: false})
-    isSponsored: boolean;
-
-    @Column({default: false})
-    isVerified: boolean;
+    isDeleted: boolean;
 
     @OneToMany(() => CommunityMemberEntity, (member) => member.community, {cascade: true})
     members: CommunityMemberEntity[]

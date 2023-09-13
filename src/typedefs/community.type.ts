@@ -1,5 +1,6 @@
 import { Field, NoExplicitTypeError, ObjectType } from 'type-graphql';
 import { User } from './users.type';
+import { Location } from './location.type';
 
 @ObjectType()
 export class Community {
@@ -12,8 +13,8 @@ export class Community {
   @Field({ nullable: true})
   slug?: string;
 
-  @Field({ nullable: true})
-  location?: string;
+  @Field(() => Location, { nullable: true})
+  location?: Location;
 
   @Field({ nullable: true})
   latitude?: string;
@@ -26,18 +27,6 @@ export class Community {
 
   @Field()
   isDeleted?: boolean;
-
-  @Field()
-  dateCreated?: Date;
-
-  @Field()
-  dateUpdated?: Date;
-
-  @Field(() => User)
-  createdBy?: User;
-
-  @Field(() => User)
-  updatedBy?: User;
 
   @Field({ nullable: true})
   memberCount?: number;

@@ -1,5 +1,6 @@
 import { CommunityArgs, CommunityCreateDTO, CommunityUpdateDTO } from "@/dtos/community.dto";
 import { CommunityEntity } from "@/entities/community.entity";
+import { LocationEntity } from "@/entities/location.entity";
 
 import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
@@ -29,9 +30,8 @@ export class CommunityRepository{
         const communities = await CommunityEntity.findAndCount(
             {
               select: ["id", "name", "slug", "location", "longitude", "latitude",
-               "description", "banner", "isLive", "isApproved", "isFeatured",
-                "isSponsored", "isVerified", "members"],
-              relations: ['members', 'members.user' ],
+               "description", "banner", "isLive", "isDeleted", "isFeatured", "members"],
+              relations: ['members', 'members.user', 'location'],
             }
         );
         // console.log(communities[0])
@@ -52,8 +52,10 @@ export class CommunityRepository{
         const findCommunity: CommunityEntity = await CommunityEntity.findOne({ where: [{ name: communityData?.name }, {slug:communityData?.slug}] });
         if (findCommunity) throw new HttpException(409, `Community with name ${communityData.name} already exists`);
 
-        const createCommunityData: CommunityEntity = await CommunityEntity.create(communityData).save();
+        let findLocation:LocationEntity|null = null;
+        if (communityData.locationId) findLocation = await LocationEntity.findOne({where: {id: communityData.locationId}})
 
+        const createCommunityData: CommunityEntity = await CommunityEntity.create({...communityData, location: findLocation}).save();
         return createCommunityData;
     }
 
@@ -75,9 +77,19 @@ export class CommunityRepository{
         const findCommunity: CommunityEntity = await CommunityEntity.findOne({ where: { id: communityId } });
         if (!findCommunity) throw new HttpException(409, 'Community does not exists');
 
+        let findLocation:LocationEntity|null = null;
+        if (communityData.locationId) {
+          findLocation = await LocationEntity.findOne({where: {id: communityData.locationId}})
+          delete communityData.locationId;
+          communityData["location"] = findLocation
+        }
+
+
         await CommunityEntity.update(findCommunity, communityData);
 
-        const updateCommunity: CommunityEntity = await CommunityEntity.findOne({ where: { id: communityId } });
+        const updateCommunity: CommunityEntity = await CommunityEntity.findOne({ where: { id: communityId } ,  relations: ['members', 'members.user', 'location'] });
         return updateCommunity;
+
+
     }
 }

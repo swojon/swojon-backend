@@ -1,14 +1,17 @@
+import { Location } from "./location.interface";
 import { User } from "./users.interface";
 
 export interface Community {
   id?: number;
   name?: string;
+  slug?:string;
+  latitude?: string;
+  longitude?:string;
   description?: string;
+  isLive?:boolean;
+  isFeatured?:boolean;
   isDeleted?: boolean;
-  dateCreated?: Date;
-  dateUpdated?: Date;
-  createdBy?: User;
-  updatedBy?: User;
+  location?:Location;
   memberCount?: number;
   members?:CommunityMember[];
 }

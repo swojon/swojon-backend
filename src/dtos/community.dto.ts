@@ -14,7 +14,7 @@ export class CommunityCreateDTO implements Partial<Community> {
   slug: string;
 
   @Field({ nullable: true})
-  location?: string;
+  locationId?: number;
 
   @Field({ nullable: true})
   latitude?: string;
@@ -46,7 +46,7 @@ export class CommunityUpdateDTO implements Partial<Community>{
   description?: string;
 
   @Field({ nullable: true})
-  location?: string;
+  locationId: number;
 
   @Field({ nullable: true})
   latitude?: string;
