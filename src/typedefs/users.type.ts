@@ -72,6 +72,9 @@ export class UserWithMeta {
   followingCount?: number;
 
   @Field({nullable: true})
+  pointBalance?: number;
+
+  @Field({nullable: true})
   listingCount?: number;
 
   @Field(()=> [Community], {nullable:true})

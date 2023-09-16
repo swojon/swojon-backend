@@ -15,6 +15,7 @@ export interface User {
   roles: Role[];
   createdAt?: Date;
 
+
 }
 
 export interface UserWithMeta {
@@ -22,17 +23,19 @@ export interface UserWithMeta {
   email?: string;
   username?:string;
   facebookId?: string;
-  password: string;
+  password?: string;
   isApproved: boolean;
   isStaff: boolean;
   isEmailVerified: boolean;
   profile: Profile;
   roles: Role[];
 
-  createdAt: Date;
+  createdAt?: Date;
   followerCount?: number
   followingCount?: number;
   listingCount?: number;
+  pointBalance?:number;
   communities?: Community[]
+
 }
 

@@ -11,6 +11,7 @@ import { FollowEntity } from '@/entities/follow.entity';
 import { Community } from '@/interfaces/community.interface';
 import { CommunityMemberEntity } from '@/entities/communityMember.entity';
 import { ListingEntity } from '@/entities/listing.entity';
+import { PointRepository } from './point.repository';
 
 
 
@@ -55,16 +56,20 @@ export class UserRepository {
                               .where('cm.userId In (:...userIds)', { userIds })
                               .getMany();
 
+    const balances = await new PointRepository().pointBalanceQueries(userIds)
+
     const returningUsers: UserWithMeta[] = users.map((user) =>  {
       const followingCount = followingCounts.find(fe => fe.userId === user.id)?.followingCount
       const followerCount = followerCounts.find(fe => fe.followedUserId === user.id)?.followerCount
       const listingCount = listingCounts.find(li => li.userId === user.id)?.listingCount
+      const balance = balances[user.id]
       return {
         ...user ,
         followerCount : followerCount? followerCount : 0 ,
         followingCount : followingCount? followingCount : 0,
         listingCount : listingCount? listingCount : 0,
-        communities : communities.filter(item => item.user.id == user.id).map(item => item.community)
+        communities : communities.filter(item => item.user.id == user.id).map(item => item.community),
+        pointBalance: balance ? balance : 0
       }
     })
 
@@ -81,9 +86,9 @@ export class UserRepository {
                     relations: ["community"]
                   })
     const listingCount: number = await ListingEntity.count({where: {user: user}})
+    const pointBalance: number = await new PointRepository().pointBalanceQuery(user.id)
 
-    console.log(user)
-    return {...user, followerCount, followingCount, communities, listingCount };
+    return {...user, followerCount, followingCount, communities, listingCount, pointBalance };
   }
 
   public async userCreate(userData: CreateUserDto): Promise<User> {

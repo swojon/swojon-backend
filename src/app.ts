@@ -46,6 +46,7 @@ import { ListingResolver } from './resolvers/listing.resolver';
 import { FavoriteResolver } from './resolvers/favorite.resolver';
 import { SellerReviewResolver } from './resolvers/sellerReview.resolver';
 import { LocationResolver } from './resolvers/location.resolver';
+import { PointResolver } from './resolvers/point.resolver';
 // const redis = new Redis({
 //   port: 6379,
 //   host: 'localhost',
@@ -99,7 +100,7 @@ const schema = await buildSchema({
     AuthResolver, CategoryResolver, ProfileResolver, RoleResolver, FollowResolver,
     CommunityResolver, CommunityMemberResolver, CategoryResolver, LocationResolver, ChatResolver,
      SubscriptionResolver, UserResolver, BrandResolver, ListingResolver, FavoriteResolver,
-    SellerReviewResolver,
+    SellerReviewResolver, PointResolver
   ],
   pubSub: pubSub,
   authChecker: AuthCheckerMiddleware,

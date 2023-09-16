@@ -71,6 +71,9 @@ dependencies:
   jsonwebtoken:
     specifier: ^8.5.1
     version: 8.5.1
+  moment-timezone:
+    specifier: ^0.5.43
+    version: 0.5.43
   passport:
     specifier: ^0.6.0
     version: 0.6.0
@@ -5469,6 +5472,12 @@ packages:
   /module-details-from-path@1.0.3:
     resolution: {integrity: sha512-ySViT69/76t8VhE1xXHK6Ch4NcDd26gx0MzKXLO+F7NOtnqH68d9zF94nT8ZWSxXh8ELOERsnJO/sWt1xZYw5A==}
     dev: true
+
+  /moment-timezone@0.5.43:
+    resolution: {integrity: sha512-72j3aNyuIsDxdF1i7CEgV2FfxM1r6aaqJyLB2vwb33mXYyoyLly+F1zbWqhA3/bVIoJ4szlUoMbUnVdid32NUQ==}
+    dependencies:
+      moment: 2.29.4
+    dev: false
 
   /moment@2.29.4:
     resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
