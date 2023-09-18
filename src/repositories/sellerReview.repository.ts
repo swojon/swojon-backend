@@ -75,7 +75,7 @@ export class SellerReviewRepository{
                   .leftJoinAndSelect('seller_review_entity.reviewer', 'reviewer')
                   .leftJoinAndSelect('seller_review_entity.seller', 'seller')
                   .leftJoinAndSelect('seller_review_entity.listing', 'listing')
-                  .leftJoinAndSelect('seller_review.listing.location', 'listing.location')
+                  // .leftJoinAndSelect('seller_review.listing.location', 'listing.location')
                   .where("seller_review_entity.sellerId = :id", { id: userId }).printSql().getManyAndCount()
 
     const reviews: Reviews = {
@@ -88,13 +88,13 @@ export class SellerReviewRepository{
 
   public async userReviewList(userId: number): Promise<Reviews>{
 
-    const review:[SellerReviewEntity[], number] = await SellerReviewEntity.createQueryBuilder("seller_review_entity")
-                  .select(["seller_review_entity.id","seller_review_entity.dateCreated",  "seller_review_entity.isDeleted", "seller_review_entity.review", "seller_review_entity.rating"])
-                  .leftJoinAndSelect('seller_review_entity.reviewer', 'reviewer')
-                  .leftJoinAndSelect('seller_review_entity.seller', 'seller')
-                  .leftJoinAndSelect('seller_review_entity.listing', 'listing')
-                  .leftJoinAndSelect('seller_review.listing.location', 'listing.location')
-                  .where("seller_review_entity.reviewerId = :id", { id: userId }).printSql().getManyAndCount()
+    const review:[SellerReviewEntity[], number] = await SellerReviewEntity.createQueryBuilder("sr")
+                  .select(["sr.id","sr.dateCreated",  "sr.isDeleted", "sr.review", "sr.rating"])
+                  .leftJoinAndSelect('sr.reviewer', 'reviewer')
+                  .leftJoinAndSelect('sr.seller', 'seller')
+                  .leftJoinAndSelect('sr.listing', 'listing')
+                  // .leftJoinAndSelect('sr.listing.location', 'listng.location')
+                  .where("sr.reviewerId = :id", { id: userId }).printSql().getManyAndCount()
 
     const reviews: Reviews = {
       count: review[1],
