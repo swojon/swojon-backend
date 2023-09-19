@@ -8,6 +8,7 @@ export interface Community {
   latitude?: string;
   longitude?:string;
   description?: string;
+  banner?:string;
   isLive?:boolean;
   isFeatured?:boolean;
   isDeleted?: boolean;

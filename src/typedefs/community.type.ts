@@ -28,6 +28,12 @@ export class Community {
   @Field()
   isDeleted?: boolean;
 
+  @Field()
+  isFeatured?: boolean;
+
+  @Field({nullable:true})
+  banner?: string;
+
   @Field({ nullable: true})
   memberCount?: number;
 
