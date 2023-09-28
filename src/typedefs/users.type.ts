@@ -57,7 +57,7 @@ export class UserWithMeta {
   isEmailVerified: boolean;
 
   @Field()
-  createdAt: Date;
+  createdAt?: Date;
 
   @Field(() => Profile, {nullable: true})
   profile: Profile;

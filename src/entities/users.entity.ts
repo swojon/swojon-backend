@@ -1,4 +1,4 @@
-import { IsEmpty, IsNotEmpty } from 'class-validator';
+import { IsEmpty, IsNotEmpty, isEmpty } from 'class-validator';
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany, JoinTable } from 'typeorm';
 import { User } from '@interfaces/users.interface';
 import { ProfileEntity } from './profile.entity';
@@ -18,15 +18,20 @@ export class UserEntity extends BaseEntity implements User {
   @Column({nullable: true})
   username: string;
 
-  @Column()
-  @IsNotEmpty()
+  @Column({nullable:true})
   password: string;
 
-  @Column()
+  @Column({nullable: true})
+  googleId: string;
+
+  @Column({nullable:true})
+  facebookId?: string;
+
+
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column()
+
   @UpdateDateColumn()
   updatedAt: Date;
 

@@ -2,7 +2,7 @@ import { Arg, Args, Authorized, Mutation, Query, Resolver } from 'type-graphql';
 
 import { CommunityRepository } from '@/repositories/community.repository';
 import { Communities, Community } from '@/typedefs/community.type';
-import { CommunityArgs, CommunityCreateDTO, CommunityUpdateDTO } from '@/dtos/community.dto';
+import { CommunityArgs, CommunityCreateDTO, CommunityFilterInput, CommunityUpdateDTO } from '@/dtos/community.dto';
 
 @Resolver()
 export class CommunityResolver extends CommunityRepository {
@@ -11,8 +11,8 @@ export class CommunityResolver extends CommunityRepository {
   @Query(() => Communities, {
     description: 'List All Communities',
   })
-  async listCommunities(): Promise<Communities> {
-    const communities: Communities = await this.communityList();
+  async listCommunities(@Arg('filters', { nullable: true }) filters? :CommunityFilterInput): Promise<Communities> {
+    const communities: Communities = await this.communityList(filters);
     return communities;
   }
 

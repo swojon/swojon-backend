@@ -1,5 +1,6 @@
-import { CommunityArgs, CommunityCreateDTO, CommunityUpdateDTO } from "@/dtos/community.dto";
+import { CommunityArgs, CommunityCreateDTO, CommunityFilterInput, CommunityUpdateDTO } from "@/dtos/community.dto";
 import { CommunityEntity } from "@/entities/community.entity";
+import { CommunityMemberEntity } from "@/entities/communityMember.entity";
 import { LocationEntity } from "@/entities/location.entity";
 
 import { UserEntity } from "@/entities/users.entity";
@@ -26,14 +27,37 @@ export class CommunityRepository{
 
     // }
 
-    public async communityList(): Promise<Communities> {
-        const communities = await CommunityEntity.findAndCount(
-            {
-              select: ["id", "name", "slug", "location", "longitude", "latitude",
-               "description", "banner", "isLive", "isDeleted", "isFeatured", "members"],
-              relations: ['members', 'members.user', 'location'],
-            }
-        );
+    public async communityList(filters: CommunityFilterInput): Promise<Communities> {
+          let sql = CommunityEntity.createQueryBuilder("ce")
+                          .select(["ce.id", "ce.name", "ce.slug", "ce.description",
+                                   "ce.banner", "ce.latitude", 'ce.longitude', "ce.isFeatured",
+
+                                  ])
+                          .leftJoinAndSelect('ce.members', 'members')
+                          .leftJoinAndSelect('members.user', 'user')
+                          .leftJoinAndSelect('ce.location', 'location')
+                          .orderBy('ce.id', 'ASC')
+
+
+          if (filters.userIds && filters.userIds.length > 0){
+            const cmQuery = CommunityMemberEntity
+                .createQueryBuilder('cme')
+                .select("cme.communityId")
+                .where("cme.userId IN (:...userIds)")
+                .getSql()
+                // .where('br.id In (:...brandIds)', { brandIds })
+            sql = sql.where('ce.id In (' + cmQuery + ')', {userIds: filters.userIds})
+          }
+
+          const communities = await sql.getManyAndCount()
+
+        // const communities = await CommunityEntity.findAndCount(
+        //     {
+        //       select: ["id", "name", "slug", "location", "longitude", "latitude",
+        //        "description", "banner", "isLive", "isDeleted", "isFeatured", "members"],
+        //       relations: ['members', 'members.user', 'location'],
+        //     }
+        // );
         // console.log(communities[0])
 
         const communities_list: Communities = {

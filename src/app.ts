@@ -47,6 +47,10 @@ import { FavoriteResolver } from './resolvers/favorite.resolver';
 import { SellerReviewResolver } from './resolvers/sellerReview.resolver';
 import { LocationResolver } from './resolvers/location.resolver';
 import { PointResolver } from './resolvers/point.resolver';
+import passport from 'passport';
+
+const passportSetup = require('./utils/passport');
+
 // const redis = new Redis({
 //   port: 6379,
 //   host: 'localhost',
@@ -81,12 +85,16 @@ const sessionMiddleware = session({
   cookie: {
     httpOnly: true,
     secure: env === "production",
-    maxAge: 1000 * 60 * 60 * 24 * 7 * 365, // 7 years,
+    maxAge: 1000*60*5, //5 minutes ,//1000 * 60 * 60 * 24 * 7 * 365, // 7 years,
     sameSite: "lax"
   }
 })
 
 app.use(sessionMiddleware);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS}));
 app.use(compression());
 app.use(express.json());

@@ -132,3 +132,19 @@ export class CommunityMemberUpdateDTO{
   dateJoined?: Date;
 
 }
+
+
+@InputType()
+export class CommunityFilterInput{
+  @Field(() => [Number],{ nullable: true})
+  userIds?: number[];
+
+  @Field({nullable:true})
+  locationId?: number;
+
+}
+
+// @InputType()
+// export class CommunitySortInput{
+
+// }

@@ -5,7 +5,7 @@ import { User, UserWithMeta } from '@typedefs/users.type';
 
 @Resolver()
 export class UserResolver extends UserRepository {
-  // @Authorized(["ADMIN"])
+  // @Authorized()
   @Query(() => [UserWithMeta], {
     description: 'List All Users',
   })
