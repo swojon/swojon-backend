@@ -88,3 +88,10 @@ export class PagingArgs{
   @Field({ nullable: true})
   limit?:number;
 }
+
+@InputType()
+export class CategoryFilterInput{
+  @Field(() => [Boolean],{ nullable: true})
+  isFeatured?: boolean[];
+
+}

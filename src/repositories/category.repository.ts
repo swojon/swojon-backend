@@ -1,4 +1,5 @@
-import { CategoryArgs, CategoryCreateDTO, CategoryRemoveDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
+import { CategoryArgs, CategoryCreateDTO, CategoryFilterInput, CategoryRemoveDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
+import { CommunityFilterInput } from "@/dtos/community.dto";
 import { CategoryEntity, Status } from "@/entities/category.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Categories, Category } from "@/interfaces/category.interface";
@@ -8,7 +9,7 @@ import { EntityRepository, In, LessThan, MoreThan, UpdateResult } from "typeorm"
 @EntityRepository(CategoryEntity)
 export class CategoryRepository{
 
-  public async categoryList(paging: PagingArgs ): Promise<Categories> {
+  public async categoryList(paging: PagingArgs, filters: CategoryFilterInput ): Promise<Categories> {
 
 
     // const findCategories : [CategoryEntity[], number] = await CategoryEntity.findAndCount(
@@ -34,9 +35,13 @@ export class CategoryRepository{
       sql = sql.where("category_entity.id < :ending_before", {ending_before: paging.ending_before} )
     }
 
+    if (filters.isFeatured){
+        sql = sql.where("category_entity.isFeatured IN (:...isFeaturedFilters)", {isFeaturedFilters: filters.isFeatured})
+    }
+
     // console.log("Query", sql.getSql())
     // const analyze =await CategoryEntity.query(`EXPLAIN (FORMAT json) ${sql.getSql()}`)
-    // const count = analyze[0]["QUERY PLAN"][0]["Plan"]["Plan Rows"]
+    // const count = await sql.getCount()
     // const count = analyze[0].['QUERY PLAN'][0]
     // console.log("Count", count)
     const limit:number = Math.min(100, paging.limit?paging.limit: 100)
@@ -45,14 +50,17 @@ export class CategoryRepository{
     const findCategories = await sql.getManyAndCount()
 
     const categoryList = findCategories[0]
+    const count = findCategories[1]
+
     // const categoryTree: Category[] =  getCategoryTree(categoryList, null)
 
     const hasMore = categoryList.length === limit;
 
+
     // const prevCursor = paging.starting_after? paging.starting_after: paging.ending_before? paging.ending_before: null
     // const nextCursor = categoryList[categoryList.length -1].id
 
-    return {items: categoryList, hasMore: hasMore}
+    return {items: categoryList, hasMore, count}
 
   }
 

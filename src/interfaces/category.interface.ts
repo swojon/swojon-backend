@@ -20,4 +20,5 @@ export interface Category {
 export interface Categories {
   items?: Category[];
   hasMore?:boolean;
+  count?:number;
 }

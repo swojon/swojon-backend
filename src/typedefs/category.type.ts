@@ -59,4 +59,7 @@ export class Categories {
   @Field({nullable:true})
   hasMore?:boolean;
 
+  @Field({nullable:true})
+  count?:number
+
 }
