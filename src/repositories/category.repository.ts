@@ -35,7 +35,7 @@ export class CategoryRepository{
       sql = sql.where("category_entity.id < :ending_before", {ending_before: paging.ending_before} )
     }
 
-    if (filters.isFeatured){
+    if (filters?.isFeatured){
         sql = sql.where("category_entity.isFeatured IN (:...isFeaturedFilters)", {isFeaturedFilters: filters.isFeatured})
     }
 
