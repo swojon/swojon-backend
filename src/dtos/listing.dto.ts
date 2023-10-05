@@ -15,7 +15,7 @@ export class ListingCreateDTO {
   price:number
 
   @Field({nullable:true})
-  location?: string;
+  locationId?: number;
 
   @Field({nullable:true})
   latitude?: string;

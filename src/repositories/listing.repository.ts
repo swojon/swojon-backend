@@ -4,6 +4,7 @@ import { BrandEntity } from "@/entities/brand.entity";
 import { CategoryEntity } from "@/entities/category.entity";
 import { CommunityEntity } from "@/entities/community.entity";
 import { ListingEntity } from "@/entities/listing.entity";
+import { LocationEntity } from "@/entities/location.entity";
 import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Listing, Listings } from "@/interfaces/listing.interface";
@@ -25,6 +26,8 @@ export class ListingRepository{
   public async listingAdd(userId:number, listingData: ListingCreateDTO): Promise<Listing>{
     let communities: CommunityEntity[] = [];
     let brand: BrandEntity|null = null;
+    let location: LocationEntity|null = null;
+
     const findUser: UserEntity = await UserEntity.findOne({ where: { id: userId} });
     if (!findUser)  throw new HttpException(409, `User with id ${userId} does not exist`);
 
@@ -37,6 +40,13 @@ export class ListingRepository{
       brand = findBrand;
     }
 
+    if (listingData.locationId){
+      console.log(listingData.brandId)
+      const findLocation : LocationEntity = await LocationEntity.findOne({ where: {id: listingData.locationId} })
+      console.log(findLocation)
+      if (!findLocation) throw new HttpException(409, `Brand with id ${listingData.brandId} does not exist`);
+      location = findLocation;
+    }
     if (listingData.communityIds){
       communities = await CommunityEntity.findByIds(listingData.communityIds)
     }
@@ -46,7 +56,7 @@ export class ListingRepository{
     })
     if (!findCategory) throw new HttpException(409, `Category with id ${listingData.categoryId} does not exist`);
 
-    const createListingData: ListingEntity = await ListingEntity.create({...listingData, category:findCategory, brand, communities, user:findUser}).save()
+    const createListingData: ListingEntity = await ListingEntity.create({...listingData, category:findCategory, brand, communities, location,  user:findUser}).save()
     return createListingData
   }
 
