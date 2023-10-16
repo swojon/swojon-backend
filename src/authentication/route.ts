@@ -4,6 +4,7 @@ import { Router } from 'express';
 import { UserEntity } from '@/entities/users.entity';
 import cookieParser from 'cookie-parser';
 const CLIENT_URL = "http://localhost:3000";
+import jwt from 'jsonwebtoken';
 
 const router = Router();
 
@@ -34,16 +35,40 @@ router.get(
       return res.redirect(redirectTo)
     });
 
-router.post('/login',
-  passport.authenticate('local'),
-  function(req, res) {
-    console.log("I am here")
-    return res.json({"status": "success"})
-  });
+// router.post('/login',
+//   passport.authenticate('local'),
+//   function(req, res) {
+//     console.log("I am here")
+//     return res.json({"status": "success"})
+//   });
+router.post('/login', function (req, res, next) {
+  passport.authenticate('local', {session: false}, (err, user, info) => {
+    console.log("Got user", user)
+      if (err || !user) {
+          return res.status(400).json({
+              message: 'Something is not right',
+              user   : user
+          });
+      }
+     req.login(user, {session: false}, (err) => {
+         if (err) {
+             res.send(err);
+         }
+         // generate a signed son web token with the contents of user object and return it in the response
+         const token = jwt.sign({id: user.id, iat: Date.now()}, process.env.SECRET_KEY);
+         return res.json({user, token});
+      });
+  })(req, res);
+});
 
-router.get('/session', (req, res) => {
+router.get('/session', passport.authenticate('jwt', {session: false}),  (req, res) => {
   return res.json(req.session)
 })
+
+router.get('/profile', passport.authenticate('jwt', {session: false}),  function(req, res, next) {
+  // console.log(req)
+  res.send(req.user);
+});
 
 router.get('/me', async (req, res) => {
   let userId;

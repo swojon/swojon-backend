@@ -1,18 +1,19 @@
 
 import { CategoryArgs, CategoryCreateDTO, CategoryFilterInput, CategoryRemoveDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
+import { MyContext } from "@/interfaces/auth.interface";
 import { CategoryRepository } from "@/repositories/category.repository";
 import { Categories, Category } from "@/typedefs/category.type";
-import { Arg, Args, Authorized, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 
 @Resolver()
 export class CategoryResolver extends CategoryRepository{
 
-  // @Authorized()
+  @Authorized()
   @Query(() => Categories, {
     description: 'List All Categories',
   })
-  async listCategories(@Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : CategoryFilterInput): Promise<Categories> {
-      const categories: Categories = await this.categoryList(paging, filters);
+  async listCategories(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : CategoryFilterInput): Promise<Categories> {
+    const categories: Categories = await this.categoryList(paging, filters);
       return categories;
   }
 

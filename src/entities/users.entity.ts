@@ -27,10 +27,11 @@ export class UserEntity extends BaseEntity implements User {
   @Column({nullable:true})
   facebookId?: string;
 
+  @Column({nullable: true})
+  lastLogOut?: Date;
 
   @CreateDateColumn()
   createdAt: Date;
-
 
   @UpdateDateColumn()
   updatedAt: Date;

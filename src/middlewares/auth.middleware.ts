@@ -7,6 +7,7 @@ import { HttpException } from '@exceptions/httpException';
 import { RequestWithUser, DataStoredInToken, MyContext } from '@interfaces/auth.interface';
 import { Role } from '@/interfaces/role.interface';
 import { RoleEntity } from '@/entities/role.entity';
+import passport from 'passport';
 
 const getAuthorization = req => {
   const cookie = req.cookies['Authorization'];
@@ -35,6 +36,32 @@ export const AuthMiddleware = async req => {
   }
 };
 
+export const AuthJWTMiddleware = async ({ context: { user} }, roles) => {
+  try {
+
+    if (!user) {
+      throw new HttpException(401, "You don't have permission to access this resource");
+    }
+
+    if (roles.length === 0) {
+      return true;
+    }
+
+    const userRolesNames = user.roles.map(role => role.name);
+
+    if (!userRolesNames.some(role => roles.includes(role))) {
+        return false;
+    }
+
+    return true;
+
+  } catch (error) {
+    console.log("error", error)
+    return false
+  }
+};
+
+
 export const AuthCheckerMiddleware: AuthChecker<MyContext> = async ({ context: { req } }, roles) => {
   console.log(req.session)
   if (!req.session!.userId) {
@@ -55,6 +82,15 @@ export const AuthCheckerMiddleware: AuthChecker<MyContext> = async ({ context: {
 
   return true;
 };
+
+export const getUser = (req: Express.Request, res: Express.Response) =>
+  new Promise((resolve, reject) => {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+      if (err) reject(err)
+      resolve(user)
+    })(req, res)
+  })
+
 
 
 

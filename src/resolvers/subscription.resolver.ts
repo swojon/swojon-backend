@@ -17,8 +17,8 @@ export enum TOPICS_ENUM{
 export class SubscriptionResolver {
   @Subscription({
     subscribe: withFilter((_, __, payload) => {
-
-      if (!payload.req.session!.userId) {
+      console.log("payload", payload)
+      if (!payload.currentUser) {
         throw new Error("You don't have permission to access this resource");
       }
       return pubSub.asyncIterator(TOPICS_ENUM.NEW_CHAT_MESSAGE);

@@ -9,7 +9,7 @@ import express from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import { Server, createServer } from 'http';
-import {GraphQLSchema, execute, subscribe} from "graphql";
+import {GraphQLError, GraphQLSchema, execute, subscribe} from "graphql";
 // import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { WebSocketServer } from 'ws';
@@ -19,12 +19,13 @@ import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import { NODE_ENV, SUBSCRIPTION_PORT,  PORT, ORIGIN, CREDENTIALS, COOKIE_NAME, COOKIE_SECRET } from '@config';
 import { dbConnection } from '@database';
-import { AuthCheckerMiddleware } from '@middlewares/auth.middleware';
+import { AuthCheckerMiddleware, AuthJWTMiddleware, getUser } from '@middlewares/auth.middleware';
 import { ErrorMiddleware } from '@middlewares/error.middleware';
 import { logger, responseLogger, errorLogger } from '@utils/logger';
 import session from "express-session";
 // import * as  Server from 'socket.io';
 import Redis from 'ioredis';
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import RedisStore from "connect-redis";
 import {redis} from "./redis"
 import router from './authentication/route';
@@ -48,6 +49,7 @@ import { SellerReviewResolver } from './resolvers/sellerReview.resolver';
 import { LocationResolver } from './resolvers/location.resolver';
 import { PointResolver } from './resolvers/point.resolver';
 import passport from 'passport';
+import { UserEntity } from './entities/users.entity';
 
 const passportSetup = require('./utils/passport');
 
@@ -86,14 +88,14 @@ const sessionMiddleware = session({
     httpOnly: true,
     secure: env === "production",
     maxAge: 1000*60*5, //5 minutes ,//1000 * 60 * 60 * 24 * 7 * 365, // 7 years,
-    sameSite: "lax"
+    sameSite: "none"
   }
 })
 
-app.use(sessionMiddleware);
+// app.use(sessionMiddleware);
 
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 
 app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS}));
 app.use(compression());
@@ -111,7 +113,7 @@ const schema = await buildSchema({
     SellerReviewResolver, PointResolver
   ],
   pubSub: pubSub,
-  authChecker: AuthCheckerMiddleware,
+  authChecker: AuthJWTMiddleware,
 });
 
 const httpServer = createServer(app);
@@ -126,25 +128,54 @@ const wsServer = new WebSocketServer({
 
 });
 const sessionContext: Record<string, unknown> = {};
+const getDynamicContext = async (ctx, msg, args) => {
+  // ctx is the graphql-ws Context where connectionParams live
+
+ if (ctx.connectionParams.Authorization) {
+    try {
+      const decoded: JwtPayload | string = jwt.verify(ctx.connectionParams.Authorization.replace('Bearer ', ""), process.env.SECRET_KEY)
+      console.log("decoded", decoded)
+      const currentUser = await UserEntity.findOne({
+        // @ts-ignore
+        where: { id: decoded.id }, select: ["email", 'username', 'id'], relations: ['roles']});
+      return { currentUser };
+    } catch (error) {
+      return { currentUser: null };
+    }
+  }
+  // Otherwise let our resolvers know we don't have a current user
+
+};
+
 const serverCleanup = useServer({
   schema ,
-  context: ({ req, res, connection }: any) => {
-    return {req: {
-      ...req,
-      ...sessionContext
-    }, res, connection}}
-  ,
-  onConnect(ctx) {
-    // console.log("onConnect")
-    return new Promise(resolve => {
-      sessionMiddleware(ctx.extra.request as any, {} as any, () => {
-        console.log("resolved")
-        sessionContext.session = ctx.extra.request.session;
-        resolve({req: ctx.extra.request, userId: ctx.extra.request.session!.userId})
-      })
-    })
-
+  context: (ctx, msg, args) => {
+    // Returning an object will add that information to our
+    // GraphQL context, which all of our resolvers have access to.
+   return getDynamicContext(ctx, msg, args)
   },
+  // onConnect(ctx) {
+  //   // console.log("onConnect")
+  //   return new Promise(resolve => {
+  //     sessionMiddleware(ctx.extra.request as any, {} as any, () => {
+  //       console.log("resolved")
+  //       sessionContext.session = ctx.extra.request.session;
+  //       resolve({req: ctx.extra.request, userId: ctx.extra.request.session!.userId})
+  //     })
+  //   })
+  // }
+  // context: async req => {
+  //     // try to retrieve a user with the token
+  //   console.log("I am", req, )
+  //   // const user = await getUser(req, res);
+  //   // return { req, res, connect, user };
+  //   return req
+
+  //   // return { req, res, connect }
+  // },
+
+
+  // },
 
 }, wsServer);
 
@@ -165,7 +196,19 @@ const apolloServer = new ApolloServer({
       }
       // :ApolloServerPluginLandingPageGraphQLPlayground({ settings: { 'request.credentials': 'include' } }),
   ],
-  context: ({ req, res, connect }: any) => ({ req, res, connect }),
+  context: async ({ req, res, connect }: any) => {
+    // console.log(req, res)
+    // get the user token from the headers
+    const token = req.headers.authorization || '';
+
+    // try to retrieve a user with the token
+    const user = await getUser(req, res);
+    // console.log("user apollo", user)
+    return { req, res, connect, user };
+
+    // return { req, res, connect }
+  }
+    ,
   formatResponse: (response, request) => {
     responseLogger(request);
 

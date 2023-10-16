@@ -5,6 +5,8 @@ import { compare } from 'bcrypt';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import {Strategy as LocalStrategy} from 'passport-local';
+import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt'
+
 
 const GOOGLE_CLIENT_ID = "289456051793-3ltve2koi2m13g1819uhnbjigse41iug.apps.googleusercontent.com"
 const GOOGLE_CLIENT_SECRET = "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";
@@ -82,6 +84,28 @@ passport.use(new LocalStrategy(
   }
 ));
 
+passport.use(new JWTStrategy({
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey   : process.env.SECRET_KEY
+},
+async function (jwtPayload: {
+  id: number,
+  iat: Date,
+}, cb) {
+  // console.log("payload", jwtPayload)
+  //find the user in db if needed. This functionality may be omitted if you store everything you'll need in JWT payload.
+  const findUser = await  UserEntity.findOne({
+    where: {id: jwtPayload.id},
+    select: ["id", "email", "username"],
+    relations: ["roles"]
+  })
+
+  if (!findUser) return cb("Something Went Wrong");
+
+  return cb(null, findUser);
+}
+));
+
 // passport.use(
 //   new GithubStrategy(
 //     {
@@ -109,10 +133,10 @@ passport.use(new LocalStrategy(
 // );
 
 passport.serializeUser((user, done) => {
-
   done(null, user);
 });
 
 passport.deserializeUser((user, done) => {
   done(null, user);
 });
+

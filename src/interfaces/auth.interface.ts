@@ -19,6 +19,7 @@ export interface RequestWithUser {
 export interface MyContext {
   req: Request;
   res: Response;
+  user: any;
   // authorsLoader: ReturnType<typeof createAuthorsLoader>;
 }
 
