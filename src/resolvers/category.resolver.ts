@@ -8,7 +8,7 @@ import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver } from "type-grap
 @Resolver()
 export class CategoryResolver extends CategoryRepository{
 
-  @Authorized()
+  // @Authorized()
   @Query(() => Categories, {
     description: 'List All Categories',
   })
