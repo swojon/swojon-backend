@@ -97,7 +97,7 @@ const sessionMiddleware = session({
 app.use(passport.initialize());
 // app.use(passport.session());
 
-app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS}));
+app.use(cors({ origin: ORIGIN.split(','), credentials: CREDENTIALS}));
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
