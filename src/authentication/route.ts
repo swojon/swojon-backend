@@ -35,8 +35,13 @@ router.get(
       // }
       // else redirectTo = `${CLIENT_URL}/`
       console.log("req url", req.url)
+      console.log("res", res)
       console.log("Client URL", CLIENT_URL)
-      return res.redirect(`${CLIENT_URL}?token=${token}`)
+      try{
+        return res.redirect(`${CLIENT_URL}?token=${token}`)
+      }catch(err){
+        console.log("error redirecting", err)
+      }
     });
 
 // router.post('/login',
