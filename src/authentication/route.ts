@@ -16,7 +16,10 @@ router.get(
   "/google/callback", passport.authenticate("google", {
       failureRedirect: `${CLIENT_URL}/signin`,
     }), (req, res)=> {
-      console.log("I am here")
+
+      // tslint:disable-next-line
+      const token = jwt.sign({id: req.user.id!, iat: Date.now()}, process.env.SECRET_KEY);
+
       // const cookies = cookieParser(req.cookies)
       // cookies.get("redirectTo")
       console.log("cookies", req.cookies)
@@ -32,7 +35,7 @@ router.get(
       }
       else redirectTo = `${CLIENT_URL}/`
 
-      return res.redirect(redirectTo)
+      return res.redirect(`${redirectTo}?token=${token}`)
     });
 
 // router.post('/login',
