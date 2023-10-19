@@ -20,22 +20,23 @@ router.get(
       // tslint:disable-next-line
       const token = jwt.sign({id: req.user.id!, iat: Date.now()}, process.env.SECRET_KEY);
 
-      // const cookies = cookieParser(req.cookies)
-      // cookies.get("redirectTo")
-      console.log("cookies", req.cookies)
-      let redirectTo = "";
-      try {
-         redirectTo = req.cookies["redirectTo"]
-      } catch (error) {
+      // // const cookies = cookieParser(req.cookies)
+      // // cookies.get("redirectTo")
+      // console.log("cookies", req.cookies)
+      // let redirectTo = "";
+      // try {
+      //    redirectTo = req.cookies["redirectTo"]
+      // } catch (error) {
 
-      }
+      // }
 
-      if (redirectTo) {
-        redirectTo = `${CLIENT_URL}${redirectTo}`
-      }
-      else redirectTo = `${CLIENT_URL}/`
-
-      return res.redirect(`${redirectTo}?token=${token}`)
+      // if (redirectTo) {
+      //   redirectTo = `${CLIENT_URL}${redirectTo}`
+      // }
+      // else redirectTo = `${CLIENT_URL}/`
+      console.log("req url", req.url)
+      console.log("Client URL", CLIENT_URL)
+      return res.redirect(`${CLIENT_URL}?token=${token}`)
     });
 
 // router.post('/login',
