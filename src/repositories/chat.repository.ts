@@ -127,7 +127,9 @@ public async chatRoomMessageList(chatRoomId: number): Promise<ChatMessageList>{
 
     const chatMessages = await ChatMessageEntity.createQueryBuilder("chat_message_entity")
                                                 .leftJoinAndSelect('chat_message_entity.sender', 'sender')
-                                                .where("chat_message_entity.chatRoomId = :id", { id: chatRoomId }).getManyAndCount()
+                                                .where("chat_message_entity.chatRoomId = :id", { id: chatRoomId })
+                                                .orderBy('chat_message_entity.dateSent', 'ASC')
+                                                .getManyAndCount()
 
 
     // findAndCount({ where: { chatRoomId: chatRoomId }, relations:["sender"] });
