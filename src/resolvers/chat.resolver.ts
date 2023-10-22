@@ -23,7 +23,8 @@ export class ChatResolver extends ChatMessageRepository {
     description: 'Send Chat Message',
   })
   async sendChatMessage(@Arg('chatData') chatData: CreateMessageDTO, @Ctx() ctx:MyContext, @PubSub(TOPICS_ENUM.NEW_CHAT_MESSAGE) publish: Publisher<Chat>): Promise<Chat> {
-    const senderId = chatData.senderId?chatData.senderId: ctx.req.session!.userId;
+    console.log(ctx.user)
+    const senderId = chatData.senderId ??  ctx.user.id;
     const chatMessage = await this.messageSend(chatData, senderId);
     await publish(chatMessage);
     return chatMessage;

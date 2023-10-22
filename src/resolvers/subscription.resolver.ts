@@ -26,7 +26,7 @@ export class SubscriptionResolver {
     (payload, variables, context) => {
       console.log(payload)
       console.log("context:-", context)
-      return payload.chatRoom.id === variables.chatRoomId && payload.members.includes(context.req.session!.userId);
+      return payload.chatRoom.id === variables.chatRoomId && payload.members.includes(context.currentUser.id);
     }
     )
   })
