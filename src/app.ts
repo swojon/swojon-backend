@@ -131,9 +131,9 @@ const sessionContext: Record<string, unknown> = {};
 const getDynamicContext = async (ctx, msg, args) => {
   // ctx is the graphql-ws Context where connectionParams live
 
- if (ctx.connectionParams.Authorization) {
+ if (ctx.connectionParams?.headers?.Authorization) {
     try {
-      const decoded: JwtPayload | string = jwt.verify(ctx.connectionParams.Authorization.replace('Bearer ', ""), process.env.SECRET_KEY)
+      const decoded: JwtPayload | string = jwt.verify(ctx.connectionParams.headers.Authorization.replace('Bearer ', ""), process.env.SECRET_KEY)
       console.log("decoded", decoded)
       const currentUser = await UserEntity.findOne({
         // @ts-ignore

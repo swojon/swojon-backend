@@ -18,7 +18,7 @@ export class SubscriptionResolver {
   @Subscription({
     subscribe: withFilter((_, __, payload) => {
       console.log("payload", payload)
-      if (!payload.currentUser) {
+      if (!payload?.currentUser) {
         throw new Error("You don't have permission to access this resource");
       }
       return pubSub.asyncIterator(TOPICS_ENUM.NEW_CHAT_MESSAGE);

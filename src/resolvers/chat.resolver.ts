@@ -35,7 +35,7 @@ export class ChatResolver extends ChatMessageRepository {
     description: "List All Chat Rooms of a User with message",
   })
   async listChatRooms(@Ctx() ctx:MyContext, @Args(){userId}: ListChatRoomArgs): Promise<ChatRoomsWithMessage> {
-    if (!userId) userId = ctx.req.session!.userId;
+    if (!userId) userId = ctx.user.id;
     const chatRooms = await this.chatRoomList(userId);
     return chatRooms;
   }
