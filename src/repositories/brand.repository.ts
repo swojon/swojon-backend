@@ -113,19 +113,23 @@ export class BrandRepository{
 
     if (!findBrand) throw new HttpException(409, `Brand with id ${brandId} does not exist`);
 
-    await CategoryEntity.delete({ id: brandId });
+    // await CategoryEntity.delete({ id: brandId });
+    await BrandEntity.softRemove(findBrand)
 
     return findBrand;
   }
 
   public async brandsRemove(brandData: BrandRemoveDTO): Promise<Brands> {
     const brandIds = brandData.brandIds
-    const updatedResult: UpdateResult = await BrandEntity.update({id: In(brandData.brandIds)}, { isDeleted: true });
+    await BrandEntity.createQueryBuilder('be').softDelete().whereInIds(brandData.brandIds).execute()
+
+    // const updatedResult: UpdateResult = await BrandEntity.update({id: In(brandData.brandIds)}, { isDeleted: true });
     const findBrands: BrandEntity[] =  await BrandEntity.createQueryBuilder('br')
                       .select(["br.id", "br.name", "br.slug", "br.description",
                               "br.logo", "br.isFeatured", "br.isDeleted"])
                       .leftJoinAndSelect('br.categories', 'categories')
                       .where('br.id In (:...brandIds)', { brandIds })
+                      .withDeleted()
                       .getMany();
 
     return {items: findBrands}
