@@ -1,5 +1,5 @@
 import { IsNotEmpty } from "class-validator";
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Status {
   PENDING = "pending",
@@ -56,4 +56,6 @@ export class CategoryEntity extends BaseEntity{
     @Column ({default: false})
     isDeleted: boolean;
 
+    @DeleteDateColumn({name: 'deleted_at'})
+    deletedAt: Date;
 }

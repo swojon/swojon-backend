@@ -66,7 +66,7 @@ export class CategoryRepository{
 
   public async categoryAdd(categoryData: CategoryCreateDTO): Promise<Category> {
     const findCategory: CategoryEntity = await CategoryEntity.findOne({ where:
-                    [{ name: categoryData?.name }, {slug:categoryData?.slug}]
+                    [{ name: categoryData?.name }, {slug:categoryData?.slug}],
                     });
     if (findCategory) throw new HttpException(409, `Category with name ${categoryData.name} already exists`);
     let parentCategory:CategoryEntity|null = null;
@@ -85,18 +85,20 @@ export class CategoryRepository{
     const findCategory: CategoryEntity = await CategoryEntity.findOne({ where: { id: categoryId } });
     if (!findCategory) throw new HttpException(409, `Category with id ${categoryId} does not exist`);
 
-    await CategoryEntity.delete({ id: categoryId });
-
+    // await CategoryEntity.delete({ id: categoryId });
+    // await findCategory.softRemove()
+    await CategoryEntity.softRemove(findCategory)
     return findCategory;
   }
 
   public async categoriesRemove(categoryData: CategoryRemoveDTO): Promise<Categories> {
     const categoryIds = categoryData.categoryIds
-    const updatedResult: UpdateResult = await CategoryEntity.update({id: In(categoryData.categoryIds)}, { isDeleted: true });
+    await CategoryEntity.createQueryBuilder('ce').softDelete().whereInIds(categoryData.categoryIds).execute()
     const findCategories: CategoryEntity[] = await CategoryEntity.find({
       select: ["id", "name", "slug", "description", "banner", 'status', 'isDeleted', 'isFeatured', 'isGlobal', 'isDeleted'],
       relations: ["parentCategory"],
-      where: {id: In(categoryData.categoryIds)}
+      where: {id: In(categoryData.categoryIds)},
+      withDeleted: true
     })
     return {items: findCategories}
 }
