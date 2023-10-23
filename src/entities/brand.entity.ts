@@ -1,5 +1,5 @@
 import { IsNotEmpty } from "class-validator";
-import { BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, DeleteDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { CategoryEntity } from "./category.entity";
 
 @Entity()
@@ -26,6 +26,9 @@ export class BrandEntity extends BaseEntity{
 
   @Column({default: false})
   isDeleted: boolean;
+
+  @DeleteDateColumn({name: 'deleted_at'})
+  deletedAt: Date;
 
   @ManyToMany(()=>CategoryEntity)
   @JoinTable()
