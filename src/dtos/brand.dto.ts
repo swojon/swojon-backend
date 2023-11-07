@@ -1,4 +1,4 @@
-import { Field, InputType } from "type-graphql";
+import { ArgsType, Field, InputType } from "type-graphql";
 
 @InputType()
 export class BrandCreateDTO {
@@ -56,4 +56,10 @@ export class BrandRemoveDTO {
   @Field(() => [Number])
   brandIds: number[]
 
+}
+
+@ArgsType()
+export class BrandOptionsArgs{
+  @Field(() => [Number], {nullable: true})
+  categoryIds?: number[]
 }

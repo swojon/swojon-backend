@@ -1,5 +1,5 @@
 
-import { BrandCategoryInput, BrandCreateDTO, BrandRemoveDTO, BrandUpdateDTO } from "@/dtos/brand.dto";
+import { BrandCategoryInput, BrandCreateDTO, BrandOptionsArgs, BrandRemoveDTO, BrandUpdateDTO } from "@/dtos/brand.dto";
 import { PagingArgs } from "@/dtos/category.dto";
 import { BrandRepository } from "@/repositories/brand.repository";
 import { Brand, Brands } from "@/typedefs/brand.type";
@@ -14,6 +14,15 @@ export class BrandResolver extends BrandRepository{
   })
   async listBrands(@Args() paging: PagingArgs): Promise<Brands> {
       const brands: Brands = await this.brandList(paging);
+      return brands;
+  }
+
+   // @Authorized()
+   @Query(() => Brands, {
+    description: 'List All Brands',
+  })
+  async listBrandOptions(@Args() option: BrandOptionsArgs): Promise<Brands> {
+      const brands: Brands = await this.brandOptionList(option);
       return brands;
   }
 

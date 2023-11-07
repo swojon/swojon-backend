@@ -1,4 +1,4 @@
-import { BrandCreateDTO, BrandRemoveDTO, BrandUpdateDTO } from "@/dtos/brand.dto";
+import { BrandCreateDTO, BrandOptionsArgs, BrandRemoveDTO, BrandUpdateDTO } from "@/dtos/brand.dto";
 import { CategoryArgs, CategoryCreateDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
 import { BrandEntity } from "@/entities/brand.entity";
 import { CategoryEntity } from "@/entities/category.entity";
@@ -37,6 +37,19 @@ export class BrandRepository{
 
     return {items: findBrands[0], hasMore: hasMore}
 
+  }
+
+  public async brandOptionList(brandOptionsArgs: BrandOptionsArgs ): Promise<Brands>{
+    let sql = BrandEntity.createQueryBuilder("br")
+    .select(["br.id", "br.name", "br.slug"])
+    .orderBy('br.id', 'ASC')
+
+    if (brandOptionsArgs.categoryIds){
+      sql = sql.leftJoinAndSelect('br.categories', 'categories')
+            .where('categories.id In (:...categoryIds)', { categoryIds: brandOptionsArgs.categoryIds })
+    }
+    const findBrandOptions = await sql.getMany()
+    return {items: findBrandOptions}
   }
 
   public async brandAdd(brandData: BrandCreateDTO): Promise<Brand>{

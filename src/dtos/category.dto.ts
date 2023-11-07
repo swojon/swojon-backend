@@ -1,5 +1,5 @@
 import { Status } from "@/entities/category.entity";
-import { ArgsType, Field, InputType, registerEnumType } from "type-graphql";
+import { Args, ArgsType, Field, InputType, registerEnumType } from "type-graphql";
 
 registerEnumType(Status, {
   name: "Status",
