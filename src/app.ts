@@ -77,9 +77,9 @@ if (env === 'production') {
 }
 
 const sessionMiddleware = session({
-  store: new RedisStore({
-    client: redis as any
-  }),
+  // store: new RedisStore({
+  //   client: redis as any
+  // }),
   name: COOKIE_NAME,
   secret: COOKIE_SECRET,
   resave: false,
