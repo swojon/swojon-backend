@@ -39,6 +39,11 @@ export class ListingRepository{
     if (filters.brandIds){
       sql = sql.andWhere("brand.id IN (:...brandIds)", {brandIds: filters.brandIds})
     }
+
+    if (filters.categorySlug){
+      const findCategory = await CategoryEntity.findOne({where: {"slug": filters.categorySlug}})
+      if (!!findCategory) sql = sql.andWhere("category.id = :categoryId", {categoryId: findCategory.id}) 
+    }
     if (filters.categoryIds){
       sql = sql.andWhere("category.id IN (:...categoryIds)", {categoryIds: filters.categoryIds})
     }
