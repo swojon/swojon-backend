@@ -22,8 +22,8 @@ export class ListingResolver extends ListingRepository{
   })
   async createListing(@Arg('listingData') listingData : ListingCreateDTO,  @Ctx() ctx:MyContext): Promise<Listing> {
     // console.log("context", ctx)
-    // const userId: number = ctx.user.id;
-    const userId: number = 5; //it is temporary
+    const userId: number = ctx.user.id;
+    // const userId: number = 5; //it is temporary
     const listing: Listing = await this.listingAdd(userId, listingData);
     return listing;
   }
