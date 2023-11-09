@@ -12,10 +12,54 @@ import { HttpException } from "@/exceptions/httpException";
 import { Listing, Listings } from "@/interfaces/listing.interface";
 import { EntityRepository, In } from "typeorm";
 
+const getAllRelatedDependantSubCategories = (categories:any[], categoryId: any ) => {
+    
+  let categoryIds = [categoryId]
+        
+  const getChildrenCategories = (categories, tartgetCategory) => {
+    const children_categories = categories.filter(cat => cat.parentCategory?.id === tartgetCategory.id)
+    children_categories.forEach(cat => {
+      categoryIds.push(cat.id)
+      getChildrenCategories(categories, cat)
+    });
+  }
+  getChildrenCategories(categories, categoryId)
+
+  return categoryIds
+}
+
 @EntityRepository(ListingEntity)
 export class ListingRepository{
-
+ 
+        
+  
   public async listingList(paging: PagingArgs, filters: ListingFilterInput): Promise<Listings>{
+    let categoryIdsToFilter = []
+    if (filters.categorySlug || filters.categoryIds){
+      const categories = await CategoryEntity.find({
+        select: ["id", "slug"],
+        relations: ["parentCategory"]
+      })
+      if (filters.categorySlug){
+        const findCategory = categories.find(cat => cat.slug === filters.categorySlug)
+        if (!!findCategory) {
+          const relatedCategories = getAllRelatedDependantSubCategories(categories, findCategory.id)
+          categoryIdsToFilter = categoryIdsToFilter.concat(relatedCategories)
+        }
+        
+        
+      }
+      if (!!filters.categoryIds){
+        console.log("I am here")
+        filters.categoryIds.forEach(categoryId => {
+          console.log("catetgoryId", categoryId)
+          const relatedCategories = getAllRelatedDependantSubCategories(categories, categoryId)
+          console.log("Got related subcategories", relatedCategories)
+          categoryIdsToFilter = categoryIdsToFilter.concat(relatedCategories)
+        })
+      }
+    }
+    console.log("CategoryIds to filter", categoryIdsToFilter)
     let sql = ListingEntity.createQueryBuilder("listing")
               .select(["listing.title", "listing.id", "listing.price", "listing.description", ])
               .leftJoinAndSelect("listing.communities", "community")
@@ -40,12 +84,8 @@ export class ListingRepository{
       sql = sql.andWhere("brand.id IN (:...brandIds)", {brandIds: filters.brandIds})
     }
 
-    if (filters.categorySlug){
-      const findCategory = await CategoryEntity.findOne({where: {"slug": filters.categorySlug}})
-      if (!!findCategory) sql = sql.andWhere("category.id = :categoryId", {categoryId: findCategory.id}) 
-    }
-    if (filters.categoryIds){
-      sql = sql.andWhere("category.id IN (:...categoryIds)", {categoryIds: filters.categoryIds})
+    if (categoryIdsToFilter.length > 0 ){
+      sql = sql.andWhere("category.id IN (:...categoryIds)", {categoryIds: categoryIdsToFilter})
     }
     if (filters.locationIds){
       sql = sql.andWhere("location.id IN (:...locationIds)", {locationIds: filters.locationIds})

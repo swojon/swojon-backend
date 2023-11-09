@@ -12,7 +12,7 @@ export class ListingMedia {
 
   @Field()
   isPrimary?: boolean;
-  
+
 }
 @ObjectType()
 export class Listing {
@@ -80,5 +80,8 @@ export class Listings {
   items?: Listing[];
 
   @Field()
-  count: number
+  count?: number
+
+  @Field()
+  hasMore?: boolean
 }
