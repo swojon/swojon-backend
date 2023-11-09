@@ -5,7 +5,15 @@ import { Community } from "./community.type";
 import { Brand } from "./brand.type";
 import { Location } from "./location.type";
 
+@ObjectType()
+export class ListingMedia {
+  @Field()
+  url?: string;
 
+  @Field()
+  isPrimary?: boolean;
+  
+}
 @ObjectType()
 export class Listing {
   @Field()
@@ -22,6 +30,9 @@ export class Listing {
 
   @Field(()=>[Community])
   communities?: Community[]
+
+  @Field(()=>[ListingMedia])
+  media?: ListingMedia[]
 
   @Field()
   price?: number
@@ -59,6 +70,7 @@ export class Listing {
   @Field({ nullable: true})
   isSold?: boolean;
 
+  
 }
 
 

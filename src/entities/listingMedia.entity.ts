@@ -8,9 +8,6 @@ export class ListingMediaEntity extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => ListingEntity, {nullable:true, cascade:true})
-    listing: ListingEntity;
-
     @Column({nullable:true})
     media: string;
 

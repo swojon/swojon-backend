@@ -5,6 +5,7 @@ import { CommunityEntity } from "./community.entity";
 import { CategoryEntity } from "./category.entity";
 import { BrandEntity } from "./brand.entity";
 import { LocationEntity } from "./location.entity";
+import { ListingMediaEntity } from "./listingMedia.entity";
 
 export enum Status {
   PENDING = "pending",
@@ -90,5 +91,9 @@ export class ListingEntity extends BaseEntity{
 
     @Column({default: false})
     isSold: boolean;
+
+    @ManyToMany(()=>ListingMediaEntity, {cascade: true})
+    @JoinTable()
+    media: ListingMediaEntity[]
 
 }

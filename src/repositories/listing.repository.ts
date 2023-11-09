@@ -4,19 +4,21 @@ import { BrandEntity } from "@/entities/brand.entity";
 import { CategoryEntity } from "@/entities/category.entity";
 import { CommunityEntity } from "@/entities/community.entity";
 import { ListingEntity } from "@/entities/listing.entity";
+import { ListingMediaEntity } from "@/entities/listingMedia.entity";
 import { LocationEntity } from "@/entities/location.entity";
 import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Listing, Listings } from "@/interfaces/listing.interface";
 import { EntityRepository, In } from "typeorm";
 
-
 @EntityRepository(ListingEntity)
 export class ListingRepository{
 
   public async listingList(): Promise<Listings>{
-    const findListingsAndCount: [ListingEntity[], number] = await ListingEntity.findAndCount({relations:["communities", 'user', 'brand', 'category']})
-
+    const findListingsAndCount: [ListingEntity[], number] = await ListingEntity.findAndCount({
+      relations:["communities", 'user', 'brand', 'category', "media"]
+    })
+    console.log(findListingsAndCount[0])
     return {
       items: findListingsAndCount[0],
       count: findListingsAndCount[1]
@@ -50,13 +52,21 @@ export class ListingRepository{
     if (listingData.communityIds){
       communities = await CommunityEntity.findByIds(listingData.communityIds)
     }
-
+    let listingMedia = []
+    if (listingData.mediaUrls){
+      listingData.mediaUrls.forEach(url =>  {
+        if (!url.startsWith("http")) throw new HttpException(409, `Invalid media url ${url}`);
+        const media_ = ListingMediaEntity.create({url})
+        listingMedia.push(media_)
+      })
+    }
     const findCategory: CategoryEntity = await CategoryEntity.findOne({
       where: {id: listingData.categoryId}
     })
     if (!findCategory) throw new HttpException(409, `Category with id ${listingData.categoryId} does not exist`);
 
-    const createListingData: ListingEntity = await ListingEntity.create({...listingData, category:findCategory, brand, communities, location,  user:findUser}).save()
+    console.log(listingMedia)
+    const createListingData: ListingEntity = await ListingEntity.create({...listingData, category:findCategory, brand, communities, location,  user:findUser, media: listingMedia}).save()
     return createListingData
   }
 

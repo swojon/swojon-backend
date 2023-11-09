@@ -22,8 +22,12 @@ export interface Listing {
   dateCreated?:Date;
   dateDeleted?:Date;
   isSold?:boolean;
+  media?: ListingMedia[]
 }
-
+export interface ListingMedia {
+  url?:string;
+  isPrimary?:boolean;
+}
 export interface Listings{
   items: Listing[];
   count: number;
