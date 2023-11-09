@@ -1,5 +1,6 @@
 
-import { ListingCreateDTO, ListingUpdateDTO } from "@/dtos/listing.dto";
+import { PagingArgs } from "@/dtos/category.dto";
+import { ListingCreateDTO, ListingFilterInput, ListingUpdateDTO } from "@/dtos/listing.dto";
 import { BrandEntity } from "@/entities/brand.entity";
 import { CategoryEntity } from "@/entities/category.entity";
 import { CommunityEntity } from "@/entities/community.entity";
@@ -14,14 +15,50 @@ import { EntityRepository, In } from "typeorm";
 @EntityRepository(ListingEntity)
 export class ListingRepository{
 
-  public async listingList(): Promise<Listings>{
-    const findListingsAndCount: [ListingEntity[], number] = await ListingEntity.findAndCount({
-      relations:["communities", 'user', 'brand', 'category', "media"]
-    })
-    console.log(findListingsAndCount[0])
+  public async listingList(paging: PagingArgs, filters: ListingFilterInput): Promise<Listings>{
+    let sql = ListingEntity.createQueryBuilder("listing")
+              .select(["listing.title", "listing.id", "listing.price", "listing.description", ])
+              .leftJoinAndSelect("listing.communities", "community")
+              .leftJoinAndSelect("listing.user", "user")
+              .leftJoinAndSelect("listing.brand", "brand")
+              .leftJoinAndSelect("listing.category", "category")
+              .leftJoinAndSelect("listing.media", "media")
+              .leftJoinAndSelect('listing.location', "location")
+              .orderBy('listing.id', 'ASC')
+    if (paging.starting_after){
+      sql = sql.where('listing.id > :starting_after', {starting_after: paging.starting_after})
+    }else if (paging.ending_before){
+      sql = sql.where("listing.id < :ending_before", {ending_before: paging.ending_before})
+    }
+    const limit:number = Math.min(100, paging.limit?paging.limit: 100)
+    sql = sql.limit(limit)
+    
+    if (filters.communityIds){
+      sql = sql.andWhere("community.id IN (:...communityIds)", {communityIds: filters.communityIds})
+    }
+    if (filters.brandIds){
+      sql = sql.andWhere("brand.id IN (:...brandIds)", {brandIds: filters.brandIds})
+    }
+    if (filters.categoryIds){
+      sql = sql.andWhere("category.id IN (:...categoryIds)", {categoryIds: filters.categoryIds})
+    }
+    if (filters.locationIds){
+      sql = sql.andWhere("location.id IN (:...locationIds)", {locationIds: filters.locationIds})
+    }
+    if (filters.userIds){
+      sql = sql.andWhere("user.id IN (:...userIds)", {userIds: filters.userIds})
+    }
+    const findListings = await sql.getManyAndCount()
+    const listingList = findListings[0]
+    const count = findListings[1]
+    const hasMore = listingList.length === limit;
+
+    
     return {
-      items: findListingsAndCount[0],
-      count: findListingsAndCount[1]
+      items: listingList,
+      hasMore,
+      count
+      
     }
   }
 

@@ -29,6 +29,7 @@ export interface ListingMedia {
   isPrimary?:boolean;
 }
 export interface Listings{
-  items: Listing[];
-  count: number;
+  items?: Listing[];
+  count?: number;
+  hasMore?: boolean
 }

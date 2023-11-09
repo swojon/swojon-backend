@@ -1,4 +1,5 @@
-import { ListingCommunityInputDTO, ListingCreateDTO, ListingUpdateDTO } from "@/dtos/listing.dto";
+import { CategoryFilterInput, PagingArgs } from "@/dtos/category.dto";
+import { ListingCommunityInputDTO, ListingCreateDTO, ListingFilterInput, ListingUpdateDTO } from "@/dtos/listing.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { ListingRepository } from "@/repositories/listing.repository";
 import { Listing, Listings } from "@/typedefs/listing.type";
@@ -11,8 +12,8 @@ export class ListingResolver extends ListingRepository{
   @Query(() => Listings, {
     description: 'List All Listings',
   })
-  async listListings(): Promise<Listings> {
-      const listings: Listings = await this.listingList();
+  async listListings(@Args() paging: PagingArgs, @Arg('filters', {nullable:true}) filters?: ListingFilterInput): Promise<Listings> {
+      const listings: Listings = await this.listingList(paging, filters);
       return listings;
   }
 

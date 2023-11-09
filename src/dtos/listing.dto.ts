@@ -86,3 +86,30 @@ export class ListingCommunityInputDTO{
   communityIds: number[]
 
 }
+
+@InputType()
+export class ListingFilterInput{
+  @Field(() => [Boolean],{ nullable: true})
+  isFeatured?: boolean[];
+
+  @Field(() => [Number],{ nullable: true})
+  userIds?: number[];
+
+  @Field({nullable:true})
+  locationId?: number;
+ 
+  @Field(() => [Number],{ nullable: true})
+  communityIds?: number[];
+
+  @Field(() => [Number],{ nullable: true})
+  brandIds?: number[];
+
+  @Field(() => [Number],{ nullable: true})
+  categoryIds?: number[];
+
+  @Field(() => [Number],{ nullable: true})
+  locationIds?: number[];
+
+
+  
+}
