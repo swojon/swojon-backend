@@ -14,11 +14,13 @@ import { EntityRepository, In } from 'typeorm';
 const getAllRelatedDependantSubCategories = (categories: any[], categoryId: any) => {
   let categoryIds = [categoryId];
 
-  const getChildrenCategories = (categories, tartgetCategory) => {
-    const children_categories = categories.filter(cat => cat.parentCategory?.id === tartgetCategory.id);
-    children_categories.forEach(cat => {
-      categoryIds.push(cat.id);
-      getChildrenCategories(categories, cat);
+  const getChildrenCategories = (categories:any[], tartgetCategory:number|null) => {
+    const children_categories = categories.filter(cat => cat.parentCategory?.id === tartgetCategory);
+    console.log("children Categroies", children_categories)
+    children_categories.forEach(childrenCat => {
+      console.log("now checking for children id, ", childrenCat.id)
+      categoryIds.push(childrenCat.id);
+      getChildrenCategories(categories, childrenCat);
     });
   };
   getChildrenCategories(categories, categoryId);
