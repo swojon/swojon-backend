@@ -1,4 +1,4 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { ListingEntity } from "./listing.entity";
 
@@ -36,5 +36,8 @@ export class FavoriteEntity extends BaseEntity{
     //column for date updated, not empty
     @Column({nullable: true})
     dateUpdated: Date;
+
+    @DeleteDateColumn({name: 'deleted_at'})
+    deletedAt: Date;
 
   }

@@ -18,34 +18,26 @@ export class FavoriteRepository{
 
     const findFavorite:FavoriteEntity = await FavoriteEntity.findOne({ where: { user: findUser, listing: findListing} });
 
-    if (!findFavorite){
-      const createFavoriteData: Favorite = await FavoriteEntity.create({user: findUser, listing: findListing}).save();
-      return createFavoriteData;
-    }
-    if (!findFavorite.isDeleted) throw new HttpException(409, `Listing already in favorite list`);
-    else  {
-      findFavorite.isDeleted = false
-
-      const createFavoriteData: Favorite = await FavoriteEntity.save(findFavorite);
-      return createFavoriteData;
-    }
-
+   
+    if (findFavorite) throw new HttpException(409, `Listing already in favorite list`);
+   
+    const createFavoriteData: Favorite = await FavoriteEntity.create({user: findUser, listing: findListing}).save();
+    return createFavoriteData;
 
   }
 
   public async favoriteRemove(userId:number, listingId:number): Promise<Favorite>{
-    const findUser: UserEntity = await UserEntity.findOne({ where: { id: userId} });
-    if (!findUser) throw new HttpException(409, "User doesn't exist");
+    // const findUser: UserEntity = await UserEntity.findOne({ where: { id: userId} });
+    // if (!findUser) throw new HttpException(409, "User doesn't exist");
 
-    const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId } });
-    if (!findListing) throw new HttpException(409, `Listing with id ${listingId} doesn't exist`);
+    // const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId } });
+    // if (!findListing) throw new HttpException(409, `Listing with id ${listingId} doesn't exist`);
 
-    const findFavorite:FavoriteEntity = await FavoriteEntity.findOne({ where: { user: findUser, listing: findListing} });
-    if (findFavorite) throw new HttpException(409, `Listing already in favorite list`);
+    const findFavorite:FavoriteEntity = await FavoriteEntity.findOne({ where: { userId: userId, listingId: listingId}, relations: ["user", "listing"] });
+    if (!findFavorite) throw new HttpException(409, `Favorite Entity not found`);
 
-    findFavorite.isDeleted = true;
-    const updateFavoriteData : Favorite = await FavoriteEntity.save(findFavorite);
-    return updateFavoriteData;
+    const updateFavoriteaData = await findFavorite.softRemove()
+    return updateFavoriteaData;
   }
 
   public async favoriteListingList(userId: number): Promise<FavoriteListings>{
