@@ -23,6 +23,8 @@ export interface Listing {
   dateDeleted?:Date;
   isSold?:boolean;
   media?: ListingMedia[]
+  favoriteCount?:number;
+  favoriteStatus?:boolean;
 }
 export interface ListingMedia {
   url?:string;

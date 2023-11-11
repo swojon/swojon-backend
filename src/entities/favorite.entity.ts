@@ -15,6 +15,12 @@ export class FavoriteEntity extends BaseEntity{
     @ManyToOne(() => UserEntity)
     user: UserEntity;
 
+    @Column({nullable: true})
+    userId: number;
+
+    @Column({nullable: true})
+    listingId: number;
+
     //many to one relationship with listing
     @ManyToOne(() => ListingEntity)
     listing: ListingEntity;

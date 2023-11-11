@@ -12,8 +12,9 @@ export class ListingResolver extends ListingRepository{
   @Query(() => Listings, {
     description: 'List All Listings',
   })
-  async listListings(@Args() paging: PagingArgs, @Arg('filters', {nullable:true}) filters?: ListingFilterInput): Promise<Listings> {
-      const listings: Listings = await this.listingList(paging, filters);
+  async listListings(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', {nullable:true}) filters?: ListingFilterInput): Promise<Listings> {
+    const userId= ctx.user?.id;  
+    const listings: Listings = await this.listingList(userId, paging, filters);
       return listings;
   }
 

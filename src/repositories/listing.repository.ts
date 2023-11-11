@@ -3,6 +3,7 @@ import { ListingCreateDTO, ListingFilterInput, ListingUpdateDTO } from '@/dtos/l
 import { BrandEntity } from '@/entities/brand.entity';
 import { CategoryEntity } from '@/entities/category.entity';
 import { CommunityEntity } from '@/entities/community.entity';
+import { FavoriteEntity } from '@/entities/favorite.entity';
 import { ListingEntity } from '@/entities/listing.entity';
 import { ListingMediaEntity } from '@/entities/listingMedia.entity';
 import { LocationEntity } from '@/entities/location.entity';
@@ -30,7 +31,31 @@ const getAllRelatedDependantSubCategories = (categories: any[], categoryId: any)
 
 @EntityRepository(ListingEntity)
 export class ListingRepository {
-  public async listingList(paging: PagingArgs, filters: ListingFilterInput): Promise<Listings> {
+  public async listingsFavoriteCount(listingIds: any[], userId: number|null){
+    console.log("Got User as an argument, ", userId)
+    const findFavorites = await FavoriteEntity.find({where: {listingId: In(listingIds)}, select: ["userId", "listingId"]})
+    let favorites = Object()
+    listingIds.forEach(listing => {
+      const listingFavorites = findFavorites.filter(fav => fav.listingId === listing)
+      favorites[listing] = Object()
+      favorites[listing]["favoriteCount"] = listingFavorites.length;
+      favorites[listing]["favoriteStatus"] = userId ? listingFavorites.filter(fav => fav.userId === userId).length > 0 : false;
+    })
+    return favorites;
+  }
+
+  public async listingFavoriteCount(listingId: number, userId: any){
+    const findFavorites = await FavoriteEntity.findAndCount({where: {listingId: listingId}})
+    return {
+      listingId: {
+        favoriteCount: findFavorites[1],
+        favroriteStatus: userId ? findFavorites[0].filter(fav => fav.userId === userId).length > 0 : false
+      }
+    }
+
+  }
+
+  public async listingList(userId:any, paging: PagingArgs, filters: ListingFilterInput): Promise<Listings> {
     let categoryIdsToFilter = [];
     if (filters?.categorySlug || filters?.categoryIds) {
       const categories = await CategoryEntity.find({
@@ -90,11 +115,20 @@ export class ListingRepository {
     }
     const findListings = await sql.getManyAndCount();
     const listingList = findListings[0];
+    
+    const favorites = await this.listingsFavoriteCount(listingList.map(listing => listing.id), userId)
+    const listingWithFavorites = listingList.map(listing => {
+      // console.log("listing", listing)
+      listing["favoriteCount"] = favorites[listing.id].favoriteCount;
+      listing["favoriteStatus"] = favorites[listing.id].favoriteStatus;
+      
+      return listing
+    })
     const count = findListings[1];
     const hasMore = listingList.length === limit;
 
     return {
-      items: listingList,
+      items: listingWithFavorites,
       hasMore,
       count,
     };

@@ -70,6 +70,12 @@ export class Listing {
   @Field({ nullable: true})
   isSold?: boolean;
 
+  @Field({nullable: true})
+  favoriteCount?: number;
+
+  @Field({nullable: true})
+  favoriteStatus?: boolean;
+
   
 }
 
