@@ -56,10 +56,14 @@ export class FavoriteRepository{
 
     const findFavorites:ListingEntity[] = favoritesAndCount[0].map((favorite) => favorite.listing);
     const count: number = favoritesAndCount[1];
-
+    
+    const listingWithFavorites = findFavorites.map(listing => {
+      listing["favoriteStatus"] = true;
+      return listing
+    })
     const favorites: FavoriteListings = {
       count: count,
-      items: findFavorites
+      items: listingWithFavorites
     }
     return favorites;
   }
