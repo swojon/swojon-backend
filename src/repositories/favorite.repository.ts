@@ -43,8 +43,15 @@ export class FavoriteRepository{
   public async favoriteListingList(userId: number): Promise<FavoriteListings>{
 
     const favoritesAndCount = await FavoriteEntity.createQueryBuilder("favorite_entity")
-                  .select(["favorite_entity.id", "favorite_entity.isDeleted", "favorite_entity.dateCreated"])
+                  .select(["favorite_entity.id"])
                   .leftJoinAndSelect('favorite_entity.listing', 'listing')
+                  // .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 'listing.dateCreated'])
+                  .leftJoinAndSelect('favorite_entity.listing.communities', 'listing.community')
+                  .leftJoinAndSelect('favorite_entity.listing.user', 'listing.user')
+                  .leftJoinAndSelect('favorite_entity.listing.brand', 'listing.brand')
+                  .leftJoinAndSelect('favorite_entity.listing.category', 'listing.category')
+                  .leftJoinAndSelect('favorite_entity.listing.media', 'listing.media')
+                  .leftJoinAndSelect('favorite_entity.listing.location', 'listing.location')
                   .where("favorite_entity.userId = :id", { id: userId }).printSql().getManyAndCount()
 
     const findFavorites:ListingEntity[] = favoritesAndCount[0].map((favorite) => favorite.listing);
