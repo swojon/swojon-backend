@@ -11,7 +11,7 @@ export class User {
   @Field()
   email?: string;
 
-  @Field()
+  @Field({nullable: true})
   facebookId?: string;
 
   @Field({nullable:true})
@@ -41,7 +41,7 @@ export class UserWithMeta {
   @Field()
   email?: string;
 
-  @Field()
+  @Field({nullable: true })
   facebookId?: string;
 
   @Field({nullable:true})
