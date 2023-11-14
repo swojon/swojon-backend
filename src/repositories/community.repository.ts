@@ -39,7 +39,7 @@ export class CommunityRepository{
                           .orderBy('ce.id', 'ASC')
 
 
-          if (filters.userIds && filters.userIds.length > 0){
+          if (filters?.userIds && filters?.userIds.length > 0){
             const cmQuery = CommunityMemberEntity
                 .createQueryBuilder('cme')
                 .select("cme.communityId")
