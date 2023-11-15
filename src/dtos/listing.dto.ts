@@ -88,6 +88,12 @@ export class ListingCommunityInputDTO{
 }
 
 @InputType()
+export class SerachInputDTO {
+  @Field()
+  search: string;
+}
+
+@InputType()
 export class ListingFilterInput{
   @Field(() => [Boolean],{ nullable: true})
   isFeatured?: boolean[];

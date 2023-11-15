@@ -96,4 +96,8 @@ export class ListingEntity extends BaseEntity{
     @JoinTable()
     media: ListingMediaEntity[]
 
+    @Column("tsvector", { select: false, nullable: true })
+    document_with_weights: any;
+
+
 }

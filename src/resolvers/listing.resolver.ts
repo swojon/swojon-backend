@@ -1,5 +1,5 @@
 import { CategoryFilterInput, PagingArgs } from "@/dtos/category.dto";
-import { ListingCommunityInputDTO, ListingCreateDTO, ListingFilterInput, ListingUpdateDTO } from "@/dtos/listing.dto";
+import { ListingCommunityInputDTO, ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, SerachInputDTO } from "@/dtos/listing.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { ListingRepository } from "@/repositories/listing.repository";
 import { Listing, Listings } from "@/typedefs/listing.type";
@@ -16,6 +16,15 @@ export class ListingResolver extends ListingRepository{
     const userId= ctx.user?.id;  
     const listings: Listings = await this.listingList(userId, paging, filters);
       return listings;
+  }
+
+  @Query(() => Listings, {
+    description: "Search for listings",
+  })
+  async searchListings(@Ctx() ctx: MyContext, @Arg("query") query: SerachInputDTO,  @Args() paging: PagingArgs, @Arg('filters', {nullable:true}, ) filters?: ListingFilterInput): Promise<Listings> {
+    const userId = ctx.user?.id;
+    const listings: Listings = await this.listingSearch(userId, paging, filters, query);
+    return listings
   }
 
   // @Authorized()
@@ -62,4 +71,6 @@ export class ListingResolver extends ListingRepository{
     const listing: Listing = await this.listingUpdate(listingId, listingData);
     return listing;
   }
+
+  
 }

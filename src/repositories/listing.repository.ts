@@ -1,5 +1,5 @@
 import { PagingArgs } from '@/dtos/category.dto';
-import { ListingCreateDTO, ListingFilterInput, ListingUpdateDTO } from '@/dtos/listing.dto';
+import { ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, SerachInputDTO } from '@/dtos/listing.dto';
 import { BrandEntity } from '@/entities/brand.entity';
 import { CategoryEntity } from '@/entities/category.entity';
 import { CommunityEntity } from '@/entities/community.entity';
@@ -29,6 +29,32 @@ const getAllRelatedDependantSubCategories = (categories: any[], categoryId: any)
   return categoryIds;
 };
 
+const get_category_ids_to_filter = async (filters: ListingFilterInput) => {
+  let categoryIdsToFilter = [];
+  if (filters?.categorySlug || filters?.categoryIds) {
+    const categories = await CategoryEntity.find({
+      select: ['id', 'slug'],
+      relations: ['parentCategory'],
+    });
+    if (filters?.categorySlug) {
+      const findCategory = categories.find(cat => cat.slug === filters?.categorySlug);
+      if (!!findCategory) {
+        const relatedCategories = getAllRelatedDependantSubCategories(categories, findCategory.id);
+        categoryIdsToFilter = categoryIdsToFilter.concat(relatedCategories);
+      }
+    }
+    if (!!filters?.categoryIds) {
+      console.log('I am here');
+      filters?.categoryIds.forEach(categoryId => {
+        console.log('catetgoryId', categoryId);
+        const relatedCategories = getAllRelatedDependantSubCategories(categories, categoryId);
+        console.log('Got related subcategories', relatedCategories);
+        categoryIdsToFilter = categoryIdsToFilter.concat(relatedCategories);
+      });
+    }
+  } 
+  return categoryIdsToFilter;
+}
 @EntityRepository(ListingEntity)
 export class ListingRepository {
   public async listingsFavoriteCount(listingIds: any[], userId: number|null){
@@ -56,29 +82,7 @@ export class ListingRepository {
   }
 
   public async listingList(userId:any, paging: PagingArgs, filters: ListingFilterInput): Promise<Listings> {
-    let categoryIdsToFilter = [];
-    if (filters?.categorySlug || filters?.categoryIds) {
-      const categories = await CategoryEntity.find({
-        select: ['id', 'slug'],
-        relations: ['parentCategory'],
-      });
-      if (filters?.categorySlug) {
-        const findCategory = categories.find(cat => cat.slug === filters?.categorySlug);
-        if (!!findCategory) {
-          const relatedCategories = getAllRelatedDependantSubCategories(categories, findCategory.id);
-          categoryIdsToFilter = categoryIdsToFilter.concat(relatedCategories);
-        }
-      }
-      if (!!filters?.categoryIds) {
-        console.log('I am here');
-        filters?.categoryIds.forEach(categoryId => {
-          console.log('catetgoryId', categoryId);
-          const relatedCategories = getAllRelatedDependantSubCategories(categories, categoryId);
-          console.log('Got related subcategories', relatedCategories);
-          categoryIdsToFilter = categoryIdsToFilter.concat(relatedCategories);
-        });
-      }
-    }
+    let categoryIdsToFilter = await get_category_ids_to_filter(filters)
     console.log('CategoryIds to filter', categoryIdsToFilter);
     let sql = ListingEntity.createQueryBuilder('listing')
       .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 'listing.dateCreated'])
@@ -124,6 +128,70 @@ export class ListingRepository {
       
       return listing
     })
+    const count = findListings[1];
+    const hasMore = listingList.length === limit;
+
+    return {
+      items: listingWithFavorites,
+      hasMore,
+      count,
+    };
+  }
+
+  
+
+  public async listingSearch(userId, paging: PagingArgs, filters: ListingFilterInput, query: SerachInputDTO ): Promise<Listings>{
+    if (!query?.search) return this.listingList(userId, paging, filters);
+    let categoryIdsToFilter = await get_category_ids_to_filter(filters)
+    console.log('CategoryIds to filter', categoryIdsToFilter);
+    let sql = ListingEntity.createQueryBuilder('listing')
+      .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 'listing.dateCreated'])
+      .leftJoinAndSelect('listing.communities', 'community')
+      .leftJoinAndSelect('listing.user', 'user')
+      .leftJoinAndSelect('listing.brand', 'brand')
+      .leftJoinAndSelect('listing.category', 'category')
+      .leftJoinAndSelect('listing.media', 'media')
+      .leftJoinAndSelect('listing.location', 'location')
+      .orderBy('listing.id', 'ASC');
+    if (paging.starting_after) {
+      sql = sql.where('listing.id > :starting_after', { starting_after: paging.starting_after });
+    }else if (paging.ending_before) {
+        sql = sql.where('listing.id < :ending_before', { ending_before: paging.ending_before });
+    }
+    const limit: number = Math.min(100, paging.limit ? paging.limit : 100);
+    sql = sql.limit(limit);
+
+    if (filters?.communityIds) {
+      sql = sql.andWhere('community.id IN (:...communityIds)', { communityIds: filters?.communityIds });
+    }
+    if (filters?.brandIds) {
+      sql = sql.andWhere('brand.id IN (:...brandIds)', { brandIds: filters?.brandIds });
+    }
+    if (categoryIdsToFilter.length > 0) {
+      sql = sql.andWhere('category.id IN (:...categoryIds)', { categoryIds: categoryIdsToFilter });
+    }
+    if (filters?.locationIds) {
+      sql = sql.andWhere('location.id IN (:...locationIds)', { locationIds: filters?.locationIds });
+    }
+    if (filters?.userIds) {
+      sql = sql.andWhere('user.id IN (:...userIds)', { userIds: filters?.userIds });
+    }
+
+    sql = sql.andWhere("document_with_weights @@ plainto_tsquery(:query)", {
+      query: query.search
+    })
+
+    const findListings = await sql.getManyAndCount();
+    const listingList = findListings[0];
+    
+    const favorites = await this.listingsFavoriteCount(listingList.map(listing => listing.id), userId)
+    const listingWithFavorites = listingList.map(listing => {
+      // console.log("listing", listing)
+      listing["favoriteCount"] = favorites[listing.id].favoriteCount;
+      listing["favoriteStatus"] = favorites[listing.id].favoriteStatus;
+      return listing
+    })
+
     const count = findListings[1];
     const hasMore = listingList.length === limit;
 
