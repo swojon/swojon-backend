@@ -26,6 +26,7 @@
       "@database": ["database"],
       "@dtos/*": ["dtos/*"],
       "@entities/*": ["entities/*"],
+      "@migrations/*": ["migrations"],
       "@exceptions/*": ["exceptions/*"],
       "@interfaces/*": ["interfaces/*"],
       "@middlewares/*": ["middlewares/*"],
