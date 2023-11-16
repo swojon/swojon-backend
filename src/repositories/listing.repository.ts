@@ -7,6 +7,7 @@ import { FavoriteEntity } from '@/entities/favorite.entity';
 import { ListingEntity } from '@/entities/listing.entity';
 import { ListingMediaEntity } from '@/entities/listingMedia.entity';
 import { LocationEntity } from '@/entities/location.entity';
+import { SearchEntity } from '@/entities/search.entity';
 import { UserEntity } from '@/entities/users.entity';
 import { HttpException } from '@/exceptions/httpException';
 import { Listing, Listings } from '@/interfaces/listing.interface';
@@ -180,6 +181,14 @@ export class ListingRepository {
     sql = sql.andWhere("document_with_weights @@ plainto_tsquery(:query)", {
       query: query.search
     })
+    const rawSql = sql.getQuery();
+    
+    const search = await SearchEntity.create({
+      searchQuery: query.search,
+      rawSql: rawSql,
+      userId: userId,
+    }).save()
+
 
     const findListings = await sql.getManyAndCount();
     const listingList = findListings[0];
