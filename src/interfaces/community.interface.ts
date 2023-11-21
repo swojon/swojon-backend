@@ -15,6 +15,7 @@ export interface Community {
   location?:Location;
   memberCount?: number;
   members?:CommunityMember[];
+  memberStatus?: boolean;
 }
 
 export interface Communities {

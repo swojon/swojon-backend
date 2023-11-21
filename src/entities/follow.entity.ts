@@ -13,10 +13,16 @@ export class FollowEntity extends BaseEntity{
     @ManyToOne(() => UserEntity)
     user: UserEntity;
 
+    @Column({nullable: true})
+    userId: number;
+
     //many to one relationship with community
     @ManyToOne(() => UserEntity)
     followedUser: UserEntity;
 
+    @Column({nullable: true})
+    followedUserId: number;
+    
     //column for isDeleted, not empty
     @Column({default: false})
     isDeleted: boolean;

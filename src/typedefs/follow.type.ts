@@ -21,9 +21,17 @@ export class Follow {
 }
 
 @ObjectType()
+export class Follower{
+  @Field(() => User)
+  user? : User;
+
+  @Field()
+  followStatus?: boolean;
+}
+@ObjectType()
 export class Followers {
-  @Field(()=>[User])
-  items?: User[];
+  @Field(()=>[Follower])
+  items?: Follower[];
 
   @Field({ nullable: true})
   count?: number;

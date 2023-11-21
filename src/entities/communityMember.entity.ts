@@ -13,10 +13,17 @@ export class CommunityMemberEntity extends BaseEntity{
     @ManyToOne(() => UserEntity)
     user: UserEntity;
 
+    @Column({nullable: true})
+    userId: number;
+
+
     //many to one relationship with community
     @ManyToOne(() => CommunityEntity, (community) => community.members )
     community: CommunityEntity;
 
+    @Column({nullable: true})
+    communityId: number;
+    
     //column for role, not empty
     @Column({nullable: true})
     role: string;

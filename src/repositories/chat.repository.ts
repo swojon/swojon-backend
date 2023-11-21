@@ -5,7 +5,6 @@ import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { ChatRoom, Chat, chatRoomList, ChatMessageList } from "@/interfaces/chat.interface";
 import { ChatRoomMember, ChatRoomWithMessage, ChatRooms, ChatRoomsWithMessage } from "@/typedefs/chat.type";
-import { User } from "discord.js";
 import session from "express-session";
 import { EntityRepository, In } from "typeorm";
 

@@ -3,6 +3,7 @@ import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Follow, Following } from "@/interfaces/follow.interface";
 import { Follower } from "@/interfaces/Follower.interface";
+import { Followers } from "@/typedefs/follow.type";
 import { EntityRepository } from "typeorm";
 
 
@@ -39,39 +40,55 @@ export class FollowRepository{
     return createFollowData;
   }
 
-  public async followerList(userId: number): Promise<Follower>{
+  public async followerList(userId: number, requestedUserId: any): Promise<Followers>{
 
     const follow = await FollowEntity.createQueryBuilder("follow_entity")
                   .select(["follow_entity.id", "follow_entity.isDeleted", "follow_entity.dateFollowed", "follow_entity.followedUserId", "follow_entity.userId"])
                   .leftJoinAndSelect('follow_entity.user', 'user')
                   .where("follow_entity.followedUserId = :id", { id: userId }).printSql().getManyAndCount()
 
-    const findFollowers:UserEntity[] = follow[0].map((follow) => follow.user);
-    const count: number = follow[1];
+    const following = await FollowEntity.createQueryBuilder('following_entity')
+                      .select(['following_entity.userId', 'following_entity.followedUserId'])
+                      .where("following_entity.userId = :id", {id: userId}).printSql().getMany()
 
-    const follower: Follower = {
+    const findFollowers = follow[0].map((follow) => {
+      
+      return  {
+        user: follow.user, 
+        followStatus: requestedUserId ? following.filter(fol => fol.userId === requestedUserId).length > 0 : false  }
+    });
+    const count: number = follow[1];
+    
+    const followers: Followers = {
       count: count,
       items: findFollowers
     }
 
-    return follower;
+    return followers;
   }
 
-  public async followingList(userId: number): Promise<Follower>{
+  public async followingList(userId: number, requestedUserId: any): Promise<Followers>{
     const follow = await FollowEntity.createQueryBuilder("follow_entity")
             .select(["follow_entity.id", "follow_entity.isDeleted", "follow_entity.dateFollowed", "follow_entity.followedUserId", "follow_entity.userId"])
-            .leftJoinAndSelect('follow_entity.followedUser', 'user')
+            .leftJoinAndSelect('follow_entity.followedUser', 'followedUser')
+            .leftJoinAndSelect('follow_entity.user', 'user')
            .where("follow_entity.userId = :id", { id: userId }).printSql().getManyAndCount()
 
-    const findFollowing :UserEntity[] = follow[0].map((follow) => follow.followedUser);
+    const findFollowings :Follower[] = follow[0].map((fol) => {
+          return {
+              user: fol.followedUser, 
+              followStatus: requestedUserId ?  true : false
+            }     
+      });
+
     const count: number = follow[1];
 
-    const follower: Follower = {
+    const followers: Followers = {
       count: count,
-      items: findFollowing
+      items: findFollowings
     }
 
-    return follower;
+    return followers;
   }
 
 }

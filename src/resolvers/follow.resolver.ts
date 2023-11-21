@@ -1,7 +1,8 @@
-import { Arg, Authorized, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 
 import { FollowRepository } from '@/repositories/follow.repository';
 import { Follow, Followers } from '@/typedefs/follow.type';
+import { MyContext } from '@/interfaces/auth.interface';
 
 @Resolver()
 export class FollowResolver extends FollowRepository {
@@ -9,8 +10,9 @@ export class FollowResolver extends FollowRepository {
   @Query(() => Followers, {
     description: 'List All Followerer',
   })
-  async listFollowers(@Arg('userId') userId: number): Promise<Followers> {
-    const follower: Followers = await this.followerList(userId);
+  async listFollowers(@Ctx() ctx:MyContext, @Arg('userId') userId: number): Promise<Followers> {
+    const requestedUserId = ctx.user?.id;
+    const follower: Followers = await this.followerList(userId, requestedUserId);
     return follower;
 
   }
@@ -19,8 +21,9 @@ export class FollowResolver extends FollowRepository {
   @Query(() => Followers, {
     description: 'List All Following',
   })
-  async listFollowing(@Arg('userId') userId: number): Promise<Followers> {
-    const following: Followers = await this.followingList(userId);
+  async listFollowing(@Ctx() ctx:MyContext, @Arg('userId') userId: number): Promise<Followers> {
+    const requestedUserId = ctx.user?.id;
+    const following: Followers = await this.followingList(userId, requestedUserId );
     return following;
   }
 

@@ -40,6 +40,9 @@ export class Community {
   @Field(()=>[CommunityMember], { nullable: true})
   members?: CommunityMember[];
 
+  @Field({nullable: true})
+  memberStatus?: boolean;
+
 }
 
 @ObjectType()

@@ -27,7 +27,7 @@ export class CommunityRepository{
 
     // }
 
-    public async communityList(filters: CommunityFilterInput): Promise<Communities> {
+    public async communityList(filters: CommunityFilterInput, userId: any): Promise<Communities> {
           let sql = CommunityEntity.createQueryBuilder("ce")
                           .select(["ce.id", "ce.name", "ce.slug", "ce.description",
                                    "ce.banner", "ce.latitude", 'ce.longitude', "ce.isFeatured",
@@ -64,6 +64,7 @@ export class CommunityRepository{
           count: communities[1],
           items: communities[0].map((community):Community => {
             community["memberCount"] = community.members.length;
+            community["memberStatus"] = userId ? community.members.filter((mem) => mem.userId === userId).length > 0 : false;
             return community;
           })
 
