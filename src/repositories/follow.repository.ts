@@ -54,6 +54,7 @@ export class FollowRepository{
     const findFollowers = follow[0].map((follow) => {
       
       return  {
+        id: follow.id,
         user: follow.user, 
         followStatus: requestedUserId ? following.filter(fol => fol.userId === requestedUserId).length > 0 : false  }
     });
@@ -76,6 +77,7 @@ export class FollowRepository{
 
     const findFollowings :Follower[] = follow[0].map((fol) => {
           return {
+              id: fol.id,
               user: fol.followedUser, 
               followStatus: requestedUserId ?  true : false
             }     
