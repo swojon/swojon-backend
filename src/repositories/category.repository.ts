@@ -44,7 +44,7 @@ export class CategoryRepository{
     // const count = await sql.getCount()
     // const count = analyze[0].['QUERY PLAN'][0]
     // console.log("Count", count)
-    const limit:number = Math.min(100, paging.limit?paging.limit: 100)
+    const limit:number = Math.min(1000, paging.limit? paging.limit: 1000)
     sql = sql.limit(limit)
 
     const findCategories = await sql.getManyAndCount()
