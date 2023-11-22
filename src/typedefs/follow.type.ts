@@ -22,6 +22,9 @@ export class Follow {
 
 @ObjectType()
 export class Follower{
+  @Field()
+  id?: number;
+  
   @Field(() => User)
   user? : User;
 

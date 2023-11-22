@@ -20,7 +20,7 @@ export class SearchEntity extends BaseEntity{
 
     @Column({nullable: true})
     title: string;
-    
+        
     //many to one relationship with user
     @ManyToOne(() => UserEntity, {nullable: true })
     user: UserEntity;
