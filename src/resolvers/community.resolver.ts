@@ -22,8 +22,9 @@ export class CommunityResolver extends CommunityRepository {
   @Query(() => Community, {
     description: "Get Community by Id, slug or name",
   })
-  async getCommunity(@Args(){id, slug, name}: CommunityArgs): Promise<Community> {
-    const community: Community = await this.communityFind({id, slug, name});
+  async getCommunity(@Ctx() ctx:MyContext, @Args(){id, slug, name}: CommunityArgs): Promise<Community> {
+    const userId = ctx.user?.id
+    const community: Community = await this.communityFind(userId, {id, slug, name});
     return community;
   }
 

@@ -92,9 +92,16 @@ export class CommunityRepository{
         return findCommunity;
     }
 
-    public async communityFind(communityData: CommunityArgs): Promise<CommunityEntity> {
-        const findCommunity: CommunityEntity = await CommunityEntity.findOne({ where: [{ id: communityData?.id }, { name: communityData?.name }, {slug:communityData?.slug}] });
+    public async communityFind(userId: any, communityData: CommunityArgs): Promise<CommunityEntity> {
+        const findCommunity: CommunityEntity = await CommunityEntity.findOne(
+          { 
+            relations: ["members", "location"],
+            where: [{ id: communityData?.id }, { name: communityData?.name }, {slug:communityData?.slug}] }
+          );
         if (!findCommunity) throw new HttpException(409, "Community Not Found");
+        findCommunity["memberCount"] = findCommunity.members.length;
+        findCommunity["memberStatus"] = userId ? findCommunity.members.filter((mem) => mem.userId === userId).length > 0 : false;
+          
         return findCommunity;
     }
 
