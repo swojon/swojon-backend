@@ -29,15 +29,19 @@ export class FollowRepository{
     const findUser: UserEntity = await UserEntity.findOne({ where: { id:userId } });
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
-    const findFollowedUser: UserEntity = await UserEntity.findOne({ where: { id: followedUserId } });
-    if (!findFollowedUser) throw new HttpException(409, "Followed User doesn't exist");
+    // const findFollowedUser: UserEntity = await UserEntity.findOne({ where: { id: followedUserId } });
+    // if (!findFollowedUser) throw new HttpException(409, "Followed User doesn't exist");
 
-    const findFollow: FollowEntity = await FollowEntity.findOne({ where: { user: findUser, followedUser: findFollowedUser} });
-    if (!findFollow) throw new HttpException(409, `You are not following`);
-    // const createFollowData: Follow = await FollowEntity.create(followData).save();
-    findFollow.isDeleted = true;
-    const createFollowData: Follow = await FollowEntity.save(findFollow);
-    return createFollowData;
+    // const findFollow: FollowEntity = await FollowEntity.findOne({ where: { user: findUser, followedUser: findFollowedUser} });
+    // if (!findFollow) throw new HttpException(409, `You are not following`);
+    // // const createFollowData: Follow = await FollowEntity.create(followData).save();
+    
+    const findFollow: FollowEntity = await FollowEntity.findOne({ where: {userId: userId, followedUserId: followedUserId}, relations: ["followedUser", "user"]})
+    if (!findFollow) throw new HttpException(409, "follower or followed User mismatch!")
+
+    await FollowEntity.softRemove(findFollow)
+    return findFollow;
+    
   }
 
   public async followerList(userId: number, requestedUserId: any): Promise<Followers>{
