@@ -1,5 +1,5 @@
 
-import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 // import { CommunityEntity } from "./community.entity";
 
@@ -27,6 +27,9 @@ export class FollowEntity extends BaseEntity{
     @Column({default: false})
     isDeleted: boolean;
 
+    @DeleteDateColumn({name: "deleted_at"})
+    deletedAt: Date; 
+    
     //column for date joined, not empty
     @Column({default: new Date()})
     dateFollowed: Date;
