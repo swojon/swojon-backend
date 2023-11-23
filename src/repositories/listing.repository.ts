@@ -11,6 +11,7 @@ import { SearchEntity } from '@/entities/search.entity';
 import { UserEntity } from '@/entities/users.entity';
 import { HttpException } from '@/exceptions/httpException';
 import { Listing, Listings } from '@/interfaces/listing.interface';
+import { Brand } from '@/typedefs/brand.type';
 import { EntityRepository, In } from 'typeorm';
 
 const getAllRelatedDependantSubCategories = (categories: any[], categoryId: any) => {
@@ -56,6 +57,36 @@ const get_category_ids_to_filter = async (filters: ListingFilterInput) => {
   } 
   return categoryIdsToFilter;
 }
+
+const get_brand_ids_to_filter = async (filters: ListingFilterInput) => {
+  let brandIdsToFilter = []
+  if (filters?.brandIds || filters?.brandSlug){
+    if (filters?.brandIds){
+      brandIdsToFilter = brandIdsToFilter.concat(filters.brandIds)
+    }
+    else if (filters?.brandSlug){
+      const findBrands = await BrandEntity.find({select: ["slug", "id"]})
+      const findBrandIds = findBrands.filter(br => filters.brandSlug.split(',').includes(br.slug))
+      brandIdsToFilter = brandIdsToFilter.concat(findBrandIds.map(br => br.id))
+    }
+  }
+  return brandIdsToFilter;
+}
+
+const get_community_ids_to_filter = async (filters: ListingFilterInput) => {
+  let communityIdsToFilter = []
+  if (filters?.communityIds || filters?.communitySlug){
+    if (filters?.communityIds){
+      communityIdsToFilter = communityIdsToFilter.concat(filters.communityIds)
+    }
+    else if (filters?.communitySlug){
+      const findCommunities = await CommunityEntity.find({select: ["slug", "id"]})
+      const findCommunityIds = findCommunities.filter(br => filters.communitySlug.split(',').includes(br.slug))
+      communityIdsToFilter = communityIdsToFilter.concat(findCommunityIds.map(br => br.id))
+    }
+  }
+  return communityIdsToFilter;
+}
 @EntityRepository(ListingEntity)
 export class ListingRepository {
   public async listingsFavoriteCount(listingIds: any[], userId: number|null){
@@ -84,7 +115,11 @@ export class ListingRepository {
 
   public async listingList(userId:any, paging: PagingArgs, filters: ListingFilterInput): Promise<Listings> {
     let categoryIdsToFilter = await get_category_ids_to_filter(filters)
-    console.log('CategoryIds to filter', categoryIdsToFilter);
+    let brandIdsToFilter = await get_brand_ids_to_filter(filters)
+    let communityIdsToFilter = await get_community_ids_to_filter(filters)
+    console.log("Community ids to Filter ", communityIdsToFilter)
+    // console.log("brandIds to filter", brandIdsToFilter)
+    // console.log('CategoryIds to filter', categoryIdsToFilter);
     let sql = ListingEntity.createQueryBuilder('listing')
       .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 'listing.dateCreated'])
       .leftJoinAndSelect('listing.communities', 'community')
@@ -102,11 +137,11 @@ export class ListingRepository {
     const limit: number = Math.min(100, paging.limit ? paging.limit : 100);
     sql = sql.limit(limit);
 
-    if (filters?.communityIds) {
-      sql = sql.andWhere('community.id IN (:...communityIds)', { communityIds: filters?.communityIds });
+    if (communityIdsToFilter.length > 0) {
+      sql = sql.andWhere('community.id IN (:...communityIds)', { communityIds: communityIdsToFilter });
     }
-    if (filters?.brandIds) {
-      sql = sql.andWhere('brand.id IN (:...brandIds)', { brandIds: filters?.brandIds });
+    if (brandIdsToFilter.length > 0) {
+      sql = sql.andWhere('brand.id IN (:...brandIds)', { brandIds: brandIdsToFilter });
     }
 
     if (categoryIdsToFilter.length > 0) {

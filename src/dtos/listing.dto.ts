@@ -106,9 +106,15 @@ export class ListingFilterInput{
  
   @Field(() => [Number],{ nullable: true})
   communityIds?: number[];
+  
+  @Field({nullable:true})
+  communitySlug?: string; 
 
   @Field(() => [Number],{ nullable: true})
   brandIds?: number[];
+
+  @Field({nullable:true})
+  brandSlug: string; 
 
   @Field(() => [Number],{ nullable: true})
   categoryIds?: number[];
