@@ -1,4 +1,4 @@
-import { PagingArgs } from '@/dtos/category.dto';
+import { CategoryArgs, PagingArgs } from '@/dtos/category.dto';
 import { ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, SerachInputDTO } from '@/dtos/listing.dto';
 import { BrandEntity } from '@/entities/brand.entity';
 import { CategoryEntity } from '@/entities/category.entity';
@@ -174,7 +174,23 @@ export class ListingRepository {
     };
   }
 
-  
+  public async listingFind(userId:any, listingArgs: CategoryArgs): Promise<Listing> {
+    const findListing: ListingEntity = await ListingEntity.findOne(
+                    {
+                      where: [
+                          {id: listingArgs?.id},
+                          // {slug: listingArgs?.slug},
+                          {title: listingArgs?.name}],
+                      relations: ["user", "brand", "category", "media", "location", "communities", ]
+                    },
+                  );
+    if (!findListing) throw new HttpException(409, `Listing not found`);
+    const favorites = await FavoriteEntity.findAndCount({where: {"listingId": findListing.id}, select: ["userId", "id"]})
+
+    findListing["favouriteCount"] = favorites[1]
+    findListing["favoriteStatus"] = userId ? favorites[0].filter(fav => fav.userId === userId).length > 0 : false
+    return findListing;
+  }
 
   public async listingSearch(userId, paging: PagingArgs, filters: ListingFilterInput, query: SerachInputDTO ): Promise<Listings>{
     if (!query?.search) return this.listingList(userId, paging, filters);

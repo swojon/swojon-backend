@@ -34,11 +34,12 @@ router.get(
         redirectTo = `${CLIENT_URL}${redirectTo}`
       }
       else redirectTo = `${CLIENT_URL}/`
-      console.log("Redirecting To: ", redirectTo)
+      // console.log("Redirecting To: ", redirectTo)
       // console.log("req url", req.url)
       // console.log("res", res)
       console.log("Client URL", CLIENT_URL)
       try{
+        console.log("redirecting", `${redirectTo}?token=${token}`)
         return res.redirect(`${redirectTo}?token=${token}`)
       }catch(err){
         console.log("error redirecting", err)

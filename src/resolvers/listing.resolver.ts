@@ -1,4 +1,4 @@
-import { CategoryFilterInput, PagingArgs } from "@/dtos/category.dto";
+import { CategoryArgs, CategoryFilterInput, PagingArgs } from "@/dtos/category.dto";
 import { ListingCommunityInputDTO, ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, SerachInputDTO } from "@/dtos/listing.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { ListingRepository } from "@/repositories/listing.repository";
@@ -15,7 +15,16 @@ export class ListingResolver extends ListingRepository{
   async listListings(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', {nullable:true}) filters?: ListingFilterInput): Promise<Listings> {
     const userId= ctx.user?.id;  
     const listings: Listings = await this.listingList(userId, paging, filters);
-      return listings;
+    return listings;
+  }
+  // @Authorized()
+  @Query(() => Listing, {
+    description: "Get Category by Id, slug or name",
+  })
+  async getListing(@Ctx() ctx:MyContext ,@Args(){id, slug, name}: CategoryArgs): Promise<Listing> {
+    const userId = ctx.user?.id
+    const category: Listing = await this.listingFind(userId, {id, slug, name});
+    return category;
   }
 
   @Query(() => Listings, {
