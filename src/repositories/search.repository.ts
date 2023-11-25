@@ -1,7 +1,7 @@
 import { SearchEntity } from "@/entities/search.entity";
+import { HttpException } from "@/exceptions/httpException";
 import { Searches, TrendingSearches } from "@/interfaces/search.interface";
-import { SearchQuery } from "@/typedefs/search.type";
-import { EntityRepository } from "typeorm";
+import { EntityRepository, In } from "typeorm";
 
 @EntityRepository(SearchEntity)
 export class SearchRepository{
@@ -11,7 +11,8 @@ export class SearchRepository{
                 .leftJoinAndSelect('se.user', 'user')
                 .orderBy('se.id', 'ASC')
                 .limit(5)
-                .where('se.removeFromHistory = :false')
+                .where('se.removeFromHistory =false')
+                .where('se.userId = :userId ', {userId: userId})
                 .getManyAndCount()
         return {
             items: searches[0],
@@ -35,5 +36,20 @@ export class SearchRepository{
         return {
             items: searches,
         }
+    }
+
+    public async searchHistoryRemove(userId:any): Promise<Searches>{
+        if (!userId) throw new HttpException(409, "No userId passed");
+        console.log("id", userId)
+        const searches = await SearchEntity.find({
+            select: ["searchQuery", "id"],
+            where: {userId: userId}
+        })
+        console.log(searches)
+        const searchIds = searches.map(se => se.id)
+        await SearchEntity.update( {id: In(searchIds)}, {removeFromHistory: true},)
+        return {items : searches}
+
+    
     }
 }
