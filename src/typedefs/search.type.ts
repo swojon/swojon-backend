@@ -9,13 +9,13 @@ export class Search {
   @Field()
   searchQuery?: string;
 
-  @Field()
+  @Field({nullable:true})
   isSaved?: boolean;
 
   @Field(() => User, {nullable:true})
   user?:User;
 
-  @Field()
+  @Field({nullable:true})
   title?: string;
 
 }
@@ -26,10 +26,10 @@ export class Searches {
   @Field(type => [Search])
   items?: Search[];
 
-  @Field()
+  @Field({nullable:true})
   count?: number
 
-  @Field()
+  @Field({nullable:true})
   hasMore?: boolean
 }
 
