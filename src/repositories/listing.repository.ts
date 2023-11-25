@@ -192,10 +192,11 @@ export class ListingRepository {
     return findListing;
   }
 
-  public async listingSearch(userId, paging: PagingArgs, filters: ListingFilterInput, query: SerachInputDTO ): Promise<Listings>{
+  public async listingSearch(userId, paging: PagingArgs, filters: ListingFilterInput, query: SerachInputDTO, req ): Promise<Listings>{
     if (!query?.search) return this.listingList(userId, paging, filters);
-    let categoryIdsToFilter = await get_category_ids_to_filter(filters)
+    let categoryIdsToFilter = await get_category_ids_to_filter(filters);
     console.log('CategoryIds to filter', categoryIdsToFilter);
+    // console.log(req.ip, req.ips, "Ip address associated")
     let sql = ListingEntity.createQueryBuilder('listing')
       .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 'listing.dateCreated'])
       .leftJoinAndSelect('listing.communities', 'community')
@@ -238,6 +239,7 @@ export class ListingRepository {
       searchQuery: query.search,
       rawSql: rawSql,
       userId: userId,
+      clientIp: req.ip
     }).save()
 
 

@@ -32,7 +32,8 @@ export class ListingResolver extends ListingRepository{
   })
   async searchListings(@Ctx() ctx: MyContext, @Arg("query") query: SerachInputDTO,  @Args() paging: PagingArgs, @Arg('filters', {nullable:true}, ) filters?: ListingFilterInput): Promise<Listings> {
     const userId = ctx.user?.id;
-    const listings: Listings = await this.listingSearch(userId, paging, filters, query);
+    const req = ctx.req;
+    const listings: Listings = await this.listingSearch(userId, paging, filters, query, req);
     return listings
   }
 

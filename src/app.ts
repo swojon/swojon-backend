@@ -50,6 +50,7 @@ import { LocationResolver } from './resolvers/location.resolver';
 import { PointResolver } from './resolvers/point.resolver';
 import passport from 'passport';
 import { UserEntity } from './entities/users.entity';
+import { SearchResolver } from './resolvers/search.resolver';
 
 const passportSetup = require('./utils/passport');
 
@@ -102,6 +103,7 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.set('trust proxy', true)
 
 
 console.log("Initializing apollo server")
@@ -110,7 +112,7 @@ const schema = await buildSchema({
     AuthResolver, CategoryResolver, ProfileResolver, RoleResolver, FollowResolver,
     CommunityResolver, CommunityMemberResolver, CategoryResolver, LocationResolver, ChatResolver,
      SubscriptionResolver, UserResolver, BrandResolver, ListingResolver, FavoriteResolver,
-    SellerReviewResolver, PointResolver
+    SellerReviewResolver, PointResolver, SearchResolver
   ],
   pubSub: pubSub,
   authChecker: AuthJWTMiddleware,
