@@ -23,7 +23,7 @@ export class SearchResolver extends SearchRepository{
   @Query(() => Searches, {
     description: "Get trending Searches",
   })
-  async getTrendingSearches(@Ctx() ctx:MyContext ,@Args(){id, slug, name}: CategoryArgs): Promise<TrendingSearches> {
+  async getTrendingSearches(@Ctx() ctx:MyContext): Promise<TrendingSearches> {
     const req= ctx.req;
     const searches: TrendingSearches = await this.trendingSearchGet(req);
     return searches;
