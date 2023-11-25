@@ -5,19 +5,26 @@ import { EntityRepository, In } from "typeorm";
 
 @EntityRepository(SearchEntity)
 export class SearchRepository{
-    public async searchHistoryGet(userId ) : Promise<Searches>{
+    public async searchHistoryGet(userId ) : Promise<TrendingSearches>{
         let searches = await SearchEntity.createQueryBuilder('se')
-                .select(['se.id', 'se.title', 'se.isSaved', 'se.removeFromHistory', 'se.searchQuery'])
-                .leftJoinAndSelect('se.user', 'user')
-                .orderBy('se.id', 'ASC')
+                // .select(['se.id', 'se.title', 'se.isSaved', 'se.removeFromHistory', 'se.searchQuery'])
+                // .addSelect('DISTINCT(se.searchQuery)')
+                .select('se.searchQuery')
+                .distinct(true)
+                // .leftJoinAndSelect('se.user', 'user')
+                // .orderBy('se.id', 'ASC')
                 .limit(5)
-                .where('se.removeFromHistory =false')
-                .where('se.userId = :userId ', {userId: userId})
-                .getManyAndCount()
+                .where('se.removeFromHistory=false')
+                .andWhere('se.userId = :userId ', {userId: userId})
+                .getRawMany()
+
+        const searchQueries = searches.map((item) => {
+            return {searchQuery: item.se_searchQuery}
+        
+        }) 
+        console.log("search History", searchQueries)
         return {
-            items: searches[0],
-            count: searches[1],
-            hasMore: false
+            items: searchQueries
         }
     }
 
@@ -47,8 +54,9 @@ export class SearchRepository{
         })
         console.log(searches)
         const searchIds = searches.map(se => se.id)
-        await SearchEntity.update( {id: In(searchIds)}, {removeFromHistory: true},)
-        return {items : searches}
+        console.log(searchIds)
+        await SearchEntity.update( {id: In(searchIds)}, {removeFromHistory: true})
+        return {items : []}
 
     
     }

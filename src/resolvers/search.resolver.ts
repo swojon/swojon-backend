@@ -9,18 +9,18 @@ import { Args, Ctx, Mutation, Query, Resolver } from "type-graphql";
 export class SearchResolver extends SearchRepository{
 
   // @Authorized()
-  @Query(() => Searches, {
+  @Query(() => TrendingSearches, {
     description: 'Get Search History',
   })
-  async getSearchHistory(@Ctx() ctx:MyContext ): Promise<Searches> {
+  async getSearchHistory(@Ctx() ctx:MyContext ): Promise<TrendingSearches> {
     const userId= ctx.user?.id;  
     // const userId = 2;
-    const searches: Searches = await this.searchHistoryGet(userId);
+    const searches: TrendingSearches = await this.searchHistoryGet(userId);
     return searches;
   }
 
   // @Authorized()
-  @Query(() => Searches, {
+  @Query(() => TrendingSearches, {
     description: "Get trending Searches",
   })
   async getTrendingSearches(@Ctx() ctx:MyContext): Promise<TrendingSearches> {

@@ -38,6 +38,12 @@ export class SearchQuery{
     @Field()
     searchQuery: string
 }
+@ObjectType()
+export class SearchQueries {
+    @Field(type => [SearchQuery])
+    items: SearchQuery[]
+
+}
 
 @ObjectType()
 export class TrendingSearches {
