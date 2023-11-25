@@ -13,8 +13,8 @@ export class SearchResolver extends SearchRepository{
     description: 'Get Search History',
   })
   async getSearchHistory(@Ctx() ctx:MyContext ): Promise<Searches> {
-    // const userId= ctx.user?.id;  
-    const userId = 2;
+    const userId= ctx.user?.id;  
+    // const userId = 2;
     const searches: Searches = await this.searchHistoryGet(userId);
     return searches;
   }
@@ -33,7 +33,7 @@ export class SearchResolver extends SearchRepository{
     description: "Remove all search history of a user"
   })
   async removeSearchHistory(@Ctx() ctx:MyContext): Promise<Searches>{
-    const userId = 3;
+    const userId = ctx.user?.id;
     const searches: Searches = await this.searchHistoryRemove(userId);
     return  searches
   }
