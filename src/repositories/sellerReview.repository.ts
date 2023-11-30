@@ -5,7 +5,6 @@ import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Review } from "@/interfaces/sellerReview.interface";
 import { Reviews } from "@/typedefs/sellerReview.type";
-import { User } from "discord.js";
 import { EntityRepository } from "typeorm";
 
 

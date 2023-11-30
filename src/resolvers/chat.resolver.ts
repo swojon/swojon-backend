@@ -2,6 +2,7 @@ import { CreateMessageDTO, ListChatRoomArgs } from "@/dtos/chat.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { ChatMessageRepository } from "@/repositories/chat.repository";
 import { Chat, ChatRoomWithMessage, ChatRooms, ChatRoomsWithMessage, Chats } from "@/typedefs/chat.type";
+import { Notification } from "@/typedefs/notification.type";
 import { Arg, Args, Authorized, Ctx, Mutation, PubSub, Publisher, Query, Resolver } from "type-graphql";
 import { TOPICS_ENUM } from "./subscription.resolver";
 
@@ -22,11 +23,11 @@ export class ChatResolver extends ChatMessageRepository {
   @Mutation(() => Chat, {
     description: 'Send Chat Message',
   })
-  async sendChatMessage(@Arg('chatData') chatData: CreateMessageDTO, @Ctx() ctx:MyContext, @PubSub(TOPICS_ENUM.NEW_CHAT_MESSAGE) publish: Publisher<Chat>): Promise<Chat> {
+  async sendChatMessage(@Arg('chatData') chatData: CreateMessageDTO, @Ctx() ctx:MyContext, @PubSub(TOPICS_ENUM.NEW_CHAT_MESSAGE) publish: Publisher<Chat>, @PubSub(TOPICS_ENUM.NEW_NOTIFICATION) notify: Publisher<Notification>): Promise<Chat> {
     console.log(ctx.user)
     const senderId = chatData.senderId ??  ctx.user.id;
     const chatMessage = await this.messageSend(chatData, senderId);
-    await publish(chatMessage);
+    await publish(chatMessage); 
     return chatMessage;
   }
 

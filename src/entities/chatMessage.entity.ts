@@ -14,6 +14,9 @@ export class ChatMessageEntity extends BaseEntity{
   @ManyToOne(() => ChatRoomEntity, {onDelete: "CASCADE"})
   chatRoom: ChatRoomEntity;
 
+  @Column({nullable: true})
+  chatRoomId:number;
+
   //column for message
   @Column()
   content: string;
@@ -32,5 +35,8 @@ export class ChatMessageEntity extends BaseEntity{
 
   @ManyToOne(() => UserEntity, {onDelete: "CASCADE"})
   sender: UserEntity;
+
+  @Column({nullable: true})
+  senderId:number;
 
 }

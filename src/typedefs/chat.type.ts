@@ -1,4 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
+import { Listing } from "./listing.type";
 import { User } from "./users.type";
 
 
@@ -24,6 +25,8 @@ export class ChatRoom {
   @Field({ nullable: true})
   isDeleted?: boolean;
 
+  @Field(()=> [ChatRoomMember], {nullable: true})
+  members?: ChatRoomMember[];
 }
 
 
@@ -47,10 +50,6 @@ export class Chat {
 
   @Field({nullable: true})
   dateSent?: Date;
-
-  @Field(()=> [Number], {nullable: true})
-  members?: number[];
-
 }
 
 
@@ -76,7 +75,7 @@ export class ChatRooms {
 
 @ObjectType()
 export class ChatRoomWithMessage {
-  @Field()
+  @Field({nullable:true})
   id?: number;
 
   @Field({ nullable: true})
@@ -85,8 +84,14 @@ export class ChatRoomWithMessage {
   @Field(()=>[Chat], { nullable: true})
   messages?: Chat[];
 
+  @Field(() => Listing, {nullable: true} )
+  relatedListing?: Listing;
+  
   @Field({ nullable: true})
   isDeleted?: boolean;
+  
+  @Field(()=> [ChatRoomMember], {nullable: true})
+  members?: ChatRoomMember[];
 }
 
 @ObjectType()

@@ -37,6 +37,7 @@
     "express-session": "^1.17.3",
     "graphql": "^15.8.0",
     "graphql-subscriptions": "^2.0.0",
+    "graphql-type-json": "^0.3.2",
     "graphql-ws": "^5.14.0",
     "helmet": "^5.1.1",
     "hpp": "^0.2.3",

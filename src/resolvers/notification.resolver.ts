@@ -12,7 +12,7 @@ export class NotificationResolver extends NotificationRepository {
   @Query(() => Notifications, {
     description: 'List All Notifications0',
   })
-  async listCategories(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : NotificationFilterInput): Promise<Notifications> {
+  async listNotifications(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : NotificationFilterInput): Promise<Notifications> {
     const userId = ctx.user?.id;
     const notifications:Notifications = await this.notificationList(userId, paging, filters);
     return notifications;
@@ -25,6 +25,15 @@ export class NotificationResolver extends NotificationRepository {
   async markNotificationRead(@Arg('notificationId') notificationId: number): Promise<Notification> {
     const notification: Notification = await this.notificationMarkRead(notificationId);
     return notification;
+  }
+
+  @Mutation(() => Notifications, {
+    description: "Mark Notification as Read to all notification"
+  })
+  async markAllNotificationAsRead(@Ctx() ctx: MyContext): Promise<Notifications> {
+    const userId = ctx.user?.id;
+    const notifications: Notifications = await this.notificationMarkAllAsRead(userId)
+    return notifications; 
   }
 
   

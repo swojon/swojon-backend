@@ -28,7 +28,7 @@ export class NotificationEntity extends BaseEntity{
     @Column({type: "jsonb"})
     context: Record<string, any>;
 
-    @Column({ type: 'enum', enum: NotificationType , default: "`info`"})
+    @Column({ type: 'enum', enum: NotificationType , default: "info"})
     type: NotificationType;
 
     @CreateDateColumn()

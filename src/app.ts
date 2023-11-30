@@ -51,6 +51,7 @@ import { PointResolver } from './resolvers/point.resolver';
 import passport from 'passport';
 import { UserEntity } from './entities/users.entity';
 import { SearchResolver } from './resolvers/search.resolver';
+import { NotificationResolver } from './resolvers/notification.resolver';
 
 const passportSetup = require('./utils/passport');
 
@@ -112,7 +113,7 @@ const schema = await buildSchema({
     AuthResolver, CategoryResolver, ProfileResolver, RoleResolver, FollowResolver,
     CommunityResolver, CommunityMemberResolver, CategoryResolver, LocationResolver, ChatResolver,
      SubscriptionResolver, UserResolver, BrandResolver, ListingResolver, FavoriteResolver,
-    SellerReviewResolver, PointResolver, SearchResolver
+    SellerReviewResolver, PointResolver, SearchResolver, NotificationResolver
   ],
   pubSub: pubSub,
   authChecker: AuthJWTMiddleware,
@@ -132,11 +133,14 @@ const wsServer = new WebSocketServer({
 const sessionContext: Record<string, unknown> = {};
 const getDynamicContext = async (ctx, msg, args) => {
   // ctx is the graphql-ws Context where connectionParams live
-
- if (ctx.connectionParams?.headers?.Authorization) {
+  console.log("Getting dynamic context")
+  console.log(ctx.connectionParams)
+ if (ctx.connectionParams?.headers?.Authorization || ctx.connectionParams?.Authorization) {
     try {
-      const decoded: JwtPayload | string = jwt.verify(ctx.connectionParams.headers.Authorization.replace('Bearer ', ""), process.env.SECRET_KEY)
-      console.log("decoded", decoded)
+      const token = ctx.connectionParams?.headers?.Authorization ?? ctx.connectionParams?.Authorization;
+
+      const decoded: JwtPayload | string = jwt.verify(token.replace('Bearer ', ""), process.env.SECRET_KEY)
+      // console.log("decoded", decoded)
       const currentUser = await UserEntity.findOne({
         // @ts-ignore
         where: { id: decoded.id }, select: ["email", 'username', 'id'], relations: ['roles']});
@@ -201,6 +205,7 @@ const apolloServer = new ApolloServer({
   context: async ({ req, res, connect }: any) => {
     // console.log(req, res)
     // get the user token from the headers
+    // console.log("req", req.headers)
     const token = req.headers.authorization || '';
 
     // try to retrieve a user with the token

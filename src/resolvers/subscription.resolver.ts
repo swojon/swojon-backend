@@ -3,6 +3,7 @@ import { ChatRoomMemberEntity } from "@/entities/userChats.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { pubSub } from "@/pubsub";
 import { Chat } from "@/typedefs/chat.type";
+import { Notification } from "@/typedefs/notification.type";
 import { withFilter } from "graphql-subscriptions";
 import {  Arg, Authorized, Ctx, Resolver, Root, Subscription } from "type-graphql";
 
@@ -18,7 +19,7 @@ export enum TOPICS_ENUM{
 export class SubscriptionResolver {
   @Subscription({
     subscribe: withFilter((_, __, payload) => {
-      console.log("payload", payload)
+      // console.log("payload", payload)
       if (!payload?.currentUser) {
         throw new Error("You don't have permission to access this resource");
       }
@@ -38,7 +39,7 @@ export class SubscriptionResolver {
 
   @Subscription({
     subscribe: withFilter((_, __, payload) => {
-      console.log("payload", payload)
+      // console.log("payload", payload)
       if (!payload?.currentUser) {
         throw new Error("user not logged in");
       }
@@ -51,7 +52,7 @@ export class SubscriptionResolver {
     }
     )
   })
-  newNotifaction(@Root() payload: any): Chat {
+  newNotifaction(@Root() payload: any): Notification {
     // console.log("newMessageAdded():-", payload);
     return payload;
   }

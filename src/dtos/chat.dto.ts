@@ -16,6 +16,10 @@ export class CreateMessageDTO {
 
   @Field({nullable: true})
   message: string;
+
+  @Field({nullable: true})
+  relatedListingId?: number;
+  
 }
 
 // @InputType()

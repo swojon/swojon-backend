@@ -18,7 +18,7 @@ export class NotificationRepository{
                     .select(["ne.id", "ne.content", "ne.context", "ne.dateCreated",
                              "ne.type", "ne.read", 'ne.userId'])
                     .leftJoinAndSelect('ne.user', 'user')
-                    .orderBy('category_entity.id', 'ASC')
+                    .orderBy('ne.id', 'ASC')
 
     if (paging.starting_after){
       sql = sql.where("ne.id > :starting_after", {starting_after: paging.starting_after})
@@ -57,6 +57,15 @@ export class NotificationRepository{
     // const updatedCategory: CategoryEntity = await CategoryEntity.findOne({ where: { id: categoryId }, relations: ['parentCategory'] });
     return notification;
 
+  }
+
+  public async notificationMarkAllAsRead(userId:any):Promise<Notifications>{
+    if (!userId) throw new HttpException(409, "User is not logged in");
+    await NotificationEntity.update({userId: userId}, {read: true })
+
+    return{
+      items: []
+    }
   }
 
 }

@@ -3,6 +3,18 @@ import { User } from "./users.type";
 import { NotificationType } from "@/entities/notification.entity";
 
 @ObjectType()
+export class ContextType {
+  @Field({nullable: true})
+  userId: number;
+
+  @Field({nullable: true})
+  listingId: number;
+  
+  @Field({nullable: true})
+  messageId: number;
+  
+}
+@ObjectType()
 export class Notification {
   @Field()
   id?: number;
@@ -10,10 +22,13 @@ export class Notification {
   @Field(()=>User)
   user?: User
 
+  @Field({nullable:true})
+  userId?: number;
+
   @Field()
   content?: string;
 
-  @Field(() => NotificationType, {nullable:true})
+  @Field(() => String, {nullable:true})
   type?: NotificationType;
 
   @Field({nullable:true})
@@ -22,8 +37,8 @@ export class Notification {
   @Field({ nullable: true})
   read?: boolean;
 
-  @Field(() => Object, {nullable:true})
-  context?: Record<string, any> | null;;
+  @Field({nullable:true})
+  context?: string;
   
   
 }
