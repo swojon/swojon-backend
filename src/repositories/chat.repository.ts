@@ -148,9 +148,11 @@ public async chatRoomMessageList(chatRoomId: number, paging: PagingArgs): Promis
     
     const chatMessages = await sql.getManyAndCount()
     // findAndCount({ where: { chatRoomId: chatRoomId }, relations:["sender"] });
+    const hasMore = chatMessages[0].length === limit;
     const chatMessageList: ChatMessageList = {
       items: chatMessages[0],
-      count: chatMessages[1]
+      count: chatMessages[1],
+      hasMore 
     }
 
     return chatMessageList;
