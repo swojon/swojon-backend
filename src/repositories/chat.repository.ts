@@ -133,7 +133,8 @@ public async chatRoomMessageList(chatRoomId: number, paging: PagingArgs): Promis
               .leftJoinAndSelect('chatRoom.members', "members")
               .leftJoinAndSelect("members.user", 'user')
               .where("chat_message_entity.chatRoomId = :id", { id: chatRoomId })
-              .orderBy('chat_message_entity.dateSent', 'ASC')
+              .orderBy('chat_message_entity.dateSent', 'DESC')
+              .addOrderBy('chat_message_entity.id', "DESC")
               // .getManyAndCount()
 
     if (paging.starting_after){
