@@ -26,9 +26,7 @@ export class ChatMessageRepository{
     const findSender:UserEntity = await UserEntity.findOne({ where: { id: senderId} });
     if (!findSender) throw new HttpException(409, "Sender User Not Found")
     
-    if (findSender.id === findReceiver.id ){
-      throw new HttpException(409, "Sender Id and Receiver Id can't be Same.")
-    }
+  
 
     let findListing = null;
 
@@ -41,7 +39,10 @@ export class ChatMessageRepository{
     if (!chatData.chatRoomId) {
         findReceiver = await UserEntity.findOne({ where: {id:chatData.receiverId} });
         if (!findReceiver) throw new HttpException(409, "Reciever User Not Found");
-
+        
+        if (findSender.id === findReceiver.id ){
+          throw new HttpException(409, "Sender Id and Receiver Id can't be Same.")
+        }
         //check if a chatroom exist with the similiar context?
         findChatRoom = await ChatRoomEntity.createQueryBuilder('crm')
                           .innerJoin("crm.members", "member1")
@@ -143,7 +144,7 @@ public async chatRoomMessageList(chatRoomId: number, paging: PagingArgs): Promis
       sql = sql.where("chat_message_entity.id < :ending_before", {ending_before: paging.ending_before} )
     }
     
-    const limit:number = Math.min(100, paging.limit? paging.limit: 20)
+    const limit:number = Math.min(20, paging.limit? paging.limit: 20)
     sql = sql.limit(limit)
     
     const chatMessages = await sql.getManyAndCount()
