@@ -67,6 +67,9 @@ export class Chats {
 
   @Field({ nullable: true})
   count?: number;
+
+  @Field({nullable:true})
+  hasMore?:boolean;
 }
 
 
