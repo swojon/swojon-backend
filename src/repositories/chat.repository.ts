@@ -39,7 +39,14 @@ export class ChatMessageRepository{
         if (!findReceiver) throw new HttpException(409, "Reciever User Not Found");
 
         //check if a chatroom exist with the similiar context?
-        findChatRoom = await ChatRoomEntity.findOne({where: {relatedListingId: findListing, senderId: findSender.id, receiverId: findReceiver.id}})
+        findChatRoom = await ChatRoomEntity.createQueryBuilder('crm')
+                          .innerJoin("crm.members", "member1")
+                          .innerJoin("crm.members", "member2")
+                          .where("member1.userId = :userId1", { userId1: findSender.id })
+                          .andWhere("member2.userId = :userId2", { userId2: findReceiver.id })
+                          .andWhere("crm.relatedListingId = :relatedListingId", {relatedListingId: findListing.id})
+                          .getOne()
+        // .where("")  findOne({where: {relatedListingId: findListing, }})
         if (!findChatRoom) {
           findChatRoom  = await ChatRoomEntity.create({relatedListing: findListing, chatName: `${findSender.email.split('@')[0]} and ${findReceiver.email.split('@')[0]}`}).save();
           await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findSender}).save();
@@ -59,7 +66,7 @@ export class ChatMessageRepository{
     // if (!chatRoomMembers) chatRoomMembers = findReceiver? [findSender, findReceiver]: [findSender];
 
     const createChatMessageData = await ChatMessageEntity.create({chatRoom: findChatRoom, content: chatData.message, sender: findSender}).save();
-    console.log(createChatMessageData);
+    // console.log(createChatMessageData);
     // return {...createChatMessageData};
     return createChatMessageData
   }
