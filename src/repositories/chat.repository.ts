@@ -42,7 +42,7 @@ export class ChatMessageRepository{
         await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findSender}).save();
         await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findReceiver}).save();
     }else{
-      findChatRoom = await ChatRoomEntity.findOne({ where: { id: chatData.chatRoomId }, relations: ["members", "members.user"] });
+      findChatRoom = await ChatRoomEntity.findOne({ where: { id: chatData.chatRoomId }, relations: ["members", "members.user", "relatedListing"] });
     }
    
     // if still we don't have any chatRoom, its probably an error
@@ -123,6 +123,9 @@ public async chatRoomMessageList(chatRoomId: number): Promise<ChatMessageList>{
 
     const chatMessages = await ChatMessageEntity.createQueryBuilder("chat_message_entity")
                                                 .leftJoinAndSelect('chat_message_entity.sender', 'sender')
+                                                .leftJoinAndSelect('chat_message_entity.chatRoom', "chatRoom")
+                                                .leftJoinAndSelect('chatRoom.members', "members")
+                                                .leftJoinAndSelect("members.user", 'user')
                                                 .where("chat_message_entity.chatRoomId = :id", { id: chatRoomId })
                                                 .orderBy('chat_message_entity.dateSent', 'ASC')
                                                 .getManyAndCount()

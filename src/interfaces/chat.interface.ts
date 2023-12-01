@@ -1,3 +1,4 @@
+import { Listing } from "./listing.interface";
 import { User } from "./users.interface";
 export interface ChatRoomMember {
   userId?: number | null;
@@ -11,8 +12,11 @@ export interface Chat {
   isDeleted?: boolean | null;
   dateSent?: Date | null;
   isRead?: boolean | null;
-  members?: number[] | null
+  members?: number[] | null;
+  relatedListing?: Listing | null;
+
 }
+
 
 export interface ChatRoomWithMessage {
   id?: number | null;

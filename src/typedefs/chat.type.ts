@@ -27,6 +27,11 @@ export class ChatRoom {
 
   @Field(()=> [ChatRoomMember], {nullable: true})
   members?: ChatRoomMember[];
+
+  
+  @Field(() => Listing, {nullable: true})
+  relatedListing?: Listing;
+  
 }
 
 
@@ -50,6 +55,7 @@ export class Chat {
 
   @Field({nullable: true})
   dateSent?: Date;
+
 }
 
 
