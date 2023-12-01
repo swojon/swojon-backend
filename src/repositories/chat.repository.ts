@@ -26,6 +26,10 @@ export class ChatMessageRepository{
     const findSender:UserEntity = await UserEntity.findOne({ where: { id: senderId} });
     if (!findSender) throw new HttpException(409, "Sender User Not Found")
     
+    if (findSender.id === findReceiver.id ){
+      throw new HttpException(409, "Sender Id and Receiver Id can't be Same.")
+    }
+    
     let findListing = null;
 
     if (chatData.relatedListingId){
