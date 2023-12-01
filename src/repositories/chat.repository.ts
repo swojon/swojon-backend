@@ -1,14 +1,14 @@
+import { PagingArgs } from "@/dtos/category.dto";
 import { CreateMessageDTO } from "@/dtos/chat.dto";
 import { ChatMessageEntity } from "@/entities/chatMessage.entity";
 import { ListingEntity } from "@/entities/listing.entity";
 import { ChatRoomEntity, ChatRoomMemberEntity } from "@/entities/userChats.entity";
 import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
-import { ChatRoom, chatRoomList, ChatMessageList } from "@/interfaces/chat.interface";
-import { ChatRoomMember, Chat, ChatRoomWithMessage, ChatRooms, ChatRoomsWithMessage,  } from "@/typedefs/chat.type";
-import { count } from "console";
-import session from "express-session";
-import { EntityRepository, In } from "typeorm";
+import { ChatMessageList } from "@/interfaces/chat.interface";
+import { Chat, ChatRooms, ChatRoomsWithMessage,  } from "@/typedefs/chat.type";
+
+import { EntityRepository } from "typeorm";
 
 
 @EntityRepository(ChatMessageEntity)
@@ -29,7 +29,7 @@ export class ChatMessageRepository{
     if (findSender.id === findReceiver.id ){
       throw new HttpException(409, "Sender Id and Receiver Id can't be Same.")
     }
-    
+
     let findListing = null;
 
     if (chatData.relatedListingId){
@@ -50,7 +50,6 @@ export class ChatMessageRepository{
                           .andWhere("member2.userId = :userId2", { userId2: findReceiver.id })
                           .andWhere("crm.relatedListingId = :relatedListingId", {relatedListingId: findListing.id})
                           .getOne()
-        // .where("")  findOne({where: {relatedListingId: findListing, }})
         if (!findChatRoom) {
           findChatRoom  = await ChatRoomEntity.create({relatedListing: findListing, chatName: `${findSender.email.split('@')[0]} and ${findReceiver.email.split('@')[0]}`}).save();
           await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findSender}).save();
@@ -62,16 +61,8 @@ export class ChatMessageRepository{
    
     // if still we don't have any chatRoom, its probably an error
     if (!findChatRoom) throw new HttpException(409, "Chat room doesn't exist");
-    // // console.log(chatData);
-    // let chatRoomMembers = findChatRoom.members.map(mem => mem.user);
-
-    // let chatRoomMembers = findChatRoomMembers.map((member) => member.user.id )
-
-    // if (!chatRoomMembers) chatRoomMembers = findReceiver? [findSender, findReceiver]: [findSender];
 
     const createChatMessageData = await ChatMessageEntity.create({chatRoom: findChatRoom, content: chatData.message, sender: findSender}).save();
-    // console.log(createChatMessageData);
-    // return {...createChatMessageData};
     return createChatMessageData
   }
 
@@ -134,18 +125,27 @@ export class ChatMessageRepository{
     return chatRooms;
 }
 
-public async chatRoomMessageList(chatRoomId: number): Promise<ChatMessageList>{
+public async chatRoomMessageList(chatRoomId: number, paging: PagingArgs): Promise<ChatMessageList>{
 
-    const chatMessages = await ChatMessageEntity.createQueryBuilder("chat_message_entity")
-                                                .leftJoinAndSelect('chat_message_entity.sender', 'sender')
-                                                .leftJoinAndSelect('chat_message_entity.chatRoom', "chatRoom")
-                                                .leftJoinAndSelect('chatRoom.members', "members")
-                                                .leftJoinAndSelect("members.user", 'user')
-                                                .where("chat_message_entity.chatRoomId = :id", { id: chatRoomId })
-                                                .orderBy('chat_message_entity.dateSent', 'ASC')
-                                                .getManyAndCount()
+    let sql = ChatMessageEntity.createQueryBuilder("chat_message_entity")
+              .leftJoinAndSelect('chat_message_entity.sender', 'sender')
+              .leftJoinAndSelect('chat_message_entity.chatRoom', "chatRoom")
+              .leftJoinAndSelect('chatRoom.members', "members")
+              .leftJoinAndSelect("members.user", 'user')
+              .where("chat_message_entity.chatRoomId = :id", { id: chatRoomId })
+              .orderBy('chat_message_entity.dateSent', 'ASC')
+              // .getManyAndCount()
 
-
+    if (paging.starting_after){
+      sql = sql.where("chat_message_entity.id > :starting_after", {starting_after: paging.starting_after})
+    }else if (paging.ending_before){
+      sql = sql.where("chat_message_entity.id < :ending_before", {ending_before: paging.ending_before} )
+    }
+    
+    const limit:number = Math.min(100, paging.limit? paging.limit: 20)
+    sql = sql.limit(limit)
+    
+    const chatMessages = await sql.getManyAndCount()
     // findAndCount({ where: { chatRoomId: chatRoomId }, relations:["sender"] });
     const chatMessageList: ChatMessageList = {
       items: chatMessages[0],

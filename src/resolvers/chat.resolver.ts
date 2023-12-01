@@ -1,3 +1,4 @@
+import { PagingArgs } from "@/dtos/category.dto";
 import { CreateMessageDTO, ListChatRoomArgs } from "@/dtos/chat.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { ChatMessageRepository } from "@/repositories/chat.repository";
@@ -14,8 +15,8 @@ export class ChatResolver extends ChatMessageRepository {
   @Query(() => Chats, {
     description: 'List All Chat Messages',
   })
-  async listChatMessages(@Arg('chatRoomId') chatRoomId:number): Promise<Chats> {
-    const chatMessages = await this.chatRoomMessageList(chatRoomId);
+  async listChatMessages(@Arg('chatRoomId') chatRoomId:number, @Args() paging: PagingArgs): Promise<Chats> {
+    const chatMessages = await this.chatRoomMessageList(chatRoomId, paging);
     return chatMessages;
   }
 
