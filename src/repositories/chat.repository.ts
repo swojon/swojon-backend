@@ -38,9 +38,13 @@ export class ChatMessageRepository{
         findReceiver = await UserEntity.findOne({ where: {id:chatData.receiverId} });
         if (!findReceiver) throw new HttpException(409, "Reciever User Not Found");
 
-        findChatRoom  = await ChatRoomEntity.create({relatedListing: findListing, chatName: `${findSender.email.split('@')[0]} and ${findReceiver.email.split('@')[0]}`}).save();
-        await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findSender}).save();
-        await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findReceiver}).save();
+        //check if a chatroom exist with the similiar context?
+        findChatRoom = await ChatRoomEntity.findOne({where: {relatedListingId: findListing, senderId: findSender.id, receiverId: findReceiver.id}})
+        if (!findChatRoom) {
+          findChatRoom  = await ChatRoomEntity.create({relatedListing: findListing, chatName: `${findSender.email.split('@')[0]} and ${findReceiver.email.split('@')[0]}`}).save();
+          await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findSender}).save();
+          await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findReceiver}).save();
+        }
     }else{
       findChatRoom = await ChatRoomEntity.findOne({ where: { id: chatData.chatRoomId }, relations: ["members", "members.user", "relatedListing"] });
     }
