@@ -40,3 +40,28 @@ export class Reviews {
   @Field()
   count?: number
 }
+
+@ObjectType()
+export class SummaryReview{
+  @Field({nullable:true})
+  avgRating?: number;
+
+  @Field({nullable:true})
+  reviewCount?: number;
+
+  @Field({nullable:true})
+  five_star_count?: number;
+  
+  @Field({nullable:true})
+  four_star_count?: number;
+  
+  @Field({nullable:true})
+  three_star_count?: number;
+  
+  @Field({nullable:true})
+  two_star_count?: number;
+  
+  @Field({nullable:true})
+  one_star_count?: number;
+
+}

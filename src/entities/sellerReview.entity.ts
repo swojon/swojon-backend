@@ -15,13 +15,22 @@ export class SellerReviewEntity extends BaseEntity{
       @ManyToOne(() => UserEntity)
       reviewer: UserEntity;
 
+      @Column({nullable: true})
+      reviewerId: number;
+
+
       @ManyToOne(() => UserEntity)
       seller: UserEntity;
-
+      
+      @Column({nullable: true})
+      sellerId: number;
+      
       //relation with listing
       @ManyToOne(() => ListingEntity)
       listing: ListingEntity;
-
+      
+      @Column({nullable: true})
+      listingId: number;
       //column for review, not empty
       @Column({nullable:true})
       review: string;

@@ -1,6 +1,6 @@
 import { Arg, Authorized, Mutation, Query, Resolver } from 'type-graphql';
 import { SellerReviewRepository } from '@/repositories/sellerReview.repository';
-import { Review, Reviews } from '@/typedefs/sellerReview.type';
+import { Review, Reviews, SummaryReview } from '@/typedefs/sellerReview.type';
 import { ReviewCreateDTO, ReviewUpdateDTO } from '@/dtos/sellerReview.dto';
 
 @Resolver()
@@ -14,7 +14,14 @@ export class SellerReviewResolver extends SellerReviewRepository {
     return reviews;
 
   }
-
+  
+  @Query(() => SummaryReview, {
+    description: 'List All Reviews of a seller',
+  })
+  async summaryUserReview(@Arg('userId') userId: number): Promise<SummaryReview> {
+    const reviews: SummaryReview = await this.userReviewSummary(userId);
+    return reviews;
+  }
   @Query(() => Reviews, {
     description: 'List All Reviews of a seller',
   })

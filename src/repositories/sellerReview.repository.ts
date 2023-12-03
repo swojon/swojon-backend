@@ -4,7 +4,7 @@ import { SellerReviewEntity } from "@/entities/sellerReview.entity";
 import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Review } from "@/interfaces/sellerReview.interface";
-import { Reviews } from "@/typedefs/sellerReview.type";
+import { Reviews, SummaryReview } from "@/typedefs/sellerReview.type";
 import { EntityRepository } from "typeorm";
 
 
@@ -103,5 +103,33 @@ export class SellerReviewRepository{
     return reviews;
   }
 
+  public async userReviewSummary(userId: number): Promise<SummaryReview>{
+    const userReviews = await SellerReviewEntity.findAndCount({
+      where: {sellerId: userId},
+      select: ["rating"]
+    })
+    const summary = {
+        reviewCount: userReviews[1],
+        five_star_count : 0,
+        four_star_count : 0,
+        three_star_count : 0,
+        two_star_count : 0,
+        one_star_count: 0,
+        avgRating :  userReviews[0].reduce((accu, curr) => accu + Math.ceil(curr.rating), 0)/ userReviews[1]
+    }
 
+    userReviews[0].forEach(rating => {
+      const r = Math.ceil(rating.rating);
+      if (r < 2) summary.one_star_count += 1
+      else if (r < 3) summary.two_star_count += 1
+      else if (r < 4) summary.three_star_count += 1
+      else if (r < 5) summary.four_star_count += 1
+      else summary.five_star_count += 1
+    })
+    
+
+    // console.log("raw", userReviews)
+    // console.log("summary", summary)
+    return summary
+  }
 }
