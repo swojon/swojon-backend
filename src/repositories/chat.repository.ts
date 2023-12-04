@@ -6,7 +6,7 @@ import { ChatRoomEntity, ChatRoomMemberEntity } from "@/entities/userChats.entit
 import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { ChatMessageList } from "@/interfaces/chat.interface";
-import { Chat, ChatRooms, ChatRoomsWithMessage,  } from "@/typedefs/chat.type";
+import { Chat, ChatRoom, ChatRooms, ChatRoomsWithMessage,  } from "@/typedefs/chat.type";
 
 import { EntityRepository } from "typeorm";
 
@@ -66,7 +66,17 @@ export class ChatMessageRepository{
     const createChatMessageData = await ChatMessageEntity.create({chatRoom: findChatRoom, content: chatData.message, sender: findSender}).save();
     return createChatMessageData
   }
+  public async chatRoomGet(userId: number|null, id: number|null):Promise<ChatRoom>{
+      const chatRoom = await ChatRoomEntity.findOne(id, {
+          relations: ["members", "relatedListing", "members.user"],
+          select: ["id", "chatName"]
+        })
+      if (!chatRoom) throw new HttpException(409, "Chat Room Doesn't Exist")
 
+      // @todo add check if the user is a member. Otherwise return 404
+      return chatRoom
+
+  }
   public async chatRoomList(userId: number|null): Promise<ChatRoomsWithMessage>{
       
     const chatRoomMembers = await ChatRoomMemberEntity.createQueryBuilder('crm')

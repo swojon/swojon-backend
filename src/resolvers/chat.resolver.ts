@@ -2,7 +2,7 @@ import { PagingArgs } from "@/dtos/category.dto";
 import { CreateMessageDTO, ListChatRoomArgs } from "@/dtos/chat.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { ChatMessageRepository } from "@/repositories/chat.repository";
-import { Chat, ChatRoomWithMessage, ChatRooms, ChatRoomsWithMessage, Chats } from "@/typedefs/chat.type";
+import { Chat, ChatRoomWithMessage, ChatRooms, ChatRoomsWithMessage, Chats, ChatRoom } from "@/typedefs/chat.type";
 import { Notification } from "@/typedefs/notification.type";
 import { Arg, Args, Authorized, Ctx, Mutation, PubSub, Publisher, Query, Resolver } from "type-graphql";
 import { TOPICS_ENUM } from "./subscription.resolver";
@@ -30,6 +30,15 @@ export class ChatResolver extends ChatMessageRepository {
     const chatMessage = await this.messageSend(chatData, senderId);
     await publish(chatMessage); 
     return chatMessage;
+  }
+ // @Authorized()
+ @Query(() => ChatRoom, {
+  description: "Get ChatRoom by id",
+  })
+  async getChatRoom(@Ctx() ctx:MyContext, @Args(){userId, id}: ListChatRoomArgs): Promise<ChatRoom> {
+    if (!userId) userId = ctx.user.id;
+    const chatRooms = await this.chatRoomGet(userId, id);
+    return chatRooms;
   }
 
   // @Authorized()
