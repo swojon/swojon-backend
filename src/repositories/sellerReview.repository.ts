@@ -115,7 +115,7 @@ export class SellerReviewRepository{
         three_star_count : 0,
         two_star_count : 0,
         one_star_count: 0,
-        avgRating :  userReviews[0].reduce((accu, curr) => accu + Math.ceil(curr.rating), 0)/ userReviews[1]
+        avgRating : userReviews[0].length > 0 ?  userReviews[0].reduce((accu, curr) => accu + Math.ceil(curr.rating), 0)/ userReviews[1] : 0
     }
 
     userReviews[0].forEach(rating => {

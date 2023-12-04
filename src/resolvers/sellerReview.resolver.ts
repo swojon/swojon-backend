@@ -12,7 +12,6 @@ export class SellerReviewResolver extends SellerReviewRepository {
   async listListingReviews(@Arg('listingId') listingId: number): Promise<Reviews> {
     const reviews: Reviews = await this.listingReviewList(listingId);
     return reviews;
-
   }
   
   @Query(() => SummaryReview, {
