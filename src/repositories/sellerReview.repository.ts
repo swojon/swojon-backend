@@ -1,4 +1,5 @@
-import { ReviewCreateDTO, ReviewUpdateDTO } from "@/dtos/sellerReview.dto";
+import { PagingArgs } from "@/dtos/category.dto";
+import { ReviewCreateDTO, ReviewFilterInput, ReviewUpdateDTO } from "@/dtos/sellerReview.dto";
 import { ListingEntity } from "@/entities/listing.entity";
 import { SellerReviewEntity } from "@/entities/sellerReview.entity";
 import { UserEntity } from "@/entities/users.entity";
@@ -66,20 +67,43 @@ export class SellerReviewRepository{
     return reviews;
   }
 
-  public async sellerReviewList(userId: number): Promise<Reviews>{
+  public async sellerReviewList(userId: number, paging:PagingArgs, filters: ReviewFilterInput): Promise<Reviews>{
 
-    const review:[SellerReviewEntity[], number] = await SellerReviewEntity
+    // const review:[SellerReviewEntity[], number] = await 
+    let sql = SellerReviewEntity
                   .createQueryBuilder("seller_review_entity")
                   .select(["seller_review_entity.id","seller_review_entity.dateCreated",  "seller_review_entity.isDeleted", "seller_review_entity.review", "seller_review_entity.rating"])
                   .leftJoinAndSelect('seller_review_entity.reviewer', 'reviewer')
                   .leftJoinAndSelect('seller_review_entity.seller', 'seller')
                   .leftJoinAndSelect('seller_review_entity.listing', 'listing')
                   // .leftJoinAndSelect('seller_review.listing.location', 'listing.location')
-                  .where("seller_review_entity.sellerId = :id", { id: userId }).printSql().getManyAndCount()
+                  .where("seller_review_entity.sellerId = :id", { id: userId })
+    
+    if (paging.starting_after){
+      sql = sql.andWhere("seller_review_entity.id > :starting_after", {starting_after: paging.starting_after})
+    }else if (paging.ending_before){
+      sql = sql.andWhere("seller_review_entity.id < :ending_before", {ending_before: paging.ending_before} )
+    }
+    
+    if (filters?.stars){
+      sql = sql.where("seller_review_entity.rating IN (:...starFilters)", {starFilters: filters.stars})
+    }
+    
+    const limit:number = Math.min(1000, paging.limit? paging.limit: 1000)
+    sql = sql.take(limit)
+
+    const findReviews = await sql.getManyAndCount()
+
+    const reviewsList = findReviews[0]
+    const count = findReviews[1]
+
+    
+    const hasMore = reviewsList.length === limit;
 
     const reviews: Reviews = {
-      count: review[1],
-      items: review[0]
+      count: count,
+      hasMore,
+      items: reviewsList
     }
 
     return reviews;

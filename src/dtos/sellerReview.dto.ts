@@ -24,3 +24,10 @@ export class ReviewUpdateDTO{
   @Field(type=>Float)
   rating: number
 }
+
+@InputType()
+export class ReviewFilterInput{
+  @Field(() => [Number],{ nullable: true})
+  stars?: number[];
+
+}

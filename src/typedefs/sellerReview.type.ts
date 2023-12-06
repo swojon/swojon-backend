@@ -39,6 +39,9 @@ export class Reviews {
 
   @Field()
   count?: number
+
+  @Field({nullable: true})
+  hasMore?: boolean;
 }
 
 @ObjectType()
