@@ -14,7 +14,7 @@ export class Review {
   @Field(()=>User)
   seller?: User
 
-  @Field(()=>Listing)
+  @Field(()=>Listing, {nullable: true})
   listing?: Listing
 
   @Field({nullable:true})
