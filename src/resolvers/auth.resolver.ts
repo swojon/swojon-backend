@@ -16,13 +16,13 @@ export class AuthResolver extends AuthRepository {
     return user;
   }
 
-  @Query(() => TokenUserData, {
-    description: 'User login',
-  })
-  async login(@Arg('userData') userData: CreateUserDto, @Ctx() ctx: MyContext): Promise<{}> {
-    const { tokenData, findUser} = await this.userLogIn(userData, ctx);
-    return {...findUser, ...tokenData};
-  }
+  // @Query(() => TokenUserData, {
+  //   description: 'User login',
+  // })
+  // async login(@Arg('userData') userData: CreateUserDto, @Ctx() ctx: MyContext): Promise<{}> {
+  //   const { tokenData, findUser} = await this.userLogIn(userData, ctx);
+  //   return {...findUser, ...tokenData};
+  // }
 
   @Authorized()
   @Query(() => User, {

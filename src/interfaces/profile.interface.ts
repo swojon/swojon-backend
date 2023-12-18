@@ -2,8 +2,7 @@ import { User } from "./users.interface";
 
 export interface Profile {
   id?: number;
-  firstName?: string | null;
-  lastName?: string| null;
+  name?: string | null;
   phoneNumber?: string| null;
   isPhoneNumberVerified?: boolean;
   address?: string| null;

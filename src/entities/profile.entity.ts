@@ -9,10 +9,7 @@ export class ProfileEntity extends BaseEntity{
     id: number;
 
     @Column({ nullable: true })
-    firstName: string;
-
-    @Column({nullable: true})
-    lastName: string;
+    name: string;
 
     @Column({nullable: true, length: 11})
     phoneNumber: string;

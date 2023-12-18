@@ -26,7 +26,7 @@ export class SellerReviewEntity extends BaseEntity{
       sellerId: number;
       
       //relation with listing
-      @ManyToOne(() => ListingEntity)
+      @ManyToOne(() => ListingEntity, {nullable:true})
       listing: ListingEntity;
       
       @Column({nullable: true})

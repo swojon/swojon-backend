@@ -8,11 +8,7 @@ export class UpdateProfileDto implements Partial<Profile> {
 
   @Field({nullable: true})
   @IsString()
-  firstName?:  string;
-
-  @Field({nullable: true})
-  @IsString()
-  lastName?:  string;
+  name?:  string;
 
   @Field({nullable: true})
   @IsString()

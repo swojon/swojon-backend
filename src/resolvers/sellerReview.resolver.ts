@@ -1,7 +1,7 @@
 import { Arg, Args, Authorized, Mutation, Query, Resolver } from 'type-graphql';
 import { SellerReviewRepository } from '@/repositories/sellerReview.repository';
 import { Review, Reviews, SummaryReview } from '@/typedefs/sellerReview.type';
-import { ReviewCreateDTO, ReviewFilterInput, ReviewUpdateDTO } from '@/dtos/sellerReview.dto';
+import { ReviewCreateDTO, ReviewFilterInput, ReviewUpdateDTO, SellerReviewCreateDTO } from '@/dtos/sellerReview.dto';
 import { PagingArgs } from '@/dtos/category.dto';
 
 @Resolver()
@@ -48,6 +48,15 @@ export class SellerReviewResolver extends SellerReviewRepository {
     return review;
   }
 
+    // @Authorized()
+  @Mutation(() => Review, {
+      description: 'Add Review to a seller',
+    })
+    async createSellerReview(@Arg('reviewData') reviewData: SellerReviewCreateDTO): Promise<Review> {
+      const review: Review = await this.sellerReviewAdd(reviewData);
+      return review;
+    }
+  
   // @Authorized()
   @Mutation(() => Review, {
     description: 'Update Listing/Seller Review',

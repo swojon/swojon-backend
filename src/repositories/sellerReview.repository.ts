@@ -1,5 +1,5 @@
 import { PagingArgs } from "@/dtos/category.dto";
-import { ReviewCreateDTO, ReviewFilterInput, ReviewUpdateDTO } from "@/dtos/sellerReview.dto";
+import { ReviewCreateDTO, ReviewFilterInput, ReviewUpdateDTO, SellerReviewCreateDTO } from "@/dtos/sellerReview.dto";
 import { ListingEntity } from "@/entities/listing.entity";
 import { SellerReviewEntity } from "@/entities/sellerReview.entity";
 import { UserEntity } from "@/entities/users.entity";
@@ -11,6 +11,30 @@ import { EntityRepository } from "typeorm";
 
 @EntityRepository(SellerReviewEntity)
 export class SellerReviewRepository{
+
+  public async sellerReviewAdd(reviewData: SellerReviewCreateDTO): Promise<Review>{
+    const findReviewer:UserEntity = await UserEntity.findOne({where:{id:reviewData.reviewerId}})
+    if (!findReviewer) throw new HttpException(409, "User doesn't exist")
+    let findListing = null;
+    let findSellerId = null;
+
+    if(reviewData.listingId ){
+      findListing = await ListingEntity.findOne({where: {id:reviewData.listingId}, relations:["user"]})
+      if (!findListing) throw new HttpException(409, "Listing doesn't exist");
+      findSellerId  = findListing.user;
+    }else if (reviewData.sellerId ){
+      findSellerId = reviewData.sellerId
+    }else {
+      throw new HttpException(409, "Either Seller Id or Listing Id Must be provided. ")
+    }
+    
+    const createReviewData:SellerReviewEntity= await SellerReviewEntity.create(
+                    {...reviewData, sellerId:findSellerId, reviewer:findReviewer, listing:findListing}
+                    ).save()
+    
+    const createdData:Review = await SellerReviewEntity.findOne({where: {id:createReviewData.id}, relations:["reviewer", 'seller', 'listing']})
+    return createdData;
+  }
 
   public async listingReviewAdd(reviewData:ReviewCreateDTO): Promise<Review>{
 

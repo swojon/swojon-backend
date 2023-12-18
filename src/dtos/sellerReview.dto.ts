@@ -16,6 +16,24 @@ export class ReviewCreateDTO {
 }
 
 @InputType()
+export class SellerReviewCreateDTO {
+  @Field()
+  reviewerId: number;
+
+  @Field({nullable:true})
+  listingId?: number;
+
+  @Field({nullable:true})
+  review?: string;
+
+  @Field({nullable:true})
+  sellerId: number;
+
+  @Field(type=>Float)
+  rating: number
+}
+
+@InputType()
 export class ReviewUpdateDTO{
 
   @Field({nullable:true})

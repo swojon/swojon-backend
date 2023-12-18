@@ -7,11 +7,8 @@ export class Profile {
   id?: number;
 
   @Field(() => String, { nullable: true })
-  firstName?:  string;
-
-  @Field(() => String, { nullable: true })
-  lastName?: string ;
-
+  name?:  string;
+  
   @Field(() => String, { nullable: true })
   phoneNumber?: string ;
 
