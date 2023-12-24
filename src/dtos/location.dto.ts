@@ -20,6 +20,17 @@ export class LocationCreateDTO {
 }
 
 @InputType()
+export class NominatimSearchDTO {
+  @Field({nullable:true})
+  query?: string;
+
+  @Field({nullable: true})
+  lat?: string;
+
+  @Field({nullable: true})
+  lon?: string;
+}
+@InputType()
 export class LocationUpdateDTO {
     @Field({ nullable: true})
     name?: string;

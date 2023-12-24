@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@graphql-tools/schema": "^10.0.0",
+    "@owsas/nominatim-js": "^1.0.1",
     "@types/express-session": "1.17.0",
     "@types/passport": "^1.0.13",
     "@types/passport-google-oauth20": "^2.0.12",
@@ -44,6 +45,7 @@
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^8.5.1",
     "moment-timezone": "^0.5.43",
+    "nominatim-client": "^3.2.1",
     "passport": "^0.4.1",
     "passport-facebook": "^3.0.0",
     "passport-facebook-token": "^4.0.0",

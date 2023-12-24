@@ -1,7 +1,7 @@
 
-import { LocationArgs, LocationCreateDTO, LocationUpdateDTO } from "@/dtos/location.dto";
+import { LocationArgs, LocationCreateDTO, LocationUpdateDTO, NominatimSearchDTO } from "@/dtos/location.dto";
 import { LocationRepository } from "@/repositories/location.repository";
-import { Locations, Location } from "@/typedefs/location.type";
+import { Locations, Location, NominatimLocation, NominatimLocations } from "@/typedefs/location.type";
 import { Arg, Args, Authorized, Mutation, Query, Resolver } from "type-graphql";
 
 @Resolver()
@@ -14,6 +14,14 @@ export class LocationResolver extends LocationRepository{
   async listLocations(): Promise<Locations> {
       const locations: Locations = await this.locationList();
       return locations;
+  }
+
+  @Query(() => NominatimLocations, {
+    description: "Search for nominatim api"
+  })
+  async searchLocation(@Arg('nominatimQuery') nominatimQuery : NominatimSearchDTO) : Promise<NominatimLocations>{
+    const locations = await this.locationSearch(nominatimQuery)
+    return locations
   }
 
   // @Authorized()
@@ -34,6 +42,7 @@ export class LocationResolver extends LocationRepository{
     return location;
   }
 
+  
   // @Authorized()
   @Mutation(() => Location, {
     description: 'Remove Location',

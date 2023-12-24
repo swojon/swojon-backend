@@ -1,14 +1,53 @@
-import { LocationCreateDTO, LocationArgs, LocationUpdateDTO } from "@/dtos/location.dto";
+import { LocationCreateDTO, LocationArgs, LocationUpdateDTO, NominatimSearchDTO } from "@/dtos/location.dto";
 import { LocationEntity } from "@/entities/location.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Locations, Location } from "@/interfaces/location.interface";
+import { NominatimLocation, NominatimLocations } from "@/typedefs/location.type";
 import { EntityRepository } from "typeorm";
 
 
 
 @EntityRepository(LocationEntity)
 export class LocationRepository{
-
+  public async locationSearch(nominatimQuery:NominatimSearchDTO): Promise<NominatimLocations> {
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nominatimQuery.query)}&format=json&addressdetails=1&limit=5&polygon_svg=1`, {
+      headers: {
+        "accept-language" : "en-us",
+        "user-agent": "Swojon Web Application"
+      }
+    })
+    const data = await response.json()
+    // console.log("data", data)
+    const locations = data.map(loc => { 
+        return {
+            lat: loc.lat, 
+            lon: loc.lon, 
+            placeId: loc.place_id, 
+            displayName: loc.display_name, 
+            // address: loc.address,
+            locality: loc.address.locality ?? loc.address.natural ?? loc.address.village,
+            city: loc.address.city,
+            stateDistrict: loc.address.state_district,
+            state : loc.address.state,
+            country: loc.address.country,
+            postCode: loc.address.postcode
+          }})
+    // console.log("locations", locations)
+    return {items: locations}
+  } 
+  
+  public async reverseNominatim(nominatimQuery:NominatimSearchDTO): Promise<NominatimLocation>{
+    const response = await fetch(`https://nominatim.openstreetmap.org/lookup?lat=${nominatimQuery.lat}&lon=${nominatimQuery.lon}&format=json&addressdetails=1&limit=5&polygon_svg=1`, {
+      headers: {
+        "accept-language" : "en-us",
+        "user-agent": "Swojon Web Application"
+      }
+    })
+    
+    const data = await response.json()
+    console.log(data)
+    return {}
+  }
   public async locationList(): Promise<Locations> {
     // const getLocationTree = (locations:LocationEntity[], target: Location|null):Location[] =>{
 

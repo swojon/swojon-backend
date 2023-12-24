@@ -8,6 +8,9 @@ dependencies:
   '@graphql-tools/schema':
     specifier: ^10.0.0
     version: 10.0.0(graphql@15.8.0)
+  '@owsas/nominatim-js':
+    specifier: ^1.0.1
+    version: 1.0.1
   '@types/express-session':
     specifier: 1.17.0
     version: 1.17.0
@@ -86,6 +89,9 @@ dependencies:
   moment-timezone:
     specifier: ^0.5.43
     version: 0.5.43
+  nominatim-client:
+    specifier: ^3.2.1
+    version: 3.2.1
   passport:
     specifier: ^0.4.1
     version: 0.4.1
@@ -1288,6 +1294,10 @@ packages:
       '@opencensus/core': 0.0.8
       uuid: 3.4.0
     dev: true
+
+  /@owsas/nominatim-js@1.0.1:
+    resolution: {integrity: sha512-iGZHKfg6+CIU9ahMrGaLUT/7sGE0//lwq07ciq4wUsSc64KH1wIS16WJipsh7t1kwfaOJ5H1pb3mEi0lErkC/A==}
+    dev: false
 
   /@pkgjs/parseargs@0.11.0:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -5709,6 +5719,10 @@ packages:
       touch: 3.1.0
       undefsafe: 2.0.5
     dev: true
+
+  /nominatim-client@3.2.1:
+    resolution: {integrity: sha512-i7kGGMvXU37nUhDhlTuj0JhoWntT69BUFeEOHxw40Wf5J++dUCGnPgMCE+6KAJZCOVeK6lqjMAxP2+zyg0CbKw==}
+    dev: false
 
   /nopt@1.0.10:
     resolution: {integrity: sha512-NWmpvLSqUrgrAC9HCuxEvb+PSloHpqVu+FqcO4eeF2h5qYRhA7ev6KvelyQAKtegUbC6RypJnlEOhd8vloNKYg==}
