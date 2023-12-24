@@ -122,6 +122,6 @@ export class ListingFilterInput{
   @Field(() => [Number],{ nullable: true})
   locationIds?: number[];
 
-  @Field({nullable:true})
+  @Field(() => [String], {nullable:true})
   categorySlug? : string[];  
 }
