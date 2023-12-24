@@ -123,8 +123,5 @@ export class ListingFilterInput{
   locationIds?: number[];
 
   @Field({nullable:true})
-  categorySlug? : string;
-
-
-  
+  categorySlug? : string[];  
 }

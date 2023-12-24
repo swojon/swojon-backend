@@ -39,7 +39,7 @@ const get_category_ids_to_filter = async (filters: ListingFilterInput) => {
       relations: ['parentCategory'],
     });
     if (filters?.categorySlug) {
-      filters.categorySlug.split(',').forEach(slug => {
+      filters.categorySlug.forEach(slug => {
         const findCategory = categories.find(cat => cat.slug === slug);
         if (!!findCategory) {
           const relatedCategories = getAllRelatedDependantSubCategories(categories, findCategory.id);
