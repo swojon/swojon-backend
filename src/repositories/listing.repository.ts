@@ -39,11 +39,13 @@ const get_category_ids_to_filter = async (filters: ListingFilterInput) => {
       relations: ['parentCategory'],
     });
     if (filters?.categorySlug) {
-      const findCategory = categories.find(cat => cat.slug === filters?.categorySlug);
-      if (!!findCategory) {
-        const relatedCategories = getAllRelatedDependantSubCategories(categories, findCategory.id);
-        categoryIdsToFilter = categoryIdsToFilter.concat(relatedCategories);
-      }
+      filters.categorySlug.split(',').forEach(slug => {
+        const findCategory = categories.find(cat => cat.slug === slug);
+        if (!!findCategory) {
+          const relatedCategories = getAllRelatedDependantSubCategories(categories, findCategory.id);
+          categoryIdsToFilter = categoryIdsToFilter.concat(relatedCategories);
+        }
+      }) 
     }
     if (!!filters?.categoryIds) {
       console.log('I am here');

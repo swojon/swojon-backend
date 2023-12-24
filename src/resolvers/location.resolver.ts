@@ -24,6 +24,15 @@ export class LocationResolver extends LocationRepository{
     return locations
   }
 
+  // @Query(() => NominatimLocation, {
+  //   description: "Reverse Search for nominatim api"
+  // })
+  // async reverseSearchLocation(@Arg('nominatimQuery') nominatimQuery : NominatimSearchDTO) : Promise<NominatimLocation>{
+  //   const location = await this.reverseNominatim(nominatimQuery)
+  //   return location
+  // }
+
+
   // @Authorized()
   @Mutation(() => Location, {
     description: 'Create Location',

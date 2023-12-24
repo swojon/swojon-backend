@@ -36,18 +36,20 @@ export class LocationRepository{
     return {items: locations}
   } 
   
-  public async reverseNominatim(nominatimQuery:NominatimSearchDTO): Promise<NominatimLocation>{
-    const response = await fetch(`https://nominatim.openstreetmap.org/lookup?lat=${nominatimQuery.lat}&lon=${nominatimQuery.lon}&format=json&addressdetails=1&limit=5&polygon_svg=1`, {
-      headers: {
-        "accept-language" : "en-us",
-        "user-agent": "Swojon Web Application"
-      }
-    })
+  // public async reverseNominatim(nominatimQuery:NominatimSearchDTO): Promise<NominatimLocation>{
+  //   // @incomplete
+  //   console.log(nominatimQuery.lat, nominatimQuery.lon)
+  //   const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${nominatimQuery.lat}&lon=${nominatimQuery.lon}&format=json&addressdetails=1&limit=5`, {
+  //     headers: {
+  //       "accept-language" : "en-us",
+  //       "user-agent": "Swojon Web Application"
+  //     }
+  //   })
     
-    const data = await response.json()
-    console.log(data)
-    return {}
-  }
+  //   const data = await response.json()
+  //   console.log(data)
+  //   return {}
+  // }
   public async locationList(): Promise<Locations> {
     // const getLocationTree = (locations:LocationEntity[], target: Location|null):Location[] =>{
 
