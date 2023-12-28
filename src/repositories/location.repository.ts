@@ -4,19 +4,20 @@ import { HttpException } from "@/exceptions/httpException";
 import { Locations, Location } from "@/interfaces/location.interface";
 import { NominatimLocation, NominatimLocations } from "@/typedefs/location.type";
 import { EntityRepository } from "typeorm";
-
+// import fetch from "node-fetch";
+import axios from 'axios'
 
 
 @EntityRepository(LocationEntity)
 export class LocationRepository{
   public async locationSearch(nominatimQuery:NominatimSearchDTO): Promise<NominatimLocations> {
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nominatimQuery.query)}&format=json&addressdetails=1&limit=5&polygon_svg=1`, {
+    const {status, data} = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nominatimQuery.query)}&format=json&addressdetails=1&limit=5&polygon_svg=1`, {
       headers: {
         "accept-language" : "en-us",
         "user-agent": "Swojon Web Application"
       }
     })
-    const data = await response.json()
+    // const data:any = await response.json()
     // console.log("data", data)
     const locations = data.map(loc => { 
         return {
