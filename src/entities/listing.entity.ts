@@ -21,6 +21,9 @@ export class ListingEntity extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({nullable: true})
+    slug: string;
+
     //many to one relationship with user
     @ManyToOne(() => UserEntity)
     user: UserEntity;
@@ -40,22 +43,25 @@ export class ListingEntity extends BaseEntity{
 
     // @Column({type: "jsonb"})
     // metadata: {};
+    @Column({nullable:true, default: 'used'})
+    condition: string;
+
+    @Column({default: 1})
+    quantity: number;
+
+    @Column({default: "meetup", nullable:true})
+    dealingMethod: string;
+
+    @Column({nullable: true})
+    deliveryCharge: number;
 
     //column for price, not empty
     @Column()
     price: number;
 
     //column for location, not empty
-    @ManyToOne(()=>LocationEntity, {nullable:true})
-    location: LocationEntity;
-
-    //column for latitude, not empty
-    @Column({nullable:true})
-    latitude: string;
-
-    //column for longitude, not empty
-    @Column({nullable:true})
-    longitude: string;
+    @Column('jsonb', {nullable:true})
+    meetupLocations: object[];
 
     @Column({default: false})
     isLive: boolean;

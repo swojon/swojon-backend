@@ -1,5 +1,38 @@
 import { Field, InputType } from "type-graphql";
 
+
+@InputType()
+export class NominatimLocationInput {
+  @Field({nullable:true})
+  lat?: string 
+
+  @Field({nullable:true})
+  lon?: string 
+  
+  @Field({nullable:true})
+  placeId?: string 
+  
+  @Field({nullable:true})
+  locality?: string
+  
+  @Field({nullable:true})
+  displayName?: string 
+  
+  @Field({nullable:true})
+  city?: string
+  
+  @Field({nullable:true})
+  stateDistrict?: string
+  
+  @Field({nullable:true})
+  state ?: string
+  
+  @Field({nullable:true})
+  country?: string
+  
+  @Field({nullable:true})
+  postCode?: string
+}
 @InputType()
 export class ListingCreateDTO {
   @Field()
@@ -8,30 +41,36 @@ export class ListingCreateDTO {
   @Field({nullable: true})
   description?: string;
 
-  @Field(()=>[Number], {nullable:true})
-  communityIds?:number[]
-
-  @Field()
-  price:number
-
-  @Field({nullable:true})
-  locationId?: number;
-
-  @Field({nullable:true})
-  latitude?: string;
-
-  @Field({nullable:true})
-  longitude?: string;
-
-  @Field()
-  categoryId : number
-
-  @Field({nullable:true})
-  brandId?: number
-
+  
   @Field(()=>[String], {nullable:true})
   mediaUrls?: string[]
 
+  @Field({nullable:true})
+  slug?: string;
+  
+  @Field({nullable: true})
+  condition?: string;
+
+  @Field({nullable:true})
+  brandId?: number;
+
+  @Field()
+  categoryId: number
+
+  @Field({nullable:true})
+  quantity?: number;
+
+  @Field({nullable:true, defaultValue: "meetup"})
+  dealingMethod?: string;
+
+  @Field()
+  price: number;
+  
+  @Field({nullable:true})
+  deliveryCharge?: number;
+
+  @Field(() => [NominatimLocationInput], {nullable:true})
+  meetupLocations?: NominatimLocationInput[]
 }
 
 @InputType()

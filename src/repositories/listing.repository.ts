@@ -123,13 +123,16 @@ export class ListingRepository {
     // console.log("brandIds to filter", brandIdsToFilter)
     // console.log('CategoryIds to filter', categoryIdsToFilter);
     let sql = ListingEntity.createQueryBuilder('listing')
-      .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 'listing.dateCreated'])
-      .leftJoinAndSelect('listing.communities', 'community')
+      .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 
+        'listing.dateCreated', 'listing.meetupLocations', 'listing.quantity', 'listing.dealingMethod', 
+        'listing.deliveryCharge', 'listing.slug'
+      ])
+      // .leftJoinAndSelect('listing.communities', 'community')
       .leftJoinAndSelect('listing.user', 'user')
       .leftJoinAndSelect('listing.brand', 'brand')
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
-      .leftJoinAndSelect('listing.location', 'location')
+      // .leftJoinAndSelect('listing.location', 'location')
       .orderBy('listing.id', 'ASC');
     if (paging.starting_after) {
       sql = sql.where('listing.id > :starting_after', { starting_after: paging.starting_after });
@@ -149,9 +152,9 @@ export class ListingRepository {
     if (categoryIdsToFilter.length > 0) {
       sql = sql.andWhere('category.id IN (:...categoryIds)', { categoryIds: categoryIdsToFilter });
     }
-    if (filters?.locationIds) {
-      sql = sql.andWhere('location.id IN (:...locationIds)', { locationIds: filters?.locationIds });
-    }
+    // if (filters?.locationIds) {
+    //   sql = sql.andWhere('location.id IN (:...locationIds)', { locationIds: filters?.locationIds });
+    // }
     if (filters?.userIds) {
       sql = sql.andWhere('user.id IN (:...userIds)', { userIds: filters?.userIds });
     }
@@ -200,13 +203,15 @@ export class ListingRepository {
     console.log('CategoryIds to filter', categoryIdsToFilter);
     // console.log(req.ip, req.ips, "Ip address associated")
     let sql = ListingEntity.createQueryBuilder('listing')
-      .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 'listing.dateCreated'])
-      .leftJoinAndSelect('listing.communities', 'community')
+      .select(['listing.title', 'listing.id', 'listing.price', 
+      'listing.description', 'listing.dateCreated', 'listing.meetupLocations', 'listing.quantity', 'listing.dealingMethod', 
+      'listing.deliveryCharge', 'listing.slug'])
+      // .leftJoinAndSelect('listing.communities', 'community')
       .leftJoinAndSelect('listing.user', 'user')
       .leftJoinAndSelect('listing.brand', 'brand')
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
-      .leftJoinAndSelect('listing.location', 'location')
+      // .leftJoinAndSelect('listing.location', 'location')
       .orderBy('listing.id', 'ASC');
     if (paging.starting_after) {
       sql = sql.where('listing.id > :starting_after', { starting_after: paging.starting_after });
@@ -225,9 +230,9 @@ export class ListingRepository {
     if (categoryIdsToFilter.length > 0) {
       sql = sql.andWhere('category.id IN (:...categoryIds)', { categoryIds: categoryIdsToFilter });
     }
-    if (filters?.locationIds) {
-      sql = sql.andWhere('location.id IN (:...locationIds)', { locationIds: filters?.locationIds });
-    }
+    // if (filters?.locationIds) {
+    //   sql = sql.andWhere('location.id IN (:...locationIds)', { locationIds: filters?.locationIds });
+    // }
     if (filters?.userIds) {
       sql = sql.andWhere('user.id IN (:...userIds)', { userIds: filters?.userIds });
     }
@@ -269,7 +274,7 @@ export class ListingRepository {
   public async listingAdd(userId: number, listingData: ListingCreateDTO): Promise<Listing> {
     let communities: CommunityEntity[] = [];
     let brand: BrandEntity | null = null;
-    let location: LocationEntity | null = null;
+    // let location: LocationEntity | null = null;
 
     const findUser: UserEntity = await UserEntity.findOne({ where: { id: userId } });
     if (!findUser) throw new HttpException(409, `User with id ${userId} does not exist`);
@@ -282,16 +287,7 @@ export class ListingRepository {
       brand = findBrand;
     }
 
-    if (listingData.locationId) {
-      console.log(listingData.brandId);
-      const findLocation: LocationEntity = await LocationEntity.findOne({ where: { id: listingData.locationId } });
-      console.log(findLocation);
-      if (!findLocation) throw new HttpException(409, `Brand with id ${listingData.brandId} does not exist`);
-      location = findLocation;
-    }
-    if (listingData.communityIds) {
-      communities = await CommunityEntity.findByIds(listingData.communityIds);
-    }
+    
     let listingMedia = [];
     if (listingData.mediaUrls) {
       listingData.mediaUrls.forEach(url => {
@@ -310,8 +306,12 @@ export class ListingRepository {
       ...listingData,
       category: findCategory,
       brand,
-      communities,
-      location,
+      quantity: listingData.quantity ?? 1,
+      dealingMethod: listingData.dealingMethod ?? 'meetup',
+      meetupLocations: listingData.meetupLocations,
+      condition: listingData.condition,
+      slug: listingData.slug,
+      deliveryCharge: listingData.deliveryCharge ?? 0,
       user: findUser,
       media: listingMedia,
     }).save();

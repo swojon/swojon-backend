@@ -3,7 +3,7 @@ import { Category } from "./category.type";
 import { User } from "./users.type";
 import { Community } from "./community.type";
 import { Brand } from "./brand.type";
-import { Location } from "./location.type";
+import { Location, NominatimLocation } from "./location.type";
 
 @ObjectType()
 export class ListingMedia {
@@ -37,14 +37,19 @@ export class Listing {
   @Field()
   price?: number
 
-  @Field(() => Location, {nullable:true})
-  location?: Location;
+  @Field(() => [NominatimLocation], {nullable:true})
+  meetupLocations?: NominatimLocation[];
 
   @Field({nullable:true})
-  latitude?: string;
+  dealingMethod?: string;
 
   @Field({nullable:true})
-  longitude?: string;
+  quantity?: number;
+
+  @Field({nullable:true})
+  slug?: string;
+
+  
 
   @Field(()=> Category, {nullable: true})
   category?:Category
