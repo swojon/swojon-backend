@@ -186,7 +186,7 @@ export class ListingRepository {
                           {id: listingArgs?.id},
                           // {slug: listingArgs?.slug},
                           {title: listingArgs?.name}],
-                      relations: ["user", "brand", "category", "media", "location", "communities", ]
+                      relations: ["user", "brand", "category", "media" ]
                     },
                   );
     if (!findListing) throw new HttpException(409, `Listing not found`);
