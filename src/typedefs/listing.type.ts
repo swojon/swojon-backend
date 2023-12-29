@@ -49,7 +49,8 @@ export class Listing {
   @Field({nullable:true})
   slug?: string;
 
-  
+  @Field({nullable:true})
+  condition?: string;
 
   @Field(()=> Category, {nullable: true})
   category?:Category
