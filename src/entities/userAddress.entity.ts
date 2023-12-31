@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { CommunityEntity } from "./community.entity";
 import { ListingEntity } from "./listing.entity";
@@ -16,11 +16,11 @@ export class UserAddressEntity extends BaseEntity{
 
     //many to one relationship with user
     @ManyToOne(() => UserEntity)
-    user: UserEntity;
+    user: Relation<UserEntity>;
 
     //many to one relationship with address
     @ManyToOne(() => AddressEntity)
-    address: AddressEntity;
+    address: Relation<AddressEntity>;
 
     //isDefault
     @Column({default: false})

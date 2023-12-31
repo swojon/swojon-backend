@@ -1,5 +1,5 @@
 import { IsNotEmpty } from "class-validator";
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "./users.entity";
 
 export enum TRANSACTION_TYPE {
@@ -18,7 +18,7 @@ export class PointEntity extends BaseEntity{
 
     //many to one relationship with user
     @ManyToOne(() => UserEntity)
-    user: UserEntity;
+    user: Relation<UserEntity>;
 
     @Column()
     @IsNotEmpty()

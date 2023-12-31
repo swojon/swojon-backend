@@ -24,7 +24,7 @@ export class Category {
   @Field({ nullable: true})
   banner?: string;
 
-  @Field({ nullable: true})
+  @Field(()=> Category, { nullable: true})
   parentCategory?:Category;
 
   @Field(()=> [Category], {nullable: true})

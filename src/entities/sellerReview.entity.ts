@@ -1,4 +1,4 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Relation, Unique, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { ListingEntity } from "./listing.entity";
 import { Float } from "type-graphql";
@@ -13,21 +13,21 @@ export class SellerReviewEntity extends BaseEntity{
 
       //many to one relationship with user
       @ManyToOne(() => UserEntity)
-      reviewer: UserEntity;
+      reviewer: Relation<UserEntity>;
 
       @Column({nullable: true})
       reviewerId: number;
 
 
       @ManyToOne(() => UserEntity)
-      seller: UserEntity;
+      seller: Relation<UserEntity>;
       
       @Column({nullable: true})
       sellerId: number;
       
       //relation with listing
       @ManyToOne(() => ListingEntity, {nullable:true})
-      listing: ListingEntity;
+      listing: Relation<ListingEntity>;
       
       @Column({nullable: true})
       listingId: number;

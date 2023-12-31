@@ -1,5 +1,5 @@
 import { IsNotEmpty } from "class-validator";
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 
 
 
@@ -15,7 +15,7 @@ export class LocationEntity extends BaseEntity{
 
     //parent location foreign key
     @ManyToOne(type => LocationEntity, location => location.parentLocation, {onDelete: 'CASCADE'})
-    parentLocation: LocationEntity;
+    parentLocation: Relation<LocationEntity>;
 
     //column for slug, unique, not empty
     @Column()

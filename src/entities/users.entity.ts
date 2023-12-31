@@ -1,5 +1,5 @@
 import { IsEmpty, IsNotEmpty, isEmpty } from 'class-validator';
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany, JoinTable } from 'typeorm';
+import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany, JoinTable, Relation } from 'typeorm';
 import { User } from '@interfaces/users.interface';
 import { ProfileEntity } from './profile.entity';
 import { RoleEntity } from './role.entity';
@@ -72,10 +72,10 @@ export class UserEntity extends BaseEntity implements User {
 
   @OneToOne(() => ProfileEntity, {cascade: true})
   @JoinColumn()
-  profile: ProfileEntity
+  profile: Relation<ProfileEntity>
 
   //one to many field with role
   @ManyToMany(() => RoleEntity, {cascade: true})
   @JoinTable()
-  roles: RoleEntity[];
+  roles: Relation<RoleEntity>[];
 }

@@ -1,5 +1,5 @@
 
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { CommunityEntity } from "./community.entity";
 import { CategoryEntity } from "./category.entity";
@@ -26,12 +26,12 @@ export class ListingEntity extends BaseEntity{
 
     //many to one relationship with user
     @ManyToOne(() => UserEntity)
-    user: UserEntity;
+    user: Relation<UserEntity>;
 
     //one listing can belong to many communities
     @ManyToMany(() => CommunityEntity)
     @JoinTable()
-    communities: CommunityEntity[];
+    communities: Relation<CommunityEntity>[];
 
     //column for title, not empty
     @Column()
@@ -71,10 +71,10 @@ export class ListingEntity extends BaseEntity{
     isFeatured: boolean;
 
     @ManyToOne(() => CategoryEntity)
-    category: CategoryEntity;
+    category: Relation<CategoryEntity>;
 
     @ManyToOne(()=> BrandEntity, {nullable:true})
-    brand:BrandEntity;
+    brand:Relation<BrandEntity>;
 
     @Column({
       type:"enum",
@@ -100,7 +100,7 @@ export class ListingEntity extends BaseEntity{
 
     @ManyToMany(()=>ListingMediaEntity, {cascade: true})
     @JoinTable()
-    media: ListingMediaEntity[]
+    media: Relation<ListingMediaEntity>[]
 
     @Column("tsvector", { select: false, nullable: true })
     document_with_weights: any;

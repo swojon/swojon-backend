@@ -1,5 +1,5 @@
 import { IsNotEmpty } from "class-validator";
-import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { UserEntity } from "./users.entity";
 
 @Entity()
@@ -28,7 +28,7 @@ export class SearchEntity extends BaseEntity{
     
     //many to one relationship with user
     @ManyToOne(() => UserEntity, {nullable: true })
-    user: UserEntity;
+    user:Relation<UserEntity>;
 
     @Column({nullable: true})
     userId: number;

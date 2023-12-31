@@ -1,5 +1,5 @@
 
-import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { CommunityEntity } from "./community.entity";
 
@@ -19,7 +19,7 @@ export class CommunityMemberEntity extends BaseEntity{
 
     //many to one relationship with community
     @ManyToOne(() => CommunityEntity, (community) => community.members )
-    community: CommunityEntity;
+    community:Relation<CommunityEntity>;
 
     @Column({nullable: true})
     communityId: number;

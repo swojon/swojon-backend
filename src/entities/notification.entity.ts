@@ -1,4 +1,4 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { UserEntity } from "./users.entity";
 
 export enum NotificationType {
@@ -17,7 +17,7 @@ export class NotificationEntity extends BaseEntity{
     read: boolean;
 
     @ManyToOne(() => UserEntity)
-    user: UserEntity;
+    user:Relation<UserEntity>;
 
     @Column({nullable:true})
     userId: number;

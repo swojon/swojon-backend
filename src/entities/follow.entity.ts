@@ -1,5 +1,5 @@
 
-import { BaseEntity, Column, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 // import { CommunityEntity } from "./community.entity";
 
@@ -11,14 +11,14 @@ export class FollowEntity extends BaseEntity{
 
     //many to one relationship with user
     @ManyToOne(() => UserEntity)
-    user: UserEntity;
+    user: Relation<UserEntity>;
 
     @Column({nullable: true})
     userId: number;
 
     //many to one relationship with community
     @ManyToOne(() => UserEntity)
-    followedUser: UserEntity;
+    followedUser: Relation<UserEntity>;
 
     @Column({nullable: true})
     followedUserId: number;

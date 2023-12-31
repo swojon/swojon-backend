@@ -1,5 +1,5 @@
 import { IsNotEmpty } from "class-validator";
-import { BaseEntity, Column, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 
 export enum Status {
   PENDING = "pending",
@@ -19,7 +19,7 @@ export class CategoryEntity extends BaseEntity{
 
     //parent category foreign key
     @ManyToOne(type => CategoryEntity, category => category.parentCategory, {onDelete: 'CASCADE'})
-    parentCategory: CategoryEntity;
+    parentCategory: Relation<CategoryEntity>;
 
     //column for slug, unique, not empty
     @Column()

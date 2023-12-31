@@ -1,5 +1,5 @@
 import { IsNotEmpty } from "class-validator";
-import { BaseEntity, Column, DeleteDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, DeleteDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { CategoryEntity } from "./category.entity";
 
 @Entity()
@@ -32,7 +32,7 @@ export class BrandEntity extends BaseEntity{
 
   @ManyToMany(()=>CategoryEntity)
   @JoinTable()
-  categories: CategoryEntity[]
+  categories: Relation<CategoryEntity>[]
 
 }
 

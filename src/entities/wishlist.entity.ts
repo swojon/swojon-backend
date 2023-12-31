@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { CommunityEntity } from "./community.entity";
 import { ListingEntity } from "./listing.entity";
@@ -15,11 +15,11 @@ export class WishListEntity extends BaseEntity{
 
     //many to one relationship with user
     @ManyToOne(() => UserEntity)
-    user: UserEntity;
+    user: Relation<UserEntity>;
 
     //many to one relationship with listing
     @ManyToOne(() => ListingEntity)
-    listing: ListingEntity;
+    listing: Relation<ListingEntity>;
 
     //column for isDeleted, not empty
     @Column({default: false})
