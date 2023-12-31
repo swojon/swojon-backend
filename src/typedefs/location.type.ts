@@ -19,9 +19,6 @@ export class Location {
   banner?: string;
 
   @Field({ nullable: true})
-  parentLocation?:Location;
-
-  @Field({ nullable: true})
   isDeleted?: boolean;
 
   @Field({ nullable: true})
