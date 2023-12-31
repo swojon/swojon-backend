@@ -34,6 +34,9 @@ export class CategoryEntity extends BaseEntity{
     @Column({nullable: true})
     banner: string;
 
+    @Column({nullable: true})
+    icon: string;
+
     @Column({
       type:"enum",
       enum: Status,

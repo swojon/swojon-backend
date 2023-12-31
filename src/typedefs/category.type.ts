@@ -24,6 +24,9 @@ export class Category {
   @Field({ nullable: true})
   banner?: string;
 
+  @Field({ nullable: true})
+  icon?: string;
+  
   @Field(()=> Category, { nullable: true})
   parentCategory?:Category;
 

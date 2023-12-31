@@ -21,6 +21,9 @@ export class CategoryCreateDTO {
     banner?: string;
 
     @Field({ nullable: true})
+    icon?: string;
+
+    @Field({ nullable: true})
     parentCategoryId?: number;
 }
 
@@ -38,6 +41,9 @@ export class CategoryUpdateDTO {
     @Field({ nullable: true})
     banner?: string;
 
+    @Field({ nullable: true})
+    icon?: string;
+    
     @Field({ nullable: true})
     parentCategoryId?: number;
 

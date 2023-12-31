@@ -6,6 +6,7 @@ export interface Category {
   slug?: string;
   description?: string;
   banner?: string;
+  icon?:string;
   parentCategory?: Category;
   children?: Category[] |null;
   status?: Status;
