@@ -9,6 +9,8 @@ import { DataStoredInToken, MyContext, TokenData } from '@interfaces/auth.interf
 import { User } from '@interfaces/users.interface';
 import { ProfileEntity } from '@/entities/profile.entity';
 import cookieParser from 'cookie-parser';
+import {createTransport} from 'nodemailer';
+import { SMTP_HOST, SMTP_PASSWORD, SMTP_USERNAME, SMTP_PORT } from '@/config';
 // import { cookies } from 'next/headers';
 
 // import { SocialAuthInput } from '@/typedefs/auth.type';
@@ -33,8 +35,35 @@ export class AuthRepository {
 
     const hashedPassword = await hash(userData.password, 10);
     const profile: ProfileEntity = await new ProfileEntity().save();
-    const createUserData: User = await UserEntity.create({ ...userData, password: hashedPassword, profile: profile }).save()
-    ;
+    const createUserData: User = await UserEntity.create({ ...userData, password: hashedPassword, profile: profile }).save();
+    
+    const trasporter = createTransport({
+      host: "email-smtp.us-east-1.amazonaws.com", 
+      port: 587,
+      secure: true,
+      auth: {
+        user: SMTP_USERNAME,
+        pass: SMTP_PASSWORD
+      }
+    })
+    //   ({
+    //   host : SMTP_HOST,
+    //   port: SMTP_PORT,
+    //   secure : true,
+    //   auth: {
+    //     user: SMTP_USERNAME,
+    //     pass: SMTP_PASSWORD
+    //   }
+    // })
+    const mailOptions = {
+      from: "noreply@swojon.com",
+      to: userData.email,
+      subject: "Login Successfull",
+      text: "Please verify your email to get access to the account"
+    }
+
+    const mail = await trasporter.sendMail(mailOptions)
+    console.log(mail)
     console.log("created user successfully.")
     return createUserData;
   }

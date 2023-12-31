@@ -1,9 +1,7 @@
 import passport from 'passport';
-import * as controller from './controller';
 import { Router } from 'express';
 import { UserEntity } from '@/entities/users.entity';
-import cookieParser from 'cookie-parser';
-const CLIENT_URL = "http://localhost:3000";
+const CLIENT_URL = "https://www.swojon.com";
 import jwt from 'jsonwebtoken';
 
 const router = Router();
