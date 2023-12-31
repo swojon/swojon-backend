@@ -24,7 +24,7 @@ import { ErrorMiddleware } from '@middlewares/error.middleware';
 import { logger, responseLogger, errorLogger } from '@utils/logger';
 import session from "express-session";
 // import * as  Server from 'socket.io';
-import Redis from 'ioredis';
+// import Redis from 'ioredis';
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import RedisStore from "connect-redis";
 import {redis} from "./redis"
@@ -52,6 +52,8 @@ import passport from 'passport';
 import { UserEntity } from './entities/users.entity';
 import { SearchResolver } from './resolvers/search.resolver';
 import { NotificationResolver } from './resolvers/notification.resolver';
+import Keyv from 'keyv';
+import { KeyvAdapter } from '@apollo/utils.keyvadapter';
 
 const passportSetup = require('./utils/passport');
 
@@ -78,21 +80,21 @@ if (env === 'production') {
   app.use(helmet());
 }
 
-const sessionMiddleware = session({
-  // store: new RedisStore({
-  //   client: redis as any
-  // }),
-  name: COOKIE_NAME,
-  secret: COOKIE_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: env === "production",
-    maxAge: 1000*60*5, //5 minutes ,//1000 * 60 * 60 * 24 * 7 * 365, // 7 years,
-    sameSite: "none"
-  }
-})
+// const sessionMiddleware = session({
+//   // store: new RedisStore({
+//   //   client: redis as any
+//   // }),
+//   name: COOKIE_NAME,
+//   secret: COOKIE_SECRET,
+//   resave: false,
+//   saveUninitialized: false,
+//   cookie: {
+//     httpOnly: true,
+//     secure: env === "production",
+//     maxAge: 1000*60*5, //5 minutes ,//1000 * 60 * 60 * 24 * 7 * 365, // 7 years,
+//     sameSite: "none"
+//   }
+// })
 
 // app.use(sessionMiddleware);
 
@@ -187,7 +189,8 @@ const serverCleanup = useServer({
 
 const apolloServer = new ApolloServer({
   schema: schema,
-  cache: 'bounded',
+  // cache: 'bounded',
+  cache: new KeyvAdapter(new Keyv()),
   plugins: [
     env === 'production'
       ? ApolloServerPluginLandingPageProductionDefault({ footer: false })
