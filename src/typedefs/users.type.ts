@@ -1,7 +1,7 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Profile } from './profile.type';
 import { Role } from './role.type';
-import { Community } from './community.type';
+
 
 @ObjectType()
 export class User {
@@ -76,8 +76,5 @@ export class UserWithMeta {
 
   @Field({nullable: true})
   listingCount?: number;
-
-  @Field(()=> [Community], {nullable:true})
-  communities?: Community[]
 
 }
