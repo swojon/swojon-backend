@@ -187,6 +187,7 @@ const serverCleanup = useServer({
 
 const apolloServer = new ApolloServer({
   schema: schema,
+  cache: 'bounded',
   plugins: [
     env === 'production'
       ? ApolloServerPluginLandingPageProductionDefault({ footer: false })
