@@ -360,9 +360,11 @@ export class ListingRepository {
       console.log("updating status now")
       dataToUpdate = {...dataToUpdate, status: listingData.status}
     }
+    console.log("data to update", dataToUpdate)
+
     // await findListing.save()
     if (Object.keys(dataToUpdate).length !== 0) await ListingEntity.update({ id: listingId }, dataToUpdate);
-
+    console.log("data updated")
     const updatedListing: ListingEntity = await ListingEntity.findOne({
       where: { id: listingId },
       relations: ['user', 'brand', 'category'],
