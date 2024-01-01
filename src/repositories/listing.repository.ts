@@ -326,7 +326,12 @@ export class ListingRepository {
 
   public async listingUpdate(listingId: number, listingData: ListingUpdateDTO): Promise<Listing> {
     let dataToUpdate: any = listingData;
-    console.log("listingData", listingData)
+    Object.keys(dataToUpdate).forEach(key => {
+      if (!dataToUpdate[key] ) {
+        delete dataToUpdate[key];
+      }
+    });
+    console.log("listingData", listingData, dataToUpdate)
 
     const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId } });
     if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
