@@ -31,7 +31,7 @@ export class Listing {
   @Field(()=>[Community])
   communities?: Community[]
 
-  @Field(()=>[ListingMedia])
+  @Field(()=>[ListingMedia], {nullable:true})
   media?: ListingMedia[]
 
   @Field()

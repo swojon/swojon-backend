@@ -119,8 +119,8 @@ export class ListingRepository {
   public async listingList(userId:any, paging: PagingArgs, filters: ListingFilterInput): Promise<Listings> {
     let categoryIdsToFilter = await get_category_ids_to_filter(filters)
     let brandIdsToFilter = await get_brand_ids_to_filter(filters)
-    let communityIdsToFilter = await get_community_ids_to_filter(filters)
-    console.log("Community ids to Filter ", communityIdsToFilter)
+    // let communityIdsToFilter = await get_community_ids_to_filter(filters)
+    // console.log("Community ids to Filter ", communityIdsToFilter)
     // console.log("brandIds to filter", brandIdsToFilter)
     // console.log('CategoryIds to filter', categoryIdsToFilter);
     let sql = ListingEntity.createQueryBuilder('listing')
@@ -144,9 +144,9 @@ export class ListingRepository {
     const limit: number = Math.min(100, paging.limit ? paging.limit : 100);
     sql = sql.limit(limit);
 
-    if (communityIdsToFilter.length > 0) {
-      sql = sql.andWhere('community.id IN (:...communityIds)', { communityIds: communityIdsToFilter });
-    }
+    // if (communityIdsToFilter.length > 0) {
+    //   sql = sql.andWhere('community.id IN (:...communityIds)', { communityIds: communityIdsToFilter });
+    // }
     if (brandIdsToFilter.length > 0) {
       sql = sql.andWhere('brand.id IN (:...brandIds)', { brandIds: brandIdsToFilter });
     }
@@ -278,7 +278,7 @@ export class ListingRepository {
   }
 
   public async listingAdd(userId: number, listingData: ListingCreateDTO): Promise<Listing> {
-    let communities: CommunityEntity[] = [];
+    // let communities: CommunityEntity[] = [];
     let brand: BrandEntity | null = null;
     // let location: LocationEntity | null = null;
 
@@ -330,13 +330,13 @@ export class ListingRepository {
     const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId } });
     if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
 
-    if (listingData.communityIds) {
-      const communities = await CommunityEntity.findByIds(listingData.communityIds);
-      findListing.communities = communities;
-      await findListing.save();
+    // if (listingData.communityIds) {
+    //   const communities = await CommunityEntity.findByIds(listingData.communityIds);
+    //   findListing.communities = communities;
+    //   await findListing.save();
 
-      delete dataToUpdate.communityIds;
-    }
+    //   delete dataToUpdate.communityIds;
+    // }
 
     if (listingData.brandId) {
       const findBrand: BrandEntity = await BrandEntity.findOne({ where: { id: listingData.brandId } });
@@ -365,38 +365,38 @@ export class ListingRepository {
 
     const updatedListing: ListingEntity = await ListingEntity.findOne({
       where: { id: listingId },
-      relations: ['communities', 'user', 'brand', 'category'],
+      relations: ['user', 'brand', 'category'],
     });
     return updatedListing;
   }
 
-  public async listingCommunityAdd(listingId: number, communityIds: number[]): Promise<Listing> {
-    const findListing: ListingEntity = await ListingEntity.findOne({
-      where: { id: listingId },
-      relations: ['communities'],
-    });
-    const communitiesToAdd: number[] = communityIds.filter(comId => findListing.communities.filter(com => com.id !== comId));
-    // console.log(communitiesToAdd)
-    if (!communitiesToAdd) throw new HttpException(409, 'No Categories To Add');
-    console.log(communitiesToAdd);
+  // public async listingCommunityAdd(listingId: number, communityIds: number[]): Promise<Listing> {
+  //   const findListing: ListingEntity = await ListingEntity.findOne({
+  //     where: { id: listingId },
+  //     relations: ['communities'],
+  //   });
+  //   const communitiesToAdd: number[] = communityIds.filter(comId => findListing.communities.filter(com => com.id !== comId));
+  //   // console.log(communitiesToAdd)
+  //   if (!communitiesToAdd) throw new HttpException(409, 'No Categories To Add');
+  //   console.log(communitiesToAdd);
 
-    const communitiesEntityToAd: CommunityEntity[] = await CommunityEntity.find({ where: { id: In(communitiesToAdd) } });
-    // console.log(communitiesEntityToAd)
-    console.log(communitiesEntityToAd);
-    findListing.communities = [...findListing.communities, ...communitiesEntityToAd];
-    const savedListing = await ListingEntity.save(findListing);
-    return savedListing;
-  }
+  //   const communitiesEntityToAd: CommunityEntity[] = await CommunityEntity.find({ where: { id: In(communitiesToAdd) } });
+  //   // console.log(communitiesEntityToAd)
+  //   console.log(communitiesEntityToAd);
+  //   findListing.communities = [...findListing.communities, ...communitiesEntityToAd];
+  //   const savedListing = await ListingEntity.save(findListing);
+  //   return savedListing;
+  // }
 
-  public async listingCommunityRemove(listingId: number, communityIds: number[]): Promise<Listing> {
-    const findListing: ListingEntity = await ListingEntity.findOne({
-      where: { id: listingId },
-      relations: ['communities'],
-    });
-    findListing.communities = findListing.communities.filter(com => !communityIds.includes(com.id));
-    const savedListing = await ListingEntity.save(findListing);
-    return savedListing;
-  }
+  // public async listingCommunityRemove(listingId: number, communityIds: number[]): Promise<Listing> {
+  //   const findListing: ListingEntity = await ListingEntity.findOne({
+  //     where: { id: listingId },
+  //     relations: ['communities'],
+  //   });
+  //   findListing.communities = findListing.communities.filter(com => !communityIds.includes(com.id));
+  //   const savedListing = await ListingEntity.save(findListing);
+  //   return savedListing;
+  // }
 
   public async listingRemove(listingId: number): Promise<Listing> {
     const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId } });

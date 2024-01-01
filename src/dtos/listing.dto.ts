@@ -81,9 +81,6 @@ export class ListingUpdateDTO{
   @Field({nullable: true})
   description?: string;
 
-  @Field(()=>[Number], {nullable: true})
-  communityIds?:number[]
-
   @Field({nullable:true})
   price?:number
 
