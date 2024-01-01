@@ -82,7 +82,8 @@ export class Listing {
   @Field({nullable: true})
   favoriteStatus?: boolean;
 
-  
+  @Field({nullable:true})
+  status?:string;
 }
 
 

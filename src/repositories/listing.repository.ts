@@ -4,7 +4,7 @@ import { BrandEntity } from '@/entities/brand.entity';
 import { CategoryEntity } from '@/entities/category.entity';
 import { CommunityEntity } from '@/entities/community.entity';
 import { FavoriteEntity } from '@/entities/favorite.entity';
-import { ListingEntity } from '@/entities/listing.entity';
+import { ListingEntity, Status } from '@/entities/listing.entity';
 import { ListingMediaEntity } from '@/entities/listingMedia.entity';
 import { LocationEntity } from '@/entities/location.entity';
 import { SearchEntity } from '@/entities/search.entity';
@@ -89,6 +89,7 @@ const get_community_ids_to_filter = async (filters: ListingFilterInput) => {
   }
   return communityIdsToFilter;
 }
+
 @EntityRepository(ListingEntity)
 export class ListingRepository {
   public async listingsFavoriteCount(listingIds: any[], userId: number|null){
@@ -125,7 +126,7 @@ export class ListingRepository {
     let sql = ListingEntity.createQueryBuilder('listing')
       .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 
         'listing.dateCreated', 'listing.meetupLocations', 'listing.quantity', 'listing.dealingMethod', 
-        'listing.deliveryCharge', 'listing.slug', "listing.condition"
+        'listing.deliveryCharge', 'listing.slug', "listing.condition", "listing.status"
       ])
       // .leftJoinAndSelect('listing.communities', 'community')
       .leftJoinAndSelect('listing.user', 'user')
@@ -139,6 +140,7 @@ export class ListingRepository {
     } else if (paging.ending_before) {
       sql = sql.where('listing.id < :ending_before', { ending_before: paging.ending_before });
     }
+    
     const limit: number = Math.min(100, paging.limit ? paging.limit : 100);
     sql = sql.limit(limit);
 
@@ -158,6 +160,10 @@ export class ListingRepository {
     if (filters?.userIds) {
       sql = sql.andWhere('user.id IN (:...userIds)', { userIds: filters?.userIds });
     }
+    if (filters?.status){
+      sql = sql.andWhere(' listing.status = :status', {status: filters.status})
+    }
+
     const findListings = await sql.getManyAndCount();
     const listingList = findListings[0];
     
@@ -205,7 +211,7 @@ export class ListingRepository {
     let sql = ListingEntity.createQueryBuilder('listing')
       .select(['listing.title', 'listing.id', 'listing.price', 
       'listing.description', 'listing.dateCreated', 'listing.meetupLocations', 'listing.quantity', 'listing.dealingMethod', 
-      'listing.deliveryCharge', 'listing.slug', "listing.condition"])
+      'listing.deliveryCharge', 'listing.slug', "listing.condition", "listing.status"])
       // .leftJoinAndSelect('listing.communities', 'community')
       .leftJoinAndSelect('listing.user', 'user')
       .leftJoinAndSelect('listing.brand', 'brand')
@@ -350,6 +356,10 @@ export class ListingRepository {
       delete dataToUpdate.categoryId;
     }
 
+    if (listingData.status && Object.values(Status).includes(listingData.status as unknown as Status) ){
+      console.log("updating status now")
+      dataToUpdate = {...dataToUpdate, status: listingData.status}
+    }
     // await findListing.save()
     if (Object.keys(dataToUpdate).length !== 0) await ListingEntity.update({ id: listingId }, dataToUpdate);
 

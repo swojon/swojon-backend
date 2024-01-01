@@ -102,6 +102,8 @@ export class ListingUpdateDTO{
   @Field({nullable:true})
   brandId?: number
 
+  @Field({nullable: true})
+  status?: string;
 }
 
 @InputType()
@@ -163,4 +165,7 @@ export class ListingFilterInput{
 
   @Field(() => [String], {nullable:true})
   categorySlug? : string[];  
+
+  @Field({nullable: true})
+  status?: string;
 }
