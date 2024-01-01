@@ -326,6 +326,7 @@ export class ListingRepository {
 
   public async listingUpdate(listingId: number, listingData: ListingUpdateDTO): Promise<Listing> {
     let dataToUpdate: any = listingData;
+    console.log("listingData", listingData)
 
     const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId } });
     if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
@@ -338,7 +339,7 @@ export class ListingRepository {
     //   delete dataToUpdate.communityIds;
     // }
 
-    if (listingData.brandId) {
+    if (!!listingData.brandId) {
       const findBrand: BrandEntity = await BrandEntity.findOne({ where: { id: listingData.brandId } });
       if (!findBrand) throw new HttpException(409, `Brand with id ${listingData.brandId} does not exist`);
       console.log(findBrand);
@@ -346,7 +347,7 @@ export class ListingRepository {
       delete dataToUpdate.brandId;
     }
 
-    if (listingData.categoryId) {
+    if (!!listingData.categoryId) {
       const findCategory = await CategoryEntity.findOne({
         where: { id: listingData.categoryId },
       });
@@ -356,7 +357,7 @@ export class ListingRepository {
       delete dataToUpdate.categoryId;
     }
 
-    if (listingData.status && Object.values(Status).includes(listingData.status as unknown as Status) ){
+    if (!!listingData.status && Object.values(Status).includes(listingData.status as unknown as Status) ){
       console.log("updating status now")
       dataToUpdate = {...dataToUpdate, status: listingData.status}
     }
