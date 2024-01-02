@@ -218,11 +218,12 @@ export class ListingRepository {
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
       // .leftJoinAndSelect('listing.location', 'location')
+      .where("listing.status = approved")
       .orderBy('listing.id', 'ASC');
     if (paging.starting_after) {
-      sql = sql.where('listing.id > :starting_after', { starting_after: paging.starting_after });
+      sql = sql.andWhere('listing.id > :starting_after', { starting_after: paging.starting_after });
     }else if (paging.ending_before) {
-        sql = sql.where('listing.id < :ending_before', { ending_before: paging.ending_before });
+        sql = sql.andWhere('listing.id < :ending_before', { ending_before: paging.ending_before });
     }
     const limit: number = Math.min(100, paging.limit ? paging.limit : 100);
     sql = sql.limit(limit);
