@@ -218,7 +218,7 @@ export class ListingRepository {
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
       // .leftJoinAndSelect('listing.location', 'location')
-      .where("listing.status = approved")
+      .where("listing.status = :status", {status: "approved"})
       .orderBy('listing.id', 'ASC');
     if (paging.starting_after) {
       sql = sql.andWhere('listing.id > :starting_after', { starting_after: paging.starting_after });
