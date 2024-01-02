@@ -12,7 +12,7 @@ router.get("/google", passport.authenticate("google", { scope: ["profile", "emai
 
 router.get(
   "/google/callback", passport.authenticate("google", {
-      failureRedirect: `${CLIENT_URL}/signin`,
+      failureRedirect: `${CLIENT_URL}/login`,
     }), (req, res)=> {
 
       // @ts-ignore:next-line
@@ -22,7 +22,7 @@ router.get(
       // cookies.get("redirectTo")
       console.log("cookies", req.cookies)
      
-      const redirectTo = `${CLIENT_URL}/success`
+      const redirectTo = `${CLIENT_URL}/login/success`
       // console.log("Redirecting To: ", redirectTo)
       // console.log("req url", req.url)
       // console.log("res", res)
