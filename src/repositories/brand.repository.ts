@@ -67,8 +67,13 @@ export class BrandRepository{
     })
 
     if (!findBrand) throw new HttpException(409, `Brand with id ${brandId} does not exist`);
-
-    await BrandEntity.update({ id: brandId }, brandData);
+    let dataToUpdate: any = brandData;
+    Object.keys(dataToUpdate).forEach(key => {
+      if (!dataToUpdate[key] ) {
+        delete dataToUpdate[key];
+      }
+    });
+    await BrandEntity.update({ id: brandId }, dataToUpdate);
 
     // const updatedBrand: CategoryEntity = await CategoryEntity.findOne({ where: { id: brandId }, relations: ['categories'] });
     const updatedBrand: BrandEntity = await BrandEntity.createQueryBuilder('br')

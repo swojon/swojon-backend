@@ -120,15 +120,22 @@ export class CategoryRepository{
   public async categoryUpdate(categoryId: number, categoryData: CategoryUpdateDTO): Promise<Category> {
     const category: CategoryEntity = await CategoryEntity.findOne({ where: { id: categoryId } });
     if (!category) throw new HttpException(409, `Category with id ${categoryId} does not exist`);
+    
+    let dataToUpdate: any = categoryData;
+    Object.keys(dataToUpdate).forEach(key => {
+      if (!dataToUpdate[key] ) {
+        delete dataToUpdate[key];
+      }
+    });
 
-    if (categoryData.parentCategoryId){
-      const parentCategory:CategoryEntity = await CategoryEntity.findOne({where: {id: categoryData.parentCategoryId}})
+    if (dataToUpdate.parentCategoryId){
+      const parentCategory:CategoryEntity = await CategoryEntity.findOne({where: {id: dataToUpdate.parentCategoryId}})
       if (!parentCategory) throw new HttpException(409, `Parent Category with id ${categoryId} does not exist`);
-      delete categoryData.parentCategoryId
-      categoryData["parentCategory"] = parentCategory
+      delete dataToUpdate.parentCategoryId
+      dataToUpdate["parentCategory"] = parentCategory
     }
 
-    await CategoryEntity.update({ id: categoryId }, categoryData);
+    await CategoryEntity.update({ id: categoryId }, dataToUpdate);
 
     const updatedCategory: CategoryEntity = await CategoryEntity.findOne({ where: { id: categoryId }, relations: ['parentCategory'] });
     return updatedCategory;
