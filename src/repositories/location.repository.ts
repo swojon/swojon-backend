@@ -124,8 +124,14 @@ export class LocationRepository{
   public async locationUpdate(locationId: number, locationData: LocationUpdateDTO): Promise<Location> {
     const location: LocationEntity = await LocationEntity.findOne({ where: { id: locationId } });
     if (!location) throw new HttpException(409, `Location with id ${locationId} does not exist`);
+    let dataToUpdate: any = locationData;
+    Object.keys(dataToUpdate).forEach(key => {
+      if (!dataToUpdate[key] ) {
+        delete dataToUpdate[key];
+      }
+    });
 
-    await LocationEntity.update({ id: locationId }, locationData);
+    await LocationEntity.update({ id: locationId }, dataToUpdate);
 
     const updatedLocation: LocationEntity = await LocationEntity.findOne({ where: { id: locationId }, relations: ['parentLocation'] });
     return updatedLocation;
