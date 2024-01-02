@@ -21,17 +21,8 @@ router.get(
       // const cookies = cookieParser(req.cookies)
       // cookies.get("redirectTo")
       console.log("cookies", req.cookies)
-      let redirectTo = "";
-      try {
-         redirectTo = req.cookies["redirectTo"]
-      } catch (error) {
-
-      }
-
-      if (redirectTo) {
-        redirectTo = `${CLIENT_URL}${redirectTo}`
-      }
-      else redirectTo = `${CLIENT_URL}/`
+     
+      const redirectTo = `${CLIENT_URL}/success`
       // console.log("Redirecting To: ", redirectTo)
       // console.log("req url", req.url)
       // console.log("res", res)
