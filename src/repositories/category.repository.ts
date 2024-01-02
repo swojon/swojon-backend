@@ -25,7 +25,7 @@ export class CategoryRepository{
     let sql = CategoryEntity.createQueryBuilder("category_entity")
                     .select(["category_entity.id", "category_entity.name", "category_entity.slug", "category_entity.description",
                              "category_entity.banner", "category_entity.status", "category_entity.isFeatured",
-                             "category_entity.isSponsored", "category_entity.isGlobal",  "category_entity.isDeleted"])
+                             "category_entity.isSponsored", "category_entity.isGlobal",  "category_entity.isDeleted", "category_entity.icon"])
                     .leftJoinAndSelect('category_entity.parentCategory', 'parentCategory')
                     .orderBy('category_entity.id', 'ASC')
 
@@ -95,7 +95,7 @@ export class CategoryRepository{
     const categoryIds = categoryData.categoryIds
     await CategoryEntity.createQueryBuilder('ce').softDelete().whereInIds(categoryData.categoryIds).execute()
     const findCategories: CategoryEntity[] = await CategoryEntity.find({
-      select: ["id", "name", "slug", "description", "banner", 'status', 'isDeleted', 'isFeatured', 'isGlobal', 'isDeleted'],
+      select: ["id", "name", "slug", "description", "banner", 'status', 'isDeleted', 'isFeatured', 'isGlobal', 'isDeleted', "icon"],
       relations: ["parentCategory"],
       where: {id: In(categoryData.categoryIds)},
       withDeleted: true
