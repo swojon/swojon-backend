@@ -93,6 +93,9 @@ export class PagingArgs{
 
   @Field({ nullable: true})
   limit?:number;
+
+  @Field({nullable:true})
+  orderBy?: string;
 }
 
 @InputType()

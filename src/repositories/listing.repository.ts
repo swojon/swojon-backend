@@ -134,7 +134,13 @@ export class ListingRepository {
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
       // .leftJoinAndSelect('listing.location', 'location')
-      .orderBy('listing.id', 'ASC');
+    if (paging.orderBy){
+      if (paging.orderBy === "highest")sql = sql.orderBy('listing.price', 'DESC')
+      else if (paging.orderBy === "lowest") sql = sql.orderBy('listing.price', 'ASC')
+      if (paging.orderBy === "newest") sql = sql.orderBy('listing.id', 'DESC')
+    }
+    
+    
     if (paging.starting_after) {
       sql = sql.where('listing.id > :starting_after', { starting_after: paging.starting_after });
     } else if (paging.ending_before) {
@@ -219,10 +225,17 @@ export class ListingRepository {
       .leftJoinAndSelect('listing.media', 'media')
       // .leftJoinAndSelect('listing.location', 'location')
       .where("listing.status = :status", {status: "approved"})
-      .orderBy('listing.id', 'ASC');
+      // .orderBy('listing.id', 'ASC');
+    
+    if (paging.orderBy){
+      if (paging.orderBy === "highest")sql = sql.orderBy('listing.price', 'DESC')
+      else if (paging.orderBy === "lowest") sql = sql.orderBy('listing.price', 'ASC')
+      if (paging.orderBy === "newest") sql = sql.orderBy('listing.id', 'DESC')
+    }
+
     if (paging.starting_after) {
       sql = sql.andWhere('listing.id > :starting_after', { starting_after: paging.starting_after });
-    }else if (paging.ending_before) {
+    } else if (paging.ending_before) {
         sql = sql.andWhere('listing.id < :ending_before', { ending_before: paging.ending_before });
     }
     const limit: number = Math.min(100, paging.limit ? paging.limit : 100);
