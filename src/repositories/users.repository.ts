@@ -13,8 +13,6 @@ import { CommunityMemberEntity } from '@/entities/communityMember.entity';
 import { ListingEntity } from '@/entities/listing.entity';
 import { PointRepository } from './point.repository';
 
-
-
 @EntityRepository(UserEntity)
 export class UserRepository {
   public async userList(): Promise<UserWithMeta[]> {
@@ -96,7 +94,13 @@ export class UserRepository {
     if (findUser) throw new HttpException(409, `This email ${userData.email} already exists`);
 
     const hashedPassword = await hash(userData.password, 10);
-    const createUserData: User = await UserEntity.create({ ...userData, password: hashedPassword, profile: new ProfileEntity() }).save();
+    
+    const createUserData: User = await UserEntity.create({
+      ...userData, 
+      password: hashedPassword, 
+      profile: new ProfileEntity(), 
+
+    }).save();
 
     return createUserData;
   }

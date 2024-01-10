@@ -11,6 +11,9 @@ import { ProfileEntity } from '@/entities/profile.entity';
 import cookieParser from 'cookie-parser';
 import {createTransport} from 'nodemailer';
 import { SMTP_HOST, SMTP_PASSWORD, SMTP_USERNAME, SMTP_PORT } from '@/config';
+import { mailConfig } from '@/config/mail';
+import crypto from 'crypto'
+
 // import { cookies } from 'next/headers';
 
 // import { SocialAuthInput } from '@/typedefs/auth.type';
@@ -35,35 +38,54 @@ export class AuthRepository {
 
     const hashedPassword = await hash(userData.password, 10);
     const profile: ProfileEntity = await new ProfileEntity().save();
-    const createUserData: User = await UserEntity.create({ ...userData, password: hashedPassword, profile: profile }).save();
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
     
-    const trasporter = createTransport({
-      host: "email-smtp.us-east-1.amazonaws.com", 
-      port: 587,
-      secure: true,
-      auth: {
-        user: SMTP_USERNAME,
-        pass: SMTP_PASSWORD
-      }
-    })
-    //   ({
-    //   host : SMTP_HOST,
-    //   port: SMTP_PORT,
-    //   secure : true,
-    //   auth: {
-    //     user: SMTP_USERNAME,
-    //     pass: SMTP_PASSWORD
-    //   }
-    // })
-    const mailOptions = {
-      from: "noreply@swojon.com",
-      to: userData.email,
-      subject: "Login Successfull",
-      text: "Please verify your email to get access to the account"
-    }
+    const createUserData: User = await UserEntity.create({ 
+      ...userData,
+      password: hashedPassword, 
+      profile: profile,
+      emailVerificationToken,
+      emailVerificationTokenExpiresAt: new Date(new Date().setHours(new Date().getHours() + 1))
+     }).save();
+    
+    
+    const trasporter = createTransport(mailConfig)
 
-    const mail = await trasporter.sendMail(mailOptions)
-    console.log(mail)
+    const mailOptions = {
+      from: "care@swojon.com",
+      to: userData.email,
+      subject: "Verify Your Email Address and Join the Swojon Community!",
+      text: `
+Dear ${userData.username},
+
+Thank you for joining Swojon, your go-to marketplace for good people! To ensure the security of your account and keep you connected with our vibrant community, we need to verify your email address.
+
+Please click on the following link to verify your email:
+
+{https://www.swojon.com/verify-email/${emailVerificationToken}
+
+(Note: If the link is not clickable, please copy and paste it into your web browser.)
+
+By verifying your email, you'll gain full access to all the features Swojon has to offer, including secure transactions, personalized recommendations, and a seamless community experience.
+
+If you did not create an account with Swojon, please disregard this email.
+
+If you have any questions or need assistance, feel free to reach out to our support team at [support@swojon.com].
+
+We're excited to have you as part of the Swojon community!
+
+Best regards,
+
+The Swojon Team
+www.swojon.com
+www.facebook.com/swojon`,
+    } 
+    try {
+      const mail = await trasporter.sendMail(mailOptions)
+      console.log(mail)
+    } catch (error) {
+      console.log(error)
+    }
     console.log("created user successfully.")
     return createUserData;
   }
