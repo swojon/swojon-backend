@@ -33,5 +33,7 @@ export interface ListingMedia {
 export interface Listings{
   items?: Listing[];
   count?: number;
-  hasMore?: boolean
+  hasMore?: boolean;
+  beforeCursor?:string;
+  afterCursor?:string;
 }

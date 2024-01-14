@@ -13,6 +13,7 @@ import { HttpException } from '@/exceptions/httpException';
 import { Listing, Listings } from '@/interfaces/listing.interface';
 import { Brand } from '@/typedefs/brand.type';
 import { EntityRepository, In } from 'typeorm';
+import {buildPaginator} from 'typeorm-cursor-pagination'
 
 const getAllRelatedDependantSubCategories = (categories: any[], categoryId: any) => {
   let categoryIds = [categoryId];
@@ -134,18 +135,29 @@ export class ListingRepository {
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
       // .leftJoinAndSelect('listing.location', 'location')
+    let idOrder:"DESC" | "ASC" = "DESC"
     if (paging.orderBy){
-      if (paging.orderBy === "highest")sql = sql.orderBy('listing.price', 'DESC')
-      else if (paging.orderBy === "lowest") sql = sql.orderBy('listing.price', 'ASC')
-      if (paging.orderBy === "newest") sql = sql.orderBy('listing.id', 'DESC')
+      if (paging.orderBy === "highest"){
+        sql = sql.orderBy('listing.price', 'DESC')
+        idOrder = "ASC"
+      } 
+      else if (paging.orderBy === "lowest") {
+        sql = sql.orderBy('listing.price', 'ASC')
+        idOrder = "DESC"
+      }
+      if (paging.orderBy === "newest") {
+        sql = sql.orderBy('listing.id', 'DESC')
+        idOrder = "DESC"
+      }
+
     }
     
     
-    if (paging.starting_after) {
-      sql = sql.where('listing.id > :starting_after', { starting_after: paging.starting_after });
-    } else if (paging.ending_before) {
-      sql = sql.where('listing.id < :ending_before', { ending_before: paging.ending_before });
-    }
+    // if (paging.starting_after) {
+    //   sql = sql.where('listing.id > :starting_after', { starting_after: paging.starting_after });
+    // } else if (paging.ending_before) {
+    //   sql = sql.where('listing.id < :ending_before', { ending_before: paging.ending_before });
+    // }
     
 
     // if (communityIdsToFilter.length > 0) {
@@ -169,27 +181,46 @@ export class ListingRepository {
     }
 
     const limit: number = Math.min(100, paging.limit ?? 100);
-    sql = sql.take(limit);
+    // sql = sql.take(limit);\
+    const paginator = buildPaginator({
+      entity: ListingEntity,
+      paginationKeys: ['id'],
+      alias: 'listing',
+      query: {
+        limit: limit,
+        order: idOrder,
+        afterCursor: paging?.starting_after ?  String(paging.starting_after) : null ,
+        beforeCursor: paging?.starting_after ? String(paging.ending_before) : null,
+      },
+    });
 
-
-    const findListings = await sql.getManyAndCount();
-    const listingList = findListings[0];
+    const { data:findListings, cursor } = await paginator.paginate(sql);
     
-    const favorites = await this.listingsFavoriteCount(listingList.map(listing => listing.id), userId)
-    const listingWithFavorites = listingList.map(listing => {
+
+
+    // const findListings = await sql.getManyAndCount();
+    // const listingList = findListings[0];
+    
+    const favorites = await this.listingsFavoriteCount(findListings.map(listing => listing.id), userId)
+    const listingWithFavorites = findListings.map(listing => {
       // console.log("listing", listing)
       listing["favoriteCount"] = favorites[listing.id].favoriteCount;
       listing["favoriteStatus"] = favorites[listing.id].favoriteStatus;
       
       return listing
     })
-    const count = findListings[1];
-    const hasMore = listingList.length === limit;
+    const count = findListings.length;
+    const hasMore = findListings.length === limit;
+    const beforeCursor = cursor.beforeCursor;
+    const afterCursor = cursor.afterCursor;
 
     return {
       items: listingWithFavorites,
       hasMore,
       count,
+      beforeCursor,
+      afterCursor
+
     };
   }
 

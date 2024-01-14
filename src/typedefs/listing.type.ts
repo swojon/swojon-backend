@@ -92,9 +92,15 @@ export class Listings {
   @Field(type => [Listing])
   items?: Listing[];
 
-  @Field()
+  @Field({nullable:true})
   count?: number
 
   @Field()
   hasMore?: boolean
+
+  @Field({nullable:true})
+  beforeCursor?:string;
+
+  @Field({nullable:true})
+  afterCursor?:string;
 }

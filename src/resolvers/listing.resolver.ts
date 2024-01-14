@@ -49,21 +49,21 @@ export class ListingResolver extends ListingRepository{
     return listing;
   }
 
-  @Mutation(()=>Listing, {
-    description: "Add Communities to listing"
-  })
-  async addCommunityToListing(@Arg('inputData') inputData: ListingCommunityInputDTO): Promise<Listing> {
-      const listing: Listing  = await this.listingCommunityAdd(inputData.listingId, inputData.communityIds)
-      return listing
-  }
+  // @Mutation(()=>Listing, {
+  //   description: "Add Communities to listing"
+  // })
+  // async addCommunityToListing(@Arg('inputData') inputData: ListingCommunityInputDTO): Promise<Listing> {
+  //     const listing: Listing  = await this.listingCommunityAdd(inputData.listingId, inputData.communityIds)
+  //     return listing
+  // }
 
-  @Mutation(()=>Listing, {
-    description: "Remove Communities from listing"
-  })
-  async removeCommunityToListing(@Arg('inputData') inputData: ListingCommunityInputDTO): Promise<Listing> {
-      const listing: Listing  = await this.listingCommunityRemove(inputData.listingId, inputData.communityIds)
-      return listing
-  }
+  // @Mutation(()=>Listing, {
+  //   description: "Remove Communities from listing"
+  // })
+  // async removeCommunityToListing(@Arg('inputData') inputData: ListingCommunityInputDTO): Promise<Listing> {
+  //     const listing: Listing  = await this.listingCommunityRemove(inputData.listingId, inputData.communityIds)
+  //     return listing
+  // }
   // // @Authorized()
   @Mutation(() => Listing, {
     description: 'Remove Listing',

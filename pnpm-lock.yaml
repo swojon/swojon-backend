@@ -158,6 +158,9 @@ dependencies:
   typeorm:
     specifier: ^0.2.45
     version: 0.2.45(pg@8.11.1)
+  typeorm-cursor-pagination:
+    specifier: ^0.10.1
+    version: 0.10.1(typeorm@0.2.45)
   winston:
     specifier: ^3.8.1
     version: 3.10.0
@@ -15191,6 +15194,14 @@ packages:
 
   /typedi@0.10.0:
     resolution: {integrity: sha512-v3UJF8xm68BBj6AF4oQML3ikrfK2c9EmZUyLOfShpJuItAqVBHWP/KtpGinkSsIiP6EZyyb6Z3NXyW9dgS9X1w==}
+    dev: false
+
+  /typeorm-cursor-pagination@0.10.1(typeorm@0.2.45):
+    resolution: {integrity: sha512-ezMx9giREI8aBVUpOs7RPn5/uIdygqlduuXJcKiny9UnUXev3zIJaoXCHlrenT6pgcR1cx3baHG/HImPEgeVgA==}
+    peerDependencies:
+      typeorm: ^0.3.6
+    dependencies:
+      typeorm: 0.2.45(pg@8.11.1)
     dev: false
 
   /typeorm@0.2.45(pg@8.11.1):

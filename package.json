@@ -69,6 +69,7 @@
     "type-graphql": "^1.1.1",
     "typedi": "^0.10.0",
     "typeorm": "^0.2.45",
+    "typeorm-cursor-pagination": "^0.10.1",
     "winston": "^3.8.1",
     "winston-daily-rotate-file": "^4.7.1",
     "ws": "^8.13.0"

@@ -86,10 +86,10 @@ export class CategoryArgs {
 @ArgsType()
 export class PagingArgs{
   @Field({ nullable: true})
-  ending_before?:number;
+  ending_before?:string;
 
   @Field({ nullable: true})
-  starting_after?:number;
+  starting_after?:string;
 
   @Field({ nullable: true})
   limit?:number;
