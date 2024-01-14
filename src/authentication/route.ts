@@ -4,7 +4,7 @@ import { UserEntity } from '@/entities/users.entity';
 const CLIENT_URL = "https://www.swojon.com";
 import jwt from 'jsonwebtoken';
 
-const router = Router();
+const router:any = Router();
 
 // router.post('/login', controller.login);
 

@@ -39,8 +39,7 @@ passport.use(
         const profileData = profile._json
 
         const newProfile = {
-          firstName : profileData.given_name,
-          lastName: profileData.family_name,
+          name : `${profileData.given_name} ${profileData.family_name}` ,
           avatar: profileData.picture
         }
         await UserEntity.create({
