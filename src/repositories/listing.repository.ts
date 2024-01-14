@@ -147,8 +147,6 @@ export class ListingRepository {
       sql = sql.where('listing.id < :ending_before', { ending_before: paging.ending_before });
     }
     
-    const limit: number = Math.min(100, paging.limit ? paging.limit : 100);
-    sql = sql.limit(limit);
 
     // if (communityIdsToFilter.length > 0) {
     //   sql = sql.andWhere('community.id IN (:...communityIds)', { communityIds: communityIdsToFilter });
@@ -169,6 +167,10 @@ export class ListingRepository {
     if (filters?.status){
       sql = sql.andWhere(' listing.status = :status', {status: filters.status})
     }
+
+    const limit: number = Math.min(100, paging.limit ?? 100);
+    sql = sql.take(limit);
+
 
     const findListings = await sql.getManyAndCount();
     const listingList = findListings[0];
