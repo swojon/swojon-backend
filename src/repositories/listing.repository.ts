@@ -131,6 +131,7 @@ export class ListingRepository {
       ])
       // .leftJoinAndSelect('listing.communities', 'community')
       .leftJoinAndSelect('listing.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile')
       .leftJoinAndSelect('listing.brand', 'brand')
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
@@ -231,7 +232,7 @@ export class ListingRepository {
                           {id: listingArgs?.id},
                           // {slug: listingArgs?.slug},
                           {title: listingArgs?.name}],
-                      relations: ["user", "brand", "category", "media" ]
+                      relations: ["user", "user.profile", "brand", "category", "media" ]
                     },
                   );
     if (!findListing) throw new HttpException(409, `Listing not found`);
@@ -253,6 +254,7 @@ export class ListingRepository {
       'listing.deliveryCharge', 'listing.slug', "listing.condition", "listing.status"])
       // .leftJoinAndSelect('listing.communities', 'community')
       .leftJoinAndSelect('listing.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile')
       .leftJoinAndSelect('listing.brand', 'brand')
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')

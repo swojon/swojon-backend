@@ -48,6 +48,7 @@ export class FavoriteRepository{
                   // .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 'listing.dateCreated'])
                   // .leftJoinAndSelect('listing.communities', 'community')
                   .leftJoinAndSelect('listing.user', 'user')
+                  .leftJoinAndSelect('user.profile', 'profile')
                   .leftJoinAndSelect('listing.brand', 'brand')
                   .leftJoinAndSelect('listing.category', 'category')
                   .leftJoinAndSelect('listing.media', 'media')
