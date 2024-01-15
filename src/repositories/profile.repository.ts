@@ -17,8 +17,15 @@ export class ProfileRepository{
   public async profileUpdate(profileId: number, profileData: UpdateProfileDto): Promise <ProfileEntity>{
     const findProfile: ProfileEntity = await ProfileEntity.findOne({where: {id: profileId}});
     if(!findProfile) throw new HttpException(409, 'profile does not exists');
+   
+    let dataToUpdate: any = profileData;
+    Object.keys(dataToUpdate).forEach(key => {
+      if (!dataToUpdate[key] ) {
+        delete dataToUpdate[key];
+      }
+    });
 
-    await ProfileEntity.update(profileId, profileData);
+    await ProfileEntity.update(profileId, dataToUpdate);
     const updateProfile: ProfileEntity = await ProfileEntity.findOne({where: {id: profileId}});
     return updateProfile;
   }

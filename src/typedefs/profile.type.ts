@@ -12,7 +12,7 @@ export class Profile {
   @Field(() => String, { nullable: true })
   phoneNumber?: string ;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => Boolean, { nullable: true })
   isPhoneNumberVerified?: boolean;
 
   @Field(() => String, { nullable: true })
