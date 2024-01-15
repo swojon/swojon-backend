@@ -25,7 +25,7 @@ export class ProfileRepository{
       }
     });
 
-    await ProfileEntity.update(profileId, dataToUpdate);
+    await ProfileEntity.update({id: profileId}, dataToUpdate);
     const updateProfile: ProfileEntity = await ProfileEntity.findOne({where: {id: profileId}});
     return updateProfile;
   }

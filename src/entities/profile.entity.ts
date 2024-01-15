@@ -14,7 +14,7 @@ export class ProfileEntity extends BaseEntity{
     @Column({nullable: true, length: 11})
     phoneNumber: string;
 
-    @Column({default: false})
+    @Column({default: false, nullable:true})
     isPhoneNumberVerified: boolean;
 
     @Column({nullable: true})
