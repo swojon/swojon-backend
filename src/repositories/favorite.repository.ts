@@ -46,12 +46,12 @@ export class FavoriteRepository{
                   .select(["favorite_entity.id"])
                   .leftJoinAndSelect('favorite_entity.listing', 'listing')
                   // .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 'listing.dateCreated'])
-                  .leftJoinAndSelect('listing.communities', 'community')
+                  // .leftJoinAndSelect('listing.communities', 'community')
                   .leftJoinAndSelect('listing.user', 'user')
                   .leftJoinAndSelect('listing.brand', 'brand')
                   .leftJoinAndSelect('listing.category', 'category')
                   .leftJoinAndSelect('listing.media', 'media')
-                  .leftJoinAndSelect('listing.location', 'location')
+                  // .leftJoinAndSelect('listing.location', 'location')
                   .where("favorite_entity.userId = :id", { id: userId }).printSql().getManyAndCount()
 
     const findFavorites:ListingEntity[] = favoritesAndCount[0].map((favorite) => favorite.listing);
