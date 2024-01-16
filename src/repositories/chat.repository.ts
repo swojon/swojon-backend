@@ -145,6 +145,7 @@ public async chatRoomMessageList(chatRoomId: number, paging: PagingArgs): Promis
               .leftJoinAndSelect('chat_message_entity.chatRoom', "chatRoom")
               .leftJoinAndSelect('chatRoom.members', "members")
               .leftJoinAndSelect("members.user", 'user')
+              .leftJoinAndSelect("user.profile", 'profile')
               .where("chat_message_entity.chatRoomId = :id", { id: chatRoomId })
               .orderBy('chat_message_entity.dateSent', 'DESC')
               .addOrderBy('chat_message_entity.id', "DESC")
