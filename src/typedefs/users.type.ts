@@ -31,6 +31,10 @@ export class User {
 
   @Field(() => [Role], {nullable: true})
   roles: Role[];
+
+  
+  @Field({nullable:true})
+  createdAt?: Date;
 }
 
 @ObjectType()
