@@ -84,7 +84,6 @@ export class ChatMessageRepository{
                                 // .leftJoinAndSelect("crm.user", "user")
                                 .leftJoinAndSelect("crm.chatRoom", "chatRoom")
                                 .leftJoinAndSelect("chatRoom.members", "members")
-
                                 .leftJoinAndSelect("chatRoom.relatedListing", "relatedListing")
                                 .leftJoinAndSelect("relatedListing.media", "media")
                                 .leftJoinAndSelect("members.user", "user")
