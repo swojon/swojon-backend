@@ -86,6 +86,7 @@ export class ChatMessageRepository{
                                 .leftJoinAndSelect("chatRoom.members", "members")
 
                                 .leftJoinAndSelect("chatRoom.relatedListing", "relatedListing")
+                                .leftJoinAndSelect("relatedListing.media", "media")
                                 .leftJoinAndSelect("members.user", "user")
                                 .leftJoinAndSelect('user.profile', 'profile')
                                 .where('crm.userId = :userId', {userId: userId})
