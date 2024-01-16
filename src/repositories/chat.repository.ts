@@ -68,7 +68,7 @@ export class ChatMessageRepository{
   }
   public async chatRoomGet(userId: number|null, id: number|null):Promise<ChatRoom>{
       const chatRoom = await ChatRoomEntity.findOne(id, {
-          relations: ["members", "relatedListing", "members.user", "members.user.profile"],
+          relations: ["members", "relatedListing","relatedListing.media",  "members.user", "members.user.profile"],
           select: ["id", "chatName"]
         })
       if (!chatRoom) throw new HttpException(409, "Chat Room Doesn't Exist")
