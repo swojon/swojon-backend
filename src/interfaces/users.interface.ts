@@ -14,8 +14,12 @@ export interface User {
   profile: Profile;
   roles: Role[];
   createdAt?: Date;
+  passwordResetToken?:string;
+  passwordResetTokenExpiresAt?:Date;
+}
 
-
+export interface ResetStatus {
+  success?: boolean;
 }
 
 export interface UserWithMeta {

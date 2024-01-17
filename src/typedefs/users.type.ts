@@ -2,7 +2,11 @@ import { Field, ObjectType } from 'type-graphql';
 import { Profile } from './profile.type';
 import { Role } from './role.type';
 
-
+@ObjectType()
+export class ResetStatus {
+  @Field({nullable: true})
+  success?: boolean;
+}
 @ObjectType()
 export class User {
   @Field()

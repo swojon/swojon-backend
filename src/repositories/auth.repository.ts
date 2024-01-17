@@ -2,17 +2,18 @@ import { hash, compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { EntityRepository } from 'typeorm';
 import { COOKIE_SECRET, SECRET_KEY } from '@config';
-import { CreateUserDto } from '@dtos/users.dto';
+import { CreateUserDto, ResetPasswordDTO } from '@dtos/users.dto';
 import { UserEntity } from '@entities/users.entity';
 import { HttpException } from '@exceptions/httpException';
 import { DataStoredInToken, MyContext, TokenData } from '@interfaces/auth.interface';
-import { User } from '@interfaces/users.interface';
+import { ResetStatus, User } from '@interfaces/users.interface';
 import { ProfileEntity } from '@/entities/profile.entity';
 import cookieParser from 'cookie-parser';
 import {createTransport} from 'nodemailer';
 import { SMTP_HOST, SMTP_PASSWORD, SMTP_USERNAME, SMTP_PORT } from '@/config';
 import { mailConfig } from '@/config/mail';
 import crypto from 'crypto'
+import { generateToken } from '@/utils/generateToken';
 
 // import { cookies } from 'next/headers';
 
@@ -49,7 +50,7 @@ export class AuthRepository {
      }).save();
     
     
-    const trasporter = createTransport(mailConfig)
+    const transporter = createTransport(mailConfig)
 
     const mailOptions = {
       from: "care@swojon.com",
@@ -81,7 +82,7 @@ www.swojon.com
 www.facebook.com/swojon`,
     } 
     try {
-      const mail = await trasporter.sendMail(mailOptions)
+      const mail = await transporter.sendMail(mailOptions)
       console.log(mail)
     } catch (error) {
       console.log(error)
@@ -122,4 +123,98 @@ www.facebook.com/swojon`,
 
   // }
 
+  public async passwordResetRequest(email: string):Promise<ResetStatus> {
+    const findUser: UserEntity = await UserEntity.findOne({where : {email : email}});
+    if (!findUser) throw new HttpException(409, "User doesn't exist");
+    const token = generateToken();
+    const expireAt = new Date(new Date().getTime() +1 * 3600 * 1000); //1 hour expirty time
+    findUser.passwordResetToken = token;
+    findUser.passwordResetTokenExpiresAt = expireAt;
+    await findUser.save()
+
+    const transporter = createTransport(mailConfig)
+    const mailOptions = {
+      from : "care@swojon.com",
+      to: findUser.email,
+      subject: "Swojon Password Reset",
+      text: `
+Dear ${findUser.username},
+
+We received a request to reset the password for your Swojon account. To reset your password, please use the following token:
+
+Click on the link below to reset your password:
+
+[ https://www.swojon.com/forgot-password/reset?token=${token} ]
+
+(Note: If the link is not clickable, please copy and paste it into your web browser.)
+
+This token will expire in 1 hour, so be sure to use it promptly. If you did not request a password reset or if you have any concerns about your account security, please contact our support team immediately at [support@swojon.com].
+
+Thank you for choosing Swojon!
+
+Best regards,
+
+The Swojon Team
+www.swojon.com
+
+      `
+    }
+    try {
+      const mail = await transporter.sendMail(mailOptions)
+      // console.log(mail)
+    } catch (error) {
+      console.log(error)
+    }
+
+    return {
+      success: true
+    }
+  }
+
+  public async passwordReset(resetData:ResetPasswordDTO): Promise<ResetStatus> {
+    const findUser: UserEntity = await UserEntity.findOne({where : {passwordResetToken : resetData.token}});
+    if (!findUser) throw new HttpException(409, "Invalid Token");
+    
+    if (findUser.passwordResetTokenExpiresAt > new Date()){
+      findUser.passwordResetToken = null
+      await findUser.save()
+      throw new HttpException(409, "token expired")
+    }
+    
+    const hashedPassword = await hash(resetData.password, 10)
+    findUser.password = hashedPassword
+    findUser.passwordResetToken = null
+    await findUser.save()
+    const transporter = createTransport(mailConfig)
+    const mailOptions = {
+      from : "care@swojon.com",
+      to: findUser.email,
+      subject: "Your Swojon Password Has Been Successfully Reset",
+      text: `
+Dear ${findUser.username},
+
+We hope this email finds you well. We wanted to inform you that the password for your Swojon account has been successfully reset.
+
+If you initiated this password change, you can disregard this email. However, if you did not request a password reset or have any concerns about the security of your account, please contact our support team immediately at [support@swojon.com].
+
+For your security, we recommend updating your password periodically and ensuring it is unique to Swojon.
+
+Thank you for being part of the Swojon community!
+
+Best regards,
+
+The Swojon Team
+www.swojon.com
+      `
+    }
+    try {
+      const mail = await transporter.sendMail(mailOptions)
+      // console.log(mail)
+    } catch (error) {
+      console.log(error)
+    }   
+    return {
+      success: true
+    }
+  }
 }

@@ -1,7 +1,7 @@
 import { Authorized, Arg, Ctx, Mutation, Resolver, Query } from 'type-graphql';
-import { CreateUserDto } from '@dtos/users.dto';
+import { CreateUserDto, ResetPasswordDTO } from '@dtos/users.dto';
 import { AuthRepository } from '@repositories/auth.repository';
-import { User } from '@typedefs/users.type';
+import { ResetStatus, User } from '@typedefs/users.type';
 // import { TokenData } from '@/interfaces/auth.interface';
 import { TokenData, TokenUserData } from '@/typedefs/auth.type';
 import { MyContext } from '@/interfaces/auth.interface';
@@ -32,5 +32,22 @@ export class AuthResolver extends AuthRepository {
     const user = await this.userLogOut(userData.id);
     return user;
   }
+
+  @Mutation(() => ResetStatus, {
+    description: "Password Reset Request",
+  })
+  async resetRequest(@Arg('email') email: string): Promise<ResetStatus> {
+    const status = await this.passwordResetRequest(email)
+    return status 
+  }
+
+  @Mutation(() => ResetStatus, {
+    description: "Password Reset"
+  })
+  async resetPassword(@Arg('resetData') resetData: ResetPasswordDTO): Promise<ResetStatus> {
+    const status: ResetStatus = await this.passwordReset(resetData);
+    return status;
+  }
+
 
 }

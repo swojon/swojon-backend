@@ -23,6 +23,15 @@ export class CreateUserDto implements Partial<User> {
 }
 
 @InputType()
+export class ResetPasswordDTO {
+  @Field()
+  password : string;
+
+  @Field()
+  token: string;
+}
+
+@InputType()
 export class UpdateUserDto implements Partial<User> {
   @Field({nullable: true})
   @IsString()

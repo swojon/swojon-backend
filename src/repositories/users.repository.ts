@@ -3,7 +3,7 @@ import { EntityRepository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserEntity } from '@entities/users.entity';
 import { HttpException } from '@exceptions/httpException';
-import { User, UserWithMeta } from '@interfaces/users.interface';
+import { ResetStatus, User, UserWithMeta } from '@interfaces/users.interface';
 import { ProfileEntity } from '@/entities/profile.entity';
 import { RoleEntity } from '@/entities/role.entity';
 import { Role } from '@/interfaces/role.interface';
@@ -12,6 +12,7 @@ import { Community } from '@/interfaces/community.interface';
 import { CommunityMemberEntity } from '@/entities/communityMember.entity';
 import { ListingEntity } from '@/entities/listing.entity';
 import { PointRepository } from './point.repository';
+import { generateToken } from '@/utils/generateToken';
 
 @EntityRepository(UserEntity)
 export class UserRepository {
@@ -166,4 +167,6 @@ export class UserRepository {
     await UserEntity.delete({ id: userId });
     return findUser;
   }
+
+
 }
