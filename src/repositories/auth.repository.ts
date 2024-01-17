@@ -175,12 +175,12 @@ www.swojon.com
     const findUser: UserEntity = await UserEntity.findOne({where : {passwordResetToken : resetData.token}});
     if (!findUser) throw new HttpException(409, "Invalid Token");
     
-    if (findUser.passwordResetTokenExpiresAt > new Date()){
+    if (findUser.passwordResetTokenExpiresAt < new Date()){
       findUser.passwordResetToken = null
       await findUser.save()
       throw new HttpException(409, "token expired")
     }
-    
+
     const hashedPassword = await hash(resetData.password, 10)
     findUser.password = hashedPassword
     findUser.passwordResetToken = null
