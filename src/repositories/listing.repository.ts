@@ -136,19 +136,28 @@ export class ListingRepository {
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
       // .leftJoinAndSelect('listing.location', 'location')
-    let idOrder:"DESC" | "ASC" = "DESC"
+    // let idOrder:"DESC" | "ASC" = "DESC"
+    let orderCondition: {
+      paginationKeys: any;
+      order: "DESC" | "ASC"
+    } = {
+      paginationKeys : ["id"],
+      order: "DESC"
+    } //default
     if (paging.orderBy){
       if (paging.orderBy === "highest"){
         sql = sql.orderBy('listing.price', 'DESC')
-        idOrder = "ASC"
+        orderCondition.paginationKeys = ["price", "id"]
+        orderCondition.order = "DESC"
       } 
       else if (paging.orderBy === "lowest") {
         sql = sql.orderBy('listing.price', 'ASC')
-        idOrder = "DESC"
+        orderCondition.paginationKeys = ["price", "id"]
+        orderCondition.order = "ASC"
       }
       if (paging.orderBy === "newest") {
         sql = sql.orderBy('listing.id', 'DESC')
-        idOrder = "DESC"
+        
       }
 
     }
@@ -185,11 +194,11 @@ export class ListingRepository {
     // sql = sql.take(limit);\
     const paginator = buildPaginator({
       entity: ListingEntity,
-      paginationKeys: ['id'],
+      paginationKeys: orderCondition.paginationKeys,
       alias: 'listing',
       query: {
         limit: limit,
-        order: idOrder,
+        order: orderCondition.order,
         afterCursor: paging?.starting_after ?  String(paging.starting_after) : null ,
         beforeCursor: paging?.starting_after ? String(paging.ending_before) : null,
       },
