@@ -93,6 +93,9 @@ export class UserRepository {
   public async userCreate(userData: CreateUserDto): Promise<User> {
     const findUser: User = await UserEntity.findOne({ where: { email: userData.email } });
     if (findUser) throw new HttpException(409, `This email ${userData.email} already exists`);
+    
+    const findUserUsername: User = await UserEntity.findOne({ where: { username: userData.username } });
+    if (findUserUsername) throw new HttpException(409, `This username ${userData.username} already exists`);
 
     const hashedPassword = await hash(userData.password, 10);
     
@@ -118,7 +121,11 @@ export class UserRepository {
     userData.isApproved? to_update["isApproved"] = userData.isApproved : null
     userData.isStaff? to_update["isStaff"] = userData.isStaff : null
     userData.isSuperAdmin? to_update["isSuperAdmin"]= userData.isSuperAdmin : null
-    userData.username? to_update["username"]= userData.username : null
+    if (userData.username){
+      const findUser: User = await UserEntity.findOne({ where: { username: userData.username } });
+      if (findUser) throw new HttpException(409, `This username ${userData.username} already exists`);
+      to_update["username"]= userData.username 
+    } 
 
     await UserEntity.update(userId,  to_update)
     const updateUser: User = await UserEntity.findOne({ where: { id: userId } });

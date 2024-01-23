@@ -32,6 +32,23 @@ export class AuthResolver extends AuthRepository {
     const user = await this.userLogOut(userData.id);
     return user;
   }
+  
+  @Query(() => ResetStatus, {
+    description: "Check if a username is available or not",
+  })
+  async checkUsernameAvailability(@Arg('username') username: string): Promise<ResetStatus> {
+    const status = await this.UsernameAvailabilityCheck(username)
+    return status 
+  }
+
+    
+  @Query(() => ResetStatus, {
+    description: "Check if an email is available or not",
+  })
+  async checkEmailAvailability(@Arg('email') email: string): Promise<ResetStatus> {
+    const status = await this.EmailAvailabilityCheck(email)
+    return status 
+  }
 
   @Mutation(() => ResetStatus, {
     description: "Password Reset Request",

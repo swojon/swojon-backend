@@ -118,6 +118,21 @@ www.facebook.com/swojon`,
     return findUser;
   }
 
+  public async UsernameAvailabilityCheck(username: string):Promise<ResetStatus>{
+    const findUser: UserEntity = await UserEntity.findOne({where: {username: username}})
+    
+    return {
+      success: !findUser
+    } 
+  }
+
+  public async EmailAvailabilityCheck(email: string):Promise<ResetStatus>{
+    const findUser: UserEntity = await UserEntity.findOne({where: {email: email}})
+    
+    return {
+      success: !findUser
+    } 
+  }
   // public async facebookLogin(userData: SocialAuthInput): Promise<{ cookie: string; tokenData: TokenData; findUser: User }> {
   //     const { } =  await authenticateFacebook(userData);
 
