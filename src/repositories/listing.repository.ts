@@ -339,7 +339,6 @@ export class ListingRepository {
     // let communities: CommunityEntity[] = [];
     let brand: BrandEntity | null = null;
     // let location: LocationEntity | null = null;
-    userId = userId ?? 5;
     const findUser: UserEntity = await UserEntity.findOne({ where: { id: userId } });
     if (!findUser) throw new HttpException(409, `User with id ${userId} does not exist`);
 
