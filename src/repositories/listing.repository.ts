@@ -14,7 +14,7 @@ import { Listing, Listings } from '@/interfaces/listing.interface';
 import { Brand } from '@/typedefs/brand.type';
 import { EntityRepository, In } from 'typeorm';
 import {buildPaginator} from 'typeorm-cursor-pagination'
-
+import {Webhook, MessageBuilder} from 'discord-webhook-node'
 const getAllRelatedDependantSubCategories = (categories: any[], categoryId: any) => {
   let categoryIds = [categoryId];
 
@@ -339,14 +339,14 @@ export class ListingRepository {
     // let communities: CommunityEntity[] = [];
     let brand: BrandEntity | null = null;
     // let location: LocationEntity | null = null;
-
+    userId = userId ?? 5;
     const findUser: UserEntity = await UserEntity.findOne({ where: { id: userId } });
     if (!findUser) throw new HttpException(409, `User with id ${userId} does not exist`);
 
     if (listingData.brandId) {
-      console.log(listingData.brandId);
+      // console.log(listingData.brandId);
       const findBrand: BrandEntity = await BrandEntity.findOne({ where: { id: listingData.brandId } });
-      console.log(findBrand);
+      // console.log(findBrand);
       if (!findBrand) throw new HttpException(409, `Brand with id ${listingData.brandId} does not exist`);
       brand = findBrand;
     }
@@ -365,7 +365,7 @@ export class ListingRepository {
     });
     if (!findCategory) throw new HttpException(409, `Category with id ${listingData.categoryId} does not exist`);
 
-    console.log(listingMedia);
+    // console.log(listingMedia);
     const createListingData: ListingEntity = await ListingEntity.create({
       ...listingData,
       category: findCategory,
@@ -379,7 +379,31 @@ export class ListingRepository {
       user: findUser,
       media: listingMedia,
     }).save();
+    setTimeout(() => this.notifyListingCreation(createListingData, listingData.mediaUrls,), 500);
     return createListingData;
+  }
+
+  private async notifyListingCreation(listingData: ListingEntity, thumbnails: any[]){
+    const webhook_link = process.env.NEW_LISTING_DISCORD_WEBHOOK;
+    if (!webhook_link) return 
+    const hook = new Webhook(webhook_link);
+    const link = `https://www.swojon.com/products/${listingData.id}`;
+    const title = listingData.title;
+    
+    var embed = new MessageBuilder()
+      .setTitle(title)
+      // @ts-ignore next-line
+      .setURL(link)
+      .setDescription(`${listingData.description}`)
+      .addField("Price", `${listingData.price}`, false)
+      .setFooter('Swojon Alert')
+      .setTimestamp();
+    if (thumbnails[0]){
+      embed = embed.setThumbnail(thumbnails[0]);
+    }
+      try{      
+        hook.send(embed)
+      } catch(e){}
   }
 
   public async listingUpdate(listingId: number, listingData: ListingUpdateDTO): Promise<Listing> {
