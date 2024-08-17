@@ -52,7 +52,10 @@ export class ChatMessageRepository{
                           .andWhere("crm.relatedListingId = :relatedListingId", {relatedListingId: findListing.id})
                           .getOne()
         if (!findChatRoom) {
-          findChatRoom  = await ChatRoomEntity.create({relatedListing: findListing, chatName: `${findSender.email.split('@')[0]} and ${findReceiver.email.split('@')[0]}`}).save();
+          findChatRoom  = await ChatRoomEntity.create({
+            relatedListing: findListing,
+            chatName: `${findSender.email.split('@')[0]} and ${findReceiver.email.split('@')[0]}`
+          }).save();
           await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findSender}).save();
           await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findReceiver}).save();
         }
@@ -63,7 +66,10 @@ export class ChatMessageRepository{
     // if still we don't have any chatRoom, its probably an error
     if (!findChatRoom) throw new HttpException(409, "Chat room doesn't exist");
 
-    const createChatMessageData = await ChatMessageEntity.create({chatRoom: findChatRoom, content: chatData.message, sender: findSender}).save();
+    const createChatMessageData = await ChatMessageEntity.create({
+      chatRoom: findChatRoom, 
+      content: chatData.message, 
+      sender: findSender}).save();
     return createChatMessageData
   }
   public async chatRoomGet(userId: number|null, id: number|null):Promise<ChatRoom>{

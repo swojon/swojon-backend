@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, ManyToOne, Column, Relation } from "typeorm";
+import { Entity, BaseEntity, PrimaryGeneratedColumn, ManyToOne, Column, Relation, CreateDateColumn } from "typeorm";
 import { ChatRoomEntity } from "./userChats.entity";
 import { UserEntity } from "./users.entity";
 
@@ -22,7 +22,7 @@ export class ChatMessageEntity extends BaseEntity{
   content: string;
 
   //column for date sent
-  @Column({default: new Date()})
+  @CreateDateColumn()
   dateSent: Date;
 
   //column for isRead
