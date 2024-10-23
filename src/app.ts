@@ -123,15 +123,14 @@ const schema = await buildSchema({
 
 const httpServer = createServer(app);
 const wsServer = new WebSocketServer({
-        // This is the `httpServer` we created in a previous step.
+  // This is the `httpServer` we created in a previous step.
   server: httpServer,
   // Pass a different path here if app.use
   // serves expressMiddleware at a different path
   path: '/graphql',
 
-
-
 });
+
 const sessionContext: Record<string, unknown> = {};
 const getDynamicContext = async (ctx, msg, args) => {
   // ctx is the graphql-ws Context where connectionParams live
@@ -162,16 +161,9 @@ const serverCleanup = useServer({
     // GraphQL context, which all of our resolvers have access to.
    return getDynamicContext(ctx, msg, args)
   },
-  // onConnect(ctx) {
-  //   // console.log("onConnect")
-  //   return new Promise(resolve => {
-  //     sessionMiddleware(ctx.extra.request as any, {} as any, () => {
-  //       console.log("resolved")
-  //       sessionContext.session = ctx.extra.request.session;
-  //       resolve({req: ctx.extra.request, userId: ctx.extra.request.session!.userId})
-  //     })
-  //   })
-  // }
+  onConnect(ctx) {
+    console.log("connecting", ctx)
+  }
   // context: async req => {
   //     // try to retrieve a user with the token
   //   console.log("I am", req, )
@@ -193,10 +185,11 @@ const apolloServer = new ApolloServer({
   cache: new KeyvAdapter(new Keyv()),
   plugins: [
     env === 'production'
-      ? ApolloServerPluginLandingPageProductionDefault({ footer: false })
+      ? ApolloServerPluginLandingPageProductionDefault({ footer: false, includeCookies: true })
       : ApolloServerPluginLandingPageLocalDefault({ footer: false, embed: true, includeCookies: true }),
       ApolloServerPluginDrainHttpServer({ httpServer: httpServer}),
       {async serverWillStart() {
+          console.log("Server starting");
           return {
             async drainServer() {
               await serverCleanup.dispose();

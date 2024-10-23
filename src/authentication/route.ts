@@ -10,6 +10,14 @@ const router:any = Router();
 
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
+router.post('/goooogle',
+  passport.authenticate('google-id-token'),
+  function (req, res) {
+    // do something with req.user
+    res.send(req.user? 200 : 401);
+  }
+);
+
 router.get(
   "/google/callback", passport.authenticate("google", {
       failureRedirect: `${CLIENT_URL}/login`,

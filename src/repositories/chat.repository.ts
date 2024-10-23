@@ -49,7 +49,7 @@ export class ChatMessageRepository{
                           .innerJoin("crm.members", "member2")
                           .where("member1.userId = :userId1", { userId1: findSender.id })
                           .andWhere("member2.userId = :userId2", { userId2: findReceiver.id })
-                          .andWhere("crm.relatedListingId = :relatedListingId", {relatedListingId: findListing.id})
+                          .andWhere("crm.relatedListingId = :relatedListingId", {relatedListingId: findListing?.id})
                           .getOne()
         if (!findChatRoom) {
           findChatRoom  = await ChatRoomEntity.create({

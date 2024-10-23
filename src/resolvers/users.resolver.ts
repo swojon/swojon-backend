@@ -1,7 +1,8 @@
-import { Arg, Authorized, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserRepository } from '@repositories/users.repository';
 import { User, UserWithMeta } from '@typedefs/users.type';
+import { MyContext } from '@/interfaces/auth.interface';
 
 @Resolver()
 export class UserResolver extends UserRepository {
@@ -18,8 +19,9 @@ export class UserResolver extends UserRepository {
   @Query(() => UserWithMeta, {
     description: 'User find by id',
   })
-  async getUserById(@Arg('userId') userId: number): Promise<UserWithMeta> {
-    const user: UserWithMeta = await this.userFindById(userId);
+  async getUserById(@Ctx() ctx:MyContext, @Arg('userId') userId: number): Promise<UserWithMeta> {
+    const currentUser = ctx.user?.id;
+    const user: UserWithMeta = await this.userFindById(userId, currentUser);
     return user;
   }
 

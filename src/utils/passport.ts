@@ -6,7 +6,8 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import {Strategy as LocalStrategy} from 'passport-local';
 import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt'
-
+// import {Strategy as GoogleTokenStrategy } from 'passport-google-id-token'
+var GoogleTokenStrategy = require('passport-google-id-token');
 
 const GOOGLE_CLIENT_ID = "289456051793-3ltve2koi2m13g1819uhnbjigse41iug.apps.googleusercontent.com"
 const GOOGLE_CLIENT_SECRET = "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";
@@ -16,6 +17,16 @@ const GOOGLE_CLIENT_SECRET = "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";
 
 // FACEBOOK_APP_ID = "your id";
 // FACEBOOK_APP_SECRET = "your id";
+passport.use(new GoogleTokenStrategy({
+  clientID: GOOGLE_CLIENT_ID,
+},
+function(parsedToken, googleId, done, ) {
+  console.log("parsedToken", parsedToken);
+  console.log("google id", googleId);
+
+  return done({}, parsedToken)
+}
+));
 
 passport.use(
   new GoogleStrategy(

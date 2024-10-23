@@ -19,7 +19,7 @@ export enum TOPICS_ENUM{
 export class SubscriptionResolver {
   @Subscription({
     subscribe: withFilter((_, __, payload) => {
-      // console.log("payload", payload)
+      console.log("subscription payload", payload)
       if (!payload?.currentUser) {
         throw new Error("You don't have permission to access this resource");
       }

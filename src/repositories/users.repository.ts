@@ -16,6 +16,18 @@ import { generateToken } from '@/utils/generateToken';
 
 @EntityRepository(UserEntity)
 export class UserRepository {
+  public async userFollowerStatus(sellerId:number, userId:number|null){
+    if (!userId) return false;
+    const followEntity = await FollowEntity.find({where: {
+      userId: userId,
+      followedUserId: sellerId,
+      isDeleted: false
+    }})
+    console.log("follow", followEntity);
+    if (followEntity.length > 0) return true;
+    return false;
+  }
+
   public async userList(): Promise<UserWithMeta[]> {
     const users: User[]= await UserEntity.createQueryBuilder("user")
                                 .leftJoinAndSelect("user.profile", "profile")
@@ -75,7 +87,7 @@ export class UserRepository {
     return returningUsers;
   }
 
-  public async userFindById(userId: number): Promise<UserWithMeta> {
+  public async userFindById(userId: number, currentUser: any): Promise<UserWithMeta> {
     const user: User = await UserEntity.findOne({ where: { id: userId }, relations: ['profile', 'roles']});
     if (!user) throw new HttpException(409, "User doesn't exist");
     const followerCount:number = await FollowEntity.count({where: {followedUser: user}})
@@ -86,8 +98,11 @@ export class UserRepository {
                   })
     const listingCount: number = await ListingEntity.count({where: {user: user}})
     const pointBalance: number = await new PointRepository().pointBalanceQuery(user.id)
-
-    return {...user, followerCount, followingCount, communities, listingCount, pointBalance };
+    var followingStatus = false;
+    if (currentUser){
+      followingStatus = await this.userFollowerStatus(userId, currentUser);
+    } 
+    return {...user, followerCount, followingCount, communities, listingCount, pointBalance, followingStatus };
   }
 
   public async userCreate(userData: CreateUserDto): Promise<User> {

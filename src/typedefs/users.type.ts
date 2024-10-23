@@ -42,42 +42,16 @@ export class User {
 }
 
 @ObjectType()
-export class UserWithMeta {
-  @Field()
-  id?: number;
-
-  @Field()
-  email?: string;
-
-  @Field({nullable: true })
-  facebookId?: string;
-
-  @Field({nullable:true})
-  username?:string;
-
-  @Field()
-  isApproved: boolean;
-
-  @Field()
-  isStaff: boolean;
-
-  @Field()
-  isEmailVerified: boolean;
-
-  @Field()
-  createdAt?: Date;
-
-  @Field(() => Profile, {nullable: true})
-  profile: Profile;
-
-  @Field(() => [Role], {nullable: true})
-  roles: Role[];
+export class UserWithMeta extends User {
 
   @Field({nullable:true})
   followerCount?: number;
 
   @Field({nullable: true})
   followingCount?: number;
+
+  @Field({nullable: true})
+  followingStatus?: boolean;
 
   @Field({nullable: true})
   pointBalance?: number;
