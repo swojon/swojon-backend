@@ -6,6 +6,7 @@ import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Review } from "@/interfaces/sellerReview.interface";
 import { Reviews, SummaryReview } from "@/typedefs/sellerReview.type";
+import { parseIntStrict } from "@/utils/parseIntStrict";
 import { EntityRepository } from "typeorm";
 
 
@@ -22,8 +23,15 @@ export class SellerReviewRepository{
       findListing = await ListingEntity.findOne({where: {id:reviewData.listingId}, relations:["user"]})
       if (!findListing) throw new HttpException(409, "Listing doesn't exist");
       findSellerId  = findListing.user;
-    }else if (reviewData.sellerId ){
-      findSellerId = reviewData.sellerId
+    }else if (reviewData.sellerIdOrUsername ){
+   
+      try {
+        findSellerId = parseIntStrict(reviewData.sellerIdOrUsername)
+      } catch (error) {
+        const user = await UserEntity.findOne({where: {username: reviewData.sellerIdOrUsername}})
+        if (!user) throw new HttpException(409, "user not found");
+        findSellerId = user.id;
+      }
     }else {
       throw new HttpException(409, "Either Seller Id or Listing Id Must be provided. ")
     }
@@ -91,8 +99,16 @@ export class SellerReviewRepository{
     return reviews;
   }
 
-  public async sellerReviewList(userId: number, paging:PagingArgs, filters: ReviewFilterInput): Promise<Reviews>{
-
+  public async sellerReviewList(usernameOrId: string, paging:PagingArgs, filters: ReviewFilterInput): Promise<Reviews>{
+    var userId:number;
+    try {
+      userId = parseIntStrict(usernameOrId)
+    } catch (e) {
+      const user = await UserEntity.findOne({where: {username: usernameOrId}})
+      if (!user) throw new HttpException(409, "user not found");
+      userId = user.id;
+    
+    }
     // const review:[SellerReviewEntity[], number] = await 
     let sql = SellerReviewEntity
                   .createQueryBuilder("seller_review_entity")
@@ -133,8 +149,15 @@ export class SellerReviewRepository{
     return reviews;
   }
 
-  public async userReviewList(userId: number): Promise<Reviews>{
-
+  public async userReviewList(usernameOrId: string): Promise<Reviews>{
+    var userId
+    try {
+      userId = parseIntStrict(usernameOrId)
+    } catch (error) {
+      const user = await UserEntity.findOne({where: {username: usernameOrId}})
+      if (!user) throw new HttpException(409, "user not found");
+      userId = user.id;
+    }
     const review:[SellerReviewEntity[], number] = await SellerReviewEntity.createQueryBuilder("sr")
                   .select(["sr.id","sr.dateCreated",  "sr.isDeleted", "sr.review", "sr.rating"])
                   .leftJoinAndSelect('sr.reviewer', 'reviewer')
@@ -151,7 +174,16 @@ export class SellerReviewRepository{
     return reviews;
   }
 
-  public async userReviewSummary(userId: number): Promise<SummaryReview>{
+  public async userReviewSummary(usernameOrId: string): Promise<SummaryReview>{
+    var userId
+    try {
+      userId = parseIntStrict(usernameOrId)
+    } catch (error) {
+      const user = await UserEntity.findOne({where: {username: usernameOrId}})
+      if (!user) throw new HttpException(409, "user not found");
+      userId = user.id;
+    }
+
     const userReviews = await SellerReviewEntity.findAndCount({
       where: {sellerId: userId},
       select: ["rating"]

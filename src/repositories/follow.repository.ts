@@ -4,6 +4,7 @@ import { HttpException } from "@/exceptions/httpException";
 import { Follow, Following } from "@/interfaces/follow.interface";
 import { Follower } from "@/interfaces/Follower.interface";
 import { Followers } from "@/typedefs/follow.type";
+import { parseIntStrict } from "@/utils/parseIntStrict";
 import { EntityRepository } from "typeorm";
 
 
@@ -44,8 +45,15 @@ export class FollowRepository{
     
   }
 
-  public async followerList(userId: number, requestedUserId: any): Promise<Followers>{
-
+  public async followerList(usernameOrId: string, requestedUserId: any): Promise<Followers>{
+    var userId
+    try {
+      userId = parseIntStrict(usernameOrId)
+    } catch (error) {
+      const user = await UserEntity.findOne({where: {username: usernameOrId}})
+      if (!user) throw new HttpException(409, "user not found");
+      userId = user.id;
+    }
     const follow = await FollowEntity.createQueryBuilder("follow_entity")
                   .select(["follow_entity.id", "follow_entity.isDeleted", "follow_entity.dateFollowed", "follow_entity.followedUserId", "follow_entity.userId"])
                   .leftJoinAndSelect('follow_entity.user', 'user')
@@ -72,7 +80,15 @@ export class FollowRepository{
     return followers;
   }
 
-  public async followingList(userId: number, requestedUserId: any): Promise<Followers>{
+  public async followingList(usernameOrId: string, requestedUserId: any): Promise<Followers>{
+    var userId
+    try {
+      userId = parseIntStrict(usernameOrId)
+    } catch (error) {
+      const user = await UserEntity.findOne({where: {username: usernameOrId}})
+      if (!user) throw new HttpException(409, "user not found");
+      userId = user.id;
+    } 
     const follow = await FollowEntity.createQueryBuilder("follow_entity")
             .select(["follow_entity.id", "follow_entity.isDeleted", "follow_entity.dateFollowed", "follow_entity.followedUserId", "follow_entity.userId"])
             .leftJoinAndSelect('follow_entity.followedUser', 'followedUser')

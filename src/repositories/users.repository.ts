@@ -13,9 +13,34 @@ import { CommunityMemberEntity } from '@/entities/communityMember.entity';
 import { ListingEntity } from '@/entities/listing.entity';
 import { PointRepository } from './point.repository';
 import { generateToken } from '@/utils/generateToken';
+import { parseIntStrict } from '@/utils/parseIntStrict';
 
 @EntityRepository(UserEntity)
 export class UserRepository {
+  public checkIfUsernameValid(username) {
+  
+      if (username.length < 5) {
+          return { isValid: false, message: "Username must be at least 5 characters long." };
+      }
+
+      // Special characters check
+      const specialCharPattern = /[^a-zA-Z0-9]/;
+      if (specialCharPattern.test(username)) {
+          return { isValid: false, message: "Username should not contain special characters." };
+      }
+
+      // Blacklisted words check
+      const blacklistedWords = ["facebook", "amazon", "google", "admin", "support"];
+      const containsBlacklistedWord = blacklistedWords.some(word => username.toLowerCase().includes(word));
+
+      if (containsBlacklistedWord) {
+          return { isValid: false, message: "Username contains a blacklisted word." };
+      }
+
+      // If all checks pass
+      return { isValid: true, message: "Username is valid." };
+  }
+
   public async userFollowerStatus(sellerId:number, userId:number|null){
     if (!userId) return false;
     const followEntity = await FollowEntity.find({where: {
@@ -87,8 +112,14 @@ export class UserRepository {
     return returningUsers;
   }
 
-  public async userFindById(userId: number, currentUser: any): Promise<UserWithMeta> {
-    const user: User = await UserEntity.findOne({ where: { id: userId }, relations: ['profile', 'roles']});
+  public async userFindById(userId: string, currentUser: any): Promise<UserWithMeta> {
+    var user;
+    try {
+      user = await UserEntity.findOne({ where: { id: parseIntStrict(userId)  }, relations: ['profile', 'roles']});
+    } catch (error) {
+      user = await UserEntity.findOne({ where: { username: userId  }, relations: ['profile', 'roles']});
+      
+    }
     if (!user) throw new HttpException(409, "User doesn't exist");
     const followerCount:number = await FollowEntity.count({where: {followedUser: user}})
     const followingCount:number = await FollowEntity.count({where: {user: user}})
@@ -100,7 +131,7 @@ export class UserRepository {
     const pointBalance: number = await new PointRepository().pointBalanceQuery(user.id)
     var followingStatus = false;
     if (currentUser){
-      followingStatus = await this.userFollowerStatus(userId, currentUser);
+      followingStatus = await this.userFollowerStatus(user.id, currentUser);
     } 
     return {...user, followerCount, followingCount, communities, listingCount, pointBalance, followingStatus };
   }
@@ -109,6 +140,10 @@ export class UserRepository {
     const findUser: User = await UserEntity.findOne({ where: { email: userData.email } });
     if (findUser) throw new HttpException(409, `This email ${userData.email} already exists`);
     
+    const checkUsername = this.checkIfUsernameValid(userData.username)
+    if (!checkUsername.isValid){
+        throw new HttpException(409, checkUsername.message);
+    }
     const findUserUsername: User = await UserEntity.findOne({ where: { username: userData.username } });
     if (findUserUsername) throw new HttpException(409, `This username ${userData.username} already exists`);
 
@@ -125,6 +160,7 @@ export class UserRepository {
   }
 
   public async userUpdate(userId: number, userData: UpdateUserDto): Promise<User> {
+    
     const findUser: User = await UserEntity.findOne({ where: { id: userId } });
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
@@ -137,6 +173,11 @@ export class UserRepository {
     userData.isStaff? to_update["isStaff"] = userData.isStaff : null
     userData.isSuperAdmin? to_update["isSuperAdmin"]= userData.isSuperAdmin : null
     if (userData.username){
+
+      const checkUsername = this.checkIfUsernameValid(userData.username)
+      if (!checkUsername.isValid){
+          throw new HttpException(409, checkUsername.message);
+      }
       const findUser: User = await UserEntity.findOne({ where: { username: userData.username } });
       if (findUser) throw new HttpException(409, `This username ${userData.username} already exists`);
       to_update["username"]= userData.username 

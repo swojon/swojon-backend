@@ -414,78 +414,76 @@ export class ListingRepository {
     });
     console.log("listingData", listingData, dataToUpdate)
 
-    const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId } });
+    const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId }, relations: ["media"] });
     if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
-
-    // if (listingData.communityIds) {
-    //   const communities = await CommunityEntity.findByIds(listingData.communityIds);
-    //   findListing.communities = communities;
-    //   await findListing.save();
-
-    //   delete dataToUpdate.communityIds;
-    // }
 
     if (!!listingData.brandId) {
       const findBrand: BrandEntity = await BrandEntity.findOne({ where: { id: listingData.brandId } });
       if (!findBrand) throw new HttpException(409, `Brand with id ${listingData.brandId} does not exist`);
       console.log(findBrand);
-      dataToUpdate = { ...dataToUpdate, brand: findBrand };
+      // dataToUpdate = { ...dataToUpdate, brand: findBrand };
+      findListing.brand = findBrand;
       delete dataToUpdate.brandId;
     }
-
+   
     if (!!listingData.categoryId) {
       const findCategory = await CategoryEntity.findOne({
         where: { id: listingData.categoryId },
       });
       if (!findCategory) throw new HttpException(409, `Category with id ${listingData.categoryId} does not exist`);
-      dataToUpdate = { ...dataToUpdate, category: findCategory };
-
+      // dataToUpdate = { ...dataToUpdate, category: findCategory };
+      findListing.category = findCategory;
       delete dataToUpdate.categoryId;
+    }
+    
+    if (!!listingData.mediaUrls) {
+      let listingMedia = [];
+      for await (const url of listingData.mediaUrls) {
+        if (!url.startsWith('http')) throw new HttpException(409, `Invalid media url ${url}`);
+        var  media_;
+        media_ = await ListingMediaEntity.findOne({ where: {url:url} });
+        console.log("media", media_)
+        if (!media_){
+          media_ = await ListingMediaEntity.create({ url });
+          console.log("media1", media_)
+        }
+        listingMedia.push(media_);
+       // Closes iterator, triggers return
+      }
+      // listingData.mediaUrls.forEach(async url => {
+      
+      // });
+      console.log("mul", listingMedia)
+      delete dataToUpdate.mediaUrls
+      // dataToUpdate = {...dataToUpdate, media: listingMedia}
+      findListing.media = listingMedia;
     }
 
     if (!!listingData.status && Object.values(Status).includes(listingData.status as unknown as Status) ){
       console.log("updating status now")
-      dataToUpdate = {...dataToUpdate, status: listingData.status}
+      // dataToUpdate = {...dataToUpdate, status: listingData.status}
+      findListing.status = listingData.status as unknown as Status;
+      delete dataToUpdate.status;
     }
     console.log("data to update", dataToUpdate)
 
-    // await findListing.save()
-    if (Object.keys(dataToUpdate).length !== 0) await ListingEntity.update({ id: listingId }, dataToUpdate);
-    console.log("data updated")
+    // await findList
+    if (!!listingData.description) findListing.description = listingData.description
+    if (!!listingData.meetupLocations) findListing.meetupLocations = listingData.meetupLocations;
+    if (!!listingData.price)  findListing.price = listingData.price;
+    if (!!listingData.title) findListing.title = listingData.title;
+    
+    await ListingEntity.save(findListing)
+
+    // if (Object.keys(dataToUpdate).length !== 0) await ListingEntity.update({id: findListing.id}, dataToUpdate);
+    // console.log("data updated")
     const updatedListing: ListingEntity = await ListingEntity.findOne({
       where: { id: listingId },
-      relations: ['user', 'brand', 'category'],
+      relations: ['user', 'brand', 'category', "media"],
     });
     return updatedListing;
   }
 
-  // public async listingCommunityAdd(listingId: number, communityIds: number[]): Promise<Listing> {
-  //   const findListing: ListingEntity = await ListingEntity.findOne({
-  //     where: { id: listingId },
-  //     relations: ['communities'],
-  //   });
-  //   const communitiesToAdd: number[] = communityIds.filter(comId => findListing.communities.filter(com => com.id !== comId));
-  //   // console.log(communitiesToAdd)
-  //   if (!communitiesToAdd) throw new HttpException(409, 'No Categories To Add');
-  //   console.log(communitiesToAdd);
-
-  //   const communitiesEntityToAd: CommunityEntity[] = await CommunityEntity.find({ where: { id: In(communitiesToAdd) } });
-  //   // console.log(communitiesEntityToAd)
-  //   console.log(communitiesEntityToAd);
-  //   findListing.communities = [...findListing.communities, ...communitiesEntityToAd];
-  //   const savedListing = await ListingEntity.save(findListing);
-  //   return savedListing;
-  // }
-
-  // public async listingCommunityRemove(listingId: number, communityIds: number[]): Promise<Listing> {
-  //   const findListing: ListingEntity = await ListingEntity.findOne({
-  //     where: { id: listingId },
-  //     relations: ['communities'],
-  //   });
-  //   findListing.communities = findListing.communities.filter(com => !communityIds.includes(com.id));
-  //   const savedListing = await ListingEntity.save(findListing);
-  //   return savedListing;
-  // }
 
   public async listingRemove(listingId: number): Promise<Listing> {
     const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId } });

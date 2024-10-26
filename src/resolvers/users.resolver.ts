@@ -19,9 +19,9 @@ export class UserResolver extends UserRepository {
   @Query(() => UserWithMeta, {
     description: 'User find by id',
   })
-  async getUserById(@Ctx() ctx:MyContext, @Arg('userId') userId: number): Promise<UserWithMeta> {
+  async getUserByIdOrUsername(@Ctx() ctx:MyContext, @Arg('usernameOrId') usernameOrId: string): Promise<UserWithMeta> {
     const currentUser = ctx.user?.id;
-    const user: UserWithMeta = await this.userFindById(userId, currentUser);
+    const user: UserWithMeta = await this.userFindById(usernameOrId, currentUser);
     return user;
   }
 

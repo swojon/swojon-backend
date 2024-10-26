@@ -10,9 +10,9 @@ export class FollowResolver extends FollowRepository {
   @Query(() => Followers, {
     description: 'List All Followerer',
   })
-  async listFollowers(@Ctx() ctx:MyContext, @Arg('userId') userId: number): Promise<Followers> {
+  async listFollowers(@Ctx() ctx:MyContext, @Arg('usernameOrId') usernameOrId: string): Promise<Followers> {
     const requestedUserId = ctx.user?.id;
-    const follower: Followers = await this.followerList(userId, requestedUserId);
+    const follower: Followers = await this.followerList(usernameOrId, requestedUserId);
     return follower;
 
   }
@@ -21,9 +21,9 @@ export class FollowResolver extends FollowRepository {
   @Query(() => Followers, {
     description: 'List All Following',
   })
-  async listFollowing(@Ctx() ctx:MyContext, @Arg('userId') userId: number): Promise<Followers> {
+  async listFollowing(@Ctx() ctx:MyContext, @Arg('usernameOrId') usernameOrId: string): Promise<Followers> {
     const requestedUserId = ctx.user?.id;
-    const following: Followers = await this.followingList(userId, requestedUserId );
+    const following: Followers = await this.followingList(usernameOrId, requestedUserId );
     return following;
   }
 

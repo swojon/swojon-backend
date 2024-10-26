@@ -71,6 +71,8 @@ export class ListingCreateDTO {
 
   @Field(() => [NominatimLocationInput], {nullable:true})
   meetupLocations?: NominatimLocationInput[]
+
+  
 }
 
 @InputType()
@@ -84,14 +86,11 @@ export class ListingUpdateDTO{
   @Field({nullable:true})
   price?:number
 
-  @Field({nullable:true})
-  location?: string;
-
-  @Field({nullable:true})
-  latitude?: number;
-
-  @Field({nullable:true})
-  longitude?: number;
+  @Field(() => [NominatimLocationInput], {nullable:true})
+  meetupLocations?: NominatimLocationInput[]
+  
+  @Field(()=>[String], {nullable:true})
+  mediaUrls?: string[]
 
   @Field({nullable:true})
   categoryId? : number
@@ -101,6 +100,7 @@ export class ListingUpdateDTO{
 
   @Field({nullable: true})
   status?: string;
+  
 }
 
 @InputType()

@@ -18,23 +18,23 @@ export class SellerReviewResolver extends SellerReviewRepository {
   @Query(() => SummaryReview, {
     description: 'List All Reviews of a seller',
   })
-  async summaryUserReview(@Arg('userId') userId: number): Promise<SummaryReview> {
-    const reviews: SummaryReview = await this.userReviewSummary(userId);
+  async summaryUserReview(@Arg('usernameOrId') usernameOrId: string): Promise<SummaryReview> {
+    const reviews: SummaryReview = await this.userReviewSummary(usernameOrId);
     return reviews;
   }
   @Query(() => Reviews, {
     description: 'List All Reviews of a seller',
   })
-  async listSellerReviews(@Arg('userId') userId: number,  @Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : ReviewFilterInput): Promise<Reviews> {
-    const reviews: Reviews = await this.sellerReviewList(userId, paging, filters);
+  async listSellerReviews(@Arg('usernameOrId') usernameOrId: string,  @Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : ReviewFilterInput): Promise<Reviews> {
+    const reviews: Reviews = await this.sellerReviewList(usernameOrId, paging, filters);
     return reviews;
   }
 
   @Query(() => Reviews, {
     description: 'List All Reviews of a user',
   })
-  async listUserReviews(@Arg('userId') userId: number): Promise<Reviews> {
-    const reviews: Reviews = await this.userReviewList(userId);
+  async listUserReviews(@Arg('usernameOrId') usernameOrId: string): Promise<Reviews> {
+    const reviews: Reviews = await this.userReviewList(usernameOrId);
     return reviews;
   }
 

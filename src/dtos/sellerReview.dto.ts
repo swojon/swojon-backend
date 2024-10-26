@@ -27,7 +27,7 @@ export class SellerReviewCreateDTO {
   review?: string;
 
   @Field({nullable:true})
-  sellerId: number;
+  sellerIdOrUsername: string;
 
   @Field(type=>Float)
   rating: number

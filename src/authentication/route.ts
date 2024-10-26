@@ -34,6 +34,7 @@ router.post('/google/token', async ({ body: { tokenId } }, res)=> {
       email_verified: response.email_verified,
       first_name: response.given_name,
       last_name: response.family_name,
+      username: response.email.split("@")[0]
     };
     
     let findUser = await UserEntity.findOne({
@@ -57,7 +58,8 @@ router.post('/google/token', async ({ body: { tokenId } }, res)=> {
         googleId: user.googleId,
         email: user.email,
         isEmailVerified: !!user.email_verified,
-        profile: newProfile
+        profile: newProfile,
+        username: user.username
       }).save();
 
       findUser = await UserEntity.findOne({
