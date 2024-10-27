@@ -92,6 +92,9 @@ export class ListingUpdateDTO{
   @Field(()=>[String], {nullable:true})
   mediaUrls?: string[]
 
+  @Field({nullable: true})
+  condition?: string;
+  
   @Field({nullable:true})
   categoryId? : number
 

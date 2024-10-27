@@ -472,6 +472,7 @@ export class ListingRepository {
     if (!!listingData.meetupLocations) findListing.meetupLocations = listingData.meetupLocations;
     if (!!listingData.price)  findListing.price = listingData.price;
     if (!!listingData.title) findListing.title = listingData.title;
+    if (!!listingData.condition) findListing.condition = listingData.condition;
     
     await ListingEntity.save(findListing)
 
