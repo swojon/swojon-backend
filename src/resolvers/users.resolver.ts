@@ -37,8 +37,9 @@ export class UserResolver extends UserRepository {
   @Mutation(() => User, {
     description: 'User update',
   })
-  async updateUser(@Arg('userId') userId: number, @Arg('userData') userData: UpdateUserDto): Promise<User> {
-    const user: User = await this.userUpdate(userId, userData);
+  async updateUser(@Ctx() ctx:MyContext, @Arg('userId') userId: number, @Arg('userData') userData: UpdateUserDto): Promise<User> {
+    const currentUser = ctx.user?.id;
+    const user: User = await this.userUpdate(currentUser, userId, userData);
     return user;
   }
 

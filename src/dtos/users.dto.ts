@@ -40,6 +40,13 @@ export class UpdateUserDto implements Partial<User> {
   @MaxLength(32)
   password?: string;
 
+  @Field({nullable: true})
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(9)
+  @MaxLength(32)
+  oldPassword?: string;
+  
   //field for isApproved boolean
   @Field({nullable: true})
   isApproved?: boolean;

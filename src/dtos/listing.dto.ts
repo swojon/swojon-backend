@@ -101,10 +101,53 @@ export class ListingUpdateDTO{
   @Field({nullable:true})
   brandId?: number
 
+  @Field({nullable:true})
+  isAvailable?: boolean;
+
+  @Field({nullable:true})
+  deleteReason?: string;
+
+  @Field({nullable:true})
+  isDeleted?: boolean;
+
+  @Field({nullable:true})
+  isSold?: boolean;
+
+  @Field({nullable:true})
+  isSoldHere?: boolean;
+  
+}
+
+@InputType()
+export class AdminListingUpdateDTO{
+  
+  @Field({nullable: true})
+  rejectReason?: string;
+
   @Field({nullable: true})
   status?: string;
   
+  @Field({nullable:true})
+  isAvailable?: boolean;
+
+  @Field({nullable:true})
+  deleteReason?: string;
+
+  @Field({nullable:true})
+  isDeleted?: boolean;
 }
+
+@InputType()
+export class MarkAsUnavailableDTO {
+    
+  @Field({defaultValue:true})
+  isAvailable: boolean;
+
+  @Field({nullable:true})
+  isRelist?:boolean;
+
+}
+
 
 @InputType()
 export class ListingMediaCreateDTO{

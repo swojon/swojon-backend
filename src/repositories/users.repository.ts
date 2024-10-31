@@ -1,4 +1,4 @@
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { EntityRepository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserEntity } from '@entities/users.entity';
@@ -136,6 +136,7 @@ export class UserRepository {
     return {...user, followerCount, followingCount, communities, listingCount, pointBalance, followingStatus };
   }
 
+  
   public async userCreate(userData: CreateUserDto): Promise<User> {
     const findUser: User = await UserEntity.findOne({ where: { email: userData.email } });
     if (findUser) throw new HttpException(409, `This email ${userData.email} already exists`);
@@ -159,21 +160,28 @@ export class UserRepository {
     return createUserData;
   }
 
-  public async userUpdate(userId: number, userData: UpdateUserDto): Promise<User> {
-    
+
+  public async userUpdate(currentUser: number|any, userId: number, userData: UpdateUserDto): Promise<User> {
+    if (!currentUser){
+      throw new HttpException(409, "operation not permitted")
+    }
     const findUser: User = await UserEntity.findOne({ where: { id: userId } });
     if (!findUser) throw new HttpException(409, "User doesn't exist");
+    if (currentUser != findUser.id){
+      throw new HttpException(409, "operation not permitted")
+    }
 
     if (userData.password){
+      if (!!userData.oldPassword){
+        const isPasswordMatching: boolean = await compare(userData.oldPassword, findUser.password);
+        if (!isPasswordMatching) throw new HttpException(409, "Couldn't verify the old password");
+      }
       const hashedPassword = await hash(userData.password, 10);
-      await UserEntity.update(userId, { ...userData, password: hashedPassword });
+      await UserEntity.update(userId, { password: hashedPassword });
     }
-    const to_update = {}
-    userData.isApproved? to_update["isApproved"] = userData.isApproved : null
-    userData.isStaff? to_update["isStaff"] = userData.isStaff : null
-    userData.isSuperAdmin? to_update["isSuperAdmin"]= userData.isSuperAdmin : null
-    if (userData.username){
 
+    const to_update = {}
+    if (userData.username){
       const checkUsername = this.checkIfUsernameValid(userData.username)
       if (!checkUsername.isValid){
           throw new HttpException(409, checkUsername.message);
@@ -182,10 +190,14 @@ export class UserRepository {
       if (findUser) throw new HttpException(409, `This username ${userData.username} already exists`);
       to_update["username"]= userData.username 
     } 
-
-    await UserEntity.update(userId,  to_update)
-    const updateUser: User = await UserEntity.findOne({ where: { id: userId } });
-    return updateUser;
+    console.log("to_update", to_update)
+    if (!!to_update){
+      await UserEntity.update(userId,  to_update)
+      const updateUser: User = await UserEntity.findOne({ where: { id: userId } });
+      return updateUser;
+    }
+    return findUser;
+    
   }
 
   public async userRoleUpdate(userId:number, roleId: number): Promise<User> {

@@ -1,5 +1,5 @@
 import { CategoryArgs, PagingArgs } from '@/dtos/category.dto';
-import { ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, SerachInputDTO } from '@/dtos/listing.dto';
+import { AdminListingUpdateDTO, ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, MarkAsUnavailableDTO, SerachInputDTO } from '@/dtos/listing.dto';
 import { BrandEntity } from '@/entities/brand.entity';
 import { CategoryEntity } from '@/entities/category.entity';
 import { CommunityEntity } from '@/entities/community.entity';
@@ -127,7 +127,7 @@ export class ListingRepository {
     let sql = ListingEntity.createQueryBuilder('listing')
       .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 
         'listing.dateCreated', 'listing.meetupLocations', 'listing.quantity', 'listing.dealingMethod', 
-        'listing.deliveryCharge', 'listing.slug', "listing.condition", "listing.status"
+        'listing.deliveryCharge', 'listing.slug', "listing.condition", "listing.status", "listing.isSold", "listing.isAvailable"
       ])
       // .leftJoinAndSelect('listing.communities', 'community')
       .leftJoinAndSelect('listing.user', 'user')
@@ -135,6 +135,7 @@ export class ListingRepository {
       .leftJoinAndSelect('listing.brand', 'brand')
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
+      .where("listing.isDeleted = false")
       // .leftJoinAndSelect('listing.location', 'location')
     // let idOrder:"DESC" | "ASC" = "DESC"
     let orderCondition: {
@@ -238,9 +239,11 @@ export class ListingRepository {
     const findListing: ListingEntity = await ListingEntity.findOne(
                     {
                       where: [
-                          {id: listingArgs?.id},
+                          {id: listingArgs?.id, isDeleted: false},
                           // {slug: listingArgs?.slug},
-                          {title: listingArgs?.name}],
+                          {title: listingArgs?.name, isDeleted: false},
+                        ],
+                      
                       relations: ["user", "user.profile", "brand", "category", "media" ]
                     },
                   );
@@ -260,7 +263,7 @@ export class ListingRepository {
     let sql = ListingEntity.createQueryBuilder('listing')
       .select(['listing.title', 'listing.id', 'listing.price', 
       'listing.description', 'listing.dateCreated', 'listing.meetupLocations', 'listing.quantity', 'listing.dealingMethod', 
-      'listing.deliveryCharge', 'listing.slug', "listing.condition", "listing.status"])
+      'listing.deliveryCharge', 'listing.slug', "listing.condition", "listing.status", "listing.isSold", "listing.isAvailable"])
       // .leftJoinAndSelect('listing.communities', 'community')
       .leftJoinAndSelect('listing.user', 'user')
       .leftJoinAndSelect('user.profile', 'profile')
@@ -268,7 +271,8 @@ export class ListingRepository {
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
       // .leftJoinAndSelect('listing.location', 'location')
-      .where("listing.status = :status", {status: "approved"})
+      .where("listing.isDeleted = false")
+      .andWhere("listing.status = :status", {status: "approved"})
       // .orderBy('listing.id', 'ASC');
     
     if (paging.orderBy){
@@ -406,13 +410,6 @@ export class ListingRepository {
   }
 
   public async listingUpdate(listingId: number, listingData: ListingUpdateDTO): Promise<Listing> {
-    let dataToUpdate: any = listingData;
-    Object.keys(dataToUpdate).forEach(key => {
-      if (!dataToUpdate[key] ) {
-        delete dataToUpdate[key];
-      }
-    });
-    console.log("listingData", listingData, dataToUpdate)
 
     const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId }, relations: ["media"] });
     if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
@@ -423,7 +420,7 @@ export class ListingRepository {
       console.log(findBrand);
       // dataToUpdate = { ...dataToUpdate, brand: findBrand };
       findListing.brand = findBrand;
-      delete dataToUpdate.brandId;
+      
     }
    
     if (!!listingData.categoryId) {
@@ -433,7 +430,7 @@ export class ListingRepository {
       if (!findCategory) throw new HttpException(409, `Category with id ${listingData.categoryId} does not exist`);
       // dataToUpdate = { ...dataToUpdate, category: findCategory };
       findListing.category = findCategory;
-      delete dataToUpdate.categoryId;
+      
     }
     
     if (!!listingData.mediaUrls) {
@@ -454,27 +451,82 @@ export class ListingRepository {
       
       // });
       console.log("mul", listingMedia)
-      delete dataToUpdate.mediaUrls
       // dataToUpdate = {...dataToUpdate, media: listingMedia}
       findListing.media = listingMedia;
     }
+    var should_Status_change = true;
 
-    if (!!listingData.status && Object.values(Status).includes(listingData.status as unknown as Status) ){
-      console.log("updating status now")
-      // dataToUpdate = {...dataToUpdate, status: listingData.status}
-      findListing.status = listingData.status as unknown as Status;
-      delete dataToUpdate.status;
+    if (!!listingData.isDeleted || !!listingData.isAvailable || !!listingData.isSold){
+      should_Status_change = false;
+      if (!!listingData.isDeleted) findListing.isDeleted = listingData.isDeleted;
+      if (!!listingData.deleteReason) findListing.deleteReason = listingData.deleteReason;
+      if (!!listingData.isAvailable) findListing.isAvailable = listingData.isAvailable;
+      if (!!listingData.isSold) findListing.isSold = listingData.isSold;
+      if (!!listingData.isSoldHere) findListing.isSoldHere = listingData.isSoldHere;
     }
-    console.log("data to update", dataToUpdate)
-
+    if (!!should_Status_change){
+      findListing.status = "pending" as unknown as Status;
+    }
     // await findList
     if (!!listingData.description) findListing.description = listingData.description
     if (!!listingData.meetupLocations) findListing.meetupLocations = listingData.meetupLocations;
     if (!!listingData.price)  findListing.price = listingData.price;
     if (!!listingData.title) findListing.title = listingData.title;
     if (!!listingData.condition) findListing.condition = listingData.condition;
+
     
     await ListingEntity.save(findListing)
+
+    // if (Object.keys(dataToUpdate).length !== 0) await ListingEntity.update({id: findListing.id}, dataToUpdate);
+    // console.log("data updated")
+    const updatedListing: ListingEntity = await ListingEntity.findOne({
+      where: { id: listingId },
+      relations: ['user', 'brand', 'category', "media"],
+    });
+    if (!!should_Status_change){
+      setTimeout(() => this.notifyListingCreation(updatedListing, listingData.mediaUrls ?? []), 500);
+    }
+    return updatedListing;
+  }
+
+  public async listingAvailabilitySet(listingId:number, listingData: MarkAsUnavailableDTO):Promise<Listing>{
+    
+    const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId }, relations: ["media"] });
+    if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
+    findListing.isAvailable = listingData.isAvailable;
+    if (!!listingData.isRelist){
+      findListing.datePublished = new Date();
+    }
+       
+    await ListingEntity.save(findListing);
+    // if (Object.keys(dataToUpdate).length !== 0) await ListingEntity.update({id: findListing.id}, dataToUpdate);
+    // console.log("data updated")
+    const updatedListing: ListingEntity = await ListingEntity.findOne({
+      where: { id: listingId },
+      relations: ['user', 'brand', 'category', "media"],
+    });
+    return updatedListing;
+
+  }
+  public async adminListingUpdate(listingId: number, adminListingData: AdminListingUpdateDTO ): Promise<Listing>{
+
+    const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId }, relations: ["media"] });
+    if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
+
+    if (!!adminListingData.rejectReason)  findListing.rejectReason = adminListingData.rejectReason;
+    if (!!adminListingData.isAvailable) findListing.isAvailable = adminListingData.isAvailable;
+    if (!!adminListingData.status && Object.values(Status).includes(adminListingData.status as unknown as Status) ){
+      // dataToUpdate = {...dataToUpdate, status: listingData.status}
+      findListing.status = adminListingData.status as unknown as Status;
+      
+      if (findListing.status == "approved"){
+        findListing.datePublished = new Date();
+      }
+    }
+    if (!!adminListingData.isDeleted) findListing.isDeleted = adminListingData.isDeleted;
+    if (!!adminListingData.deleteReason) findListing.deleteReason = adminListingData.deleteReason;
+     
+    await ListingEntity.save(findListing);
 
     // if (Object.keys(dataToUpdate).length !== 0) await ListingEntity.update({id: findListing.id}, dataToUpdate);
     // console.log("data updated")
@@ -485,28 +537,14 @@ export class ListingRepository {
     return updatedListing;
   }
 
-
   public async listingRemove(listingId: number): Promise<Listing> {
     const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId } });
     if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
-
-    await ListingEntity.delete({ id: listingId });
-
+    
+    await findListing.softRemove();
     return findListing;
   }
 
-  // public async categoryFind(categoryArgs: CategoryArgs): Promise<CategoryEntity> {
-  //   const findCategory: CategoryEntity = await CategoryEntity.findOne(
-  //                   {
-  //                     where: [
-  //                         {id: categoryArgs?.id},
-  //                         {slug: categoryArgs?.slug},
-  //                         {name: categoryArgs?.name}],
-  //                     relations: ['parentCategory']
-  //                   },
+  
 
-  //             );
-  //   if (!findCategory) throw new HttpException(409, `Category not found`);
-  //   return findCategory;
-  // }
 }

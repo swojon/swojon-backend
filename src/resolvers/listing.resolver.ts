@@ -1,5 +1,5 @@
 import { CategoryArgs, CategoryFilterInput, PagingArgs } from "@/dtos/category.dto";
-import { ListingCommunityInputDTO, ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, SerachInputDTO } from "@/dtos/listing.dto";
+import { AdminListingUpdateDTO, ListingCommunityInputDTO, ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, MarkAsUnavailableDTO, SerachInputDTO } from "@/dtos/listing.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { ListingRepository } from "@/repositories/listing.repository";
 import { Listing, Listings } from "@/typedefs/listing.type";
@@ -49,22 +49,6 @@ export class ListingResolver extends ListingRepository{
     return listing;
   }
 
-  // @Mutation(()=>Listing, {
-  //   description: "Add Communities to listing"
-  // })
-  // async addCommunityToListing(@Arg('inputData') inputData: ListingCommunityInputDTO): Promise<Listing> {
-  //     const listing: Listing  = await this.listingCommunityAdd(inputData.listingId, inputData.communityIds)
-  //     return listing
-  // }
-
-  // @Mutation(()=>Listing, {
-  //   description: "Remove Communities from listing"
-  // })
-  // async removeCommunityToListing(@Arg('inputData') inputData: ListingCommunityInputDTO): Promise<Listing> {
-  //     const listing: Listing  = await this.listingCommunityRemove(inputData.listingId, inputData.communityIds)
-  //     return listing
-  // }
-  // // @Authorized()
   @Mutation(() => Listing, {
     description: 'Remove Listing',
   })
@@ -82,5 +66,21 @@ export class ListingResolver extends ListingRepository{
     return listing;
   }
 
+  @Mutation(()=> Listing, {
+    description: "Only Admin will be able to update those information"
+  })
+  async updateListingAdmin(@Arg('listingId') listingId: number, @Arg('adminlistingData') adminListingData: AdminListingUpdateDTO) : Promise <Listing> {
+    const listing: Listing = await this.adminListingUpdate(listingId, adminListingData);
+    return listing
+  }
+
+  
+  @Mutation(()=> Listing, {
+    description: "Admin update listing"
+  })
+  async setListingAvailability(@Arg('listingId') listingId: number, @Arg('listingData') listingData: MarkAsUnavailableDTO) : Promise <Listing> {
+    const listing: Listing = await this.listingAvailabilitySet(listingId, listingData);
+    return listing
+  }
   
 }

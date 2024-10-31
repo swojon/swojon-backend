@@ -59,19 +59,28 @@ export class Listing {
   brand?:Brand
 
   @Field({nullable:true})
-  dateCreated?: Date
+  dateCreated?: Date;
 
+  @Field({nullable:true})
+  datePublished?: Date;
+  
   @Field({ nullable: true})
   isFeatured?: boolean;
 
   @Field({ nullable: true})
   isDeleted?: boolean;
 
+  @Field({nullable:true})
+  deleteReason?: string;
+
   @Field({nullable: true})
   isLive?: boolean;
 
   @Field({ nullable: true})
   isApproved?: boolean;
+
+  @Field({ nullable: true})
+  isAvailable?: boolean;
 
   @Field({ nullable: true})
   isSold?: boolean;
