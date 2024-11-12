@@ -15,6 +15,7 @@ import { Brand } from '@/typedefs/brand.type';
 import { EntityRepository, In } from 'typeorm';
 import {buildPaginator} from 'typeorm-cursor-pagination'
 import {Webhook, MessageBuilder} from 'discord-webhook-node'
+import { listingApprovalMail, submitListingAndWaitApprovalMail } from '@/mail/sendMail';
 const getAllRelatedDependantSubCategories = (categories: any[], categoryId: any) => {
   let categoryIds = [categoryId];
 
@@ -382,7 +383,8 @@ export class ListingRepository {
       user: findUser,
       media: listingMedia,
     }).save();
-    setTimeout(() => this.notifyListingCreation(createListingData, listingData.mediaUrls,), 500);
+    setTimeout(() => this.notifyListingCreation(createListingData, listingData.mediaUrls), 500);
+    setTimeout(() => submitListingAndWaitApprovalMail(findUser, createListingData), 500);
     return createListingData;
   }
 
@@ -485,6 +487,7 @@ export class ListingRepository {
     });
     if (!!should_Status_change){
       setTimeout(() => this.notifyListingCreation(updatedListing, listingData.mediaUrls ?? []), 500);
+      setTimeout(() => submitListingAndWaitApprovalMail(updatedListing.user, updatedListing), 1000);
     }
     return updatedListing;
   }
@@ -510,7 +513,7 @@ export class ListingRepository {
   }
   public async adminListingUpdate(listingId: number, adminListingData: AdminListingUpdateDTO ): Promise<Listing>{
 
-    const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId }, relations: ["media"] });
+    const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId }, relations: ["media", "user"] });
     if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
 
     if (!!adminListingData.rejectReason)  findListing.rejectReason = adminListingData.rejectReason;
@@ -521,6 +524,7 @@ export class ListingRepository {
       
       if (findListing.status == "approved"){
         findListing.datePublished = new Date();
+        setTimeout(() => listingApprovalMail(findListing.user, findListing), 1000);
       }
     }
     if (!!adminListingData.isDeleted) findListing.isDeleted = adminListingData.isDeleted;
@@ -544,7 +548,5 @@ export class ListingRepository {
     await findListing.softRemove();
     return findListing;
   }
-
-  
 
 }

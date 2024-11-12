@@ -25,8 +25,14 @@ export class NotificationEntity extends BaseEntity{
     @Column()
     content: string;
 
-    @Column({type: "jsonb"})
-    context: Record<string, any>;
+    @Column({nullable:true})
+    chatRoomId: number;
+
+    @Column({nullable:true})
+    listingId: number;
+
+    @Column({nullable:true})
+    relatedUserUsername: string;
 
     @Column({ type: 'enum', enum: NotificationType , default: "info"})
     type: NotificationType;

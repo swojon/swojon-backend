@@ -9,11 +9,9 @@ import { DataStoredInToken, MyContext, TokenData } from '@interfaces/auth.interf
 import { ResetStatus, User } from '@interfaces/users.interface';
 import { ProfileEntity } from '@/entities/profile.entity';
 import cookieParser from 'cookie-parser';
-import {createTransport} from 'nodemailer';
-import { SMTP_HOST, SMTP_PASSWORD, SMTP_USERNAME, SMTP_PORT } from '@/config';
-import { mailConfig } from '@/config/mail';
 import crypto from 'crypto'
 import { generateToken } from '@/utils/generateToken';
+import { sendPasswordResetMail, sendPasswordResetSuccessMail, sendSignUpMail } from '@/mail/sendMail';
 
 // import { cookies } from 'next/headers';
 
@@ -48,46 +46,10 @@ export class AuthRepository {
       emailVerificationToken,
       emailVerificationTokenExpiresAt: new Date(new Date().setHours(new Date().getHours() + 1))
      }).save();
-    
-    
-    const transporter = createTransport(mailConfig)
-
-    const mailOptions = {
-      from: "care@swojon.com",
-      to: userData.email,
-      subject: "Verify Your Email Address and Join the Swojon Community!",
-      text: `
-Dear ${userData.username},
-
-Thank you for joining Swojon, your go-to marketplace for good people! To ensure the security of your account and keep you connected with our vibrant community, we need to verify your email address.
-
-Please click on the following link to verify your email:
-
-{https://www.swojon.com/verify-email/${emailVerificationToken}
-
-(Note: If the link is not clickable, please copy and paste it into your web browser.)
-
-By verifying your email, you'll gain full access to all the features Swojon has to offer, including secure transactions, personalized recommendations, and a seamless community experience.
-
-If you did not create an account with Swojon, please disregard this email.
-
-If you have any questions or need assistance, feel free to reach out to our support team at [support@swojon.com].
-
-We're excited to have you as part of the Swojon community!
-
-Best regards,
-
-The Swojon Team
-www.swojon.com
-www.facebook.com/swojon`,
-    } 
-    try {
-      const mail = await transporter.sendMail(mailOptions)
-      console.log(mail)
-    } catch (error) {
-      console.log(error)
-    }
     console.log("created user successfully.")
+    setTimeout(() => {sendSignUpMail(createUserData)}, 1000)
+    
+
     return createUserData;
   }
 
@@ -146,41 +108,7 @@ www.facebook.com/swojon`,
     findUser.passwordResetToken = token;
     findUser.passwordResetTokenExpiresAt = expireAt;
     await findUser.save()
-
-    const transporter = createTransport(mailConfig)
-    const mailOptions = {
-      from : "care@swojon.com",
-      to: findUser.email,
-      subject: "Swojon Password Reset",
-      text: `
-Dear ${findUser.username},
-
-We received a request to reset the password for your Swojon account. To reset your password, please use the following token:
-
-Click on the link below to reset your password:
-
-[ https://www.swojon.com/forgot-password/reset?token=${token} ]
-
-(Note: If the link is not clickable, please copy and paste it into your web browser.)
-
-This token will expire in 1 hour, so be sure to use it promptly. If you did not request a password reset or if you have any concerns about your account security, please contact our support team immediately at [support@swojon.com].
-
-Thank you for choosing Swojon!
-
-Best regards,
-
-The Swojon Team
-www.swojon.com
-
-      `
-    }
-    try {
-      const mail = await transporter.sendMail(mailOptions)
-      // console.log(mail)
-    } catch (error) {
-      console.log(error)
-    }
-
+    setTimeout(() => {sendPasswordResetMail(findUser)}, 1000)
     return {
       success: true
     }
@@ -200,34 +128,8 @@ www.swojon.com
     findUser.password = hashedPassword
     findUser.passwordResetToken = null
     await findUser.save()
-    const transporter = createTransport(mailConfig)
-    const mailOptions = {
-      from : "care@swojon.com",
-      to: findUser.email,
-      subject: "Your Swojon Password Has Been Successfully Reset",
-      text: `
-Dear ${findUser.username},
+    setTimeout(() => {sendPasswordResetSuccessMail(findUser)}, 1000)
 
-We hope this email finds you well. We wanted to inform you that the password for your Swojon account has been successfully reset.
-
-If you initiated this password change, you can disregard this email. However, if you did not request a password reset or have any concerns about the security of your account, please contact our support team immediately at [support@swojon.com].
-
-For your security, we recommend updating your password periodically and ensuring it is unique to Swojon.
-
-Thank you for being part of the Swojon community!
-
-Best regards,
-
-The Swojon Team
-www.swojon.com
-      `
-    }
-    try {
-      const mail = await transporter.sendMail(mailOptions)
-      // console.log(mail)
-    } catch (error) {
-      console.log(error)
-    }   
     return {
       success: true
     }

@@ -7,7 +7,6 @@ export interface Notification {
     user?:User;
     userId?:number;
     content?:string;
-    context?:any;
     type?: NotificationType;
     dateCreated?: Date;
 }

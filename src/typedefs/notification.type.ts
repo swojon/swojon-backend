@@ -3,18 +3,6 @@ import { User } from "./users.type";
 import { NotificationType } from "@/entities/notification.entity";
 
 @ObjectType()
-export class ContextType {
-  @Field({nullable: true})
-  userId: number;
-
-  @Field({nullable: true})
-  listingId: number;
-  
-  @Field({nullable: true})
-  messageId: number;
-  
-}
-@ObjectType()
 export class Notification {
   @Field()
   id?: number;
@@ -38,9 +26,14 @@ export class Notification {
   read?: boolean;
 
   @Field({nullable:true})
-  context?: string;
-  
-  
+  chatRoomId?: number;
+ 
+  @Field({nullable:true})
+  listingId?: number;
+
+  @Field({nullable:true})
+  relatedUserUsername?: string;
+
 }
 
 

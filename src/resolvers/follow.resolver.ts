@@ -1,9 +1,11 @@
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Authorized, Ctx, Mutation, Publisher, PubSub, Query, Resolver } from 'type-graphql';
 
 import { FollowRepository } from '@/repositories/follow.repository';
 import { Follow, Followers } from '@/typedefs/follow.type';
 import { MyContext } from '@/interfaces/auth.interface';
-
+import { TOPICS_ENUM } from './subscription.resolver';
+import { NotificationEntity, NotificationType } from '@/entities/notification.entity';
+import { Notification } from "@/typedefs/notification.type";
 @Resolver()
 export class FollowResolver extends FollowRepository {
   // @Authorized()
@@ -31,8 +33,19 @@ export class FollowResolver extends FollowRepository {
   @Mutation(() => Follow, {
     description: 'Follow user',
   })
-  async addFollow(@Arg('userId') userId: number, @Arg('followedUserId') followedUserId: number): Promise<Follow> {
+  async addFollow(@Arg('userId') userId: number, @Arg('followedUserId') followedUserId: number, @PubSub(TOPICS_ENUM.NEW_NOTIFICATION) notify: Publisher<Notification>): Promise<Follow> {
     const follow: Follow = await this.followAdd(userId, followedUserId);
+    setTimeout(async () => {
+          const newNotification = await NotificationEntity.create({
+              user : follow.followedUser,
+              type: NotificationType.INFO,
+              content: `${follow.user.username} started following you.`,
+              relatedUserUsername: follow.user.username
+          }).save();
+
+          console.log("publishing")
+          await notify(newNotification);
+        }, 1000);
     return follow;
   }
 

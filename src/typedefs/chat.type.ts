@@ -65,11 +65,17 @@ export class Chats {
   @Field(()=>[Chat])
   items?: Chat[];
 
-  @Field({ nullable: true})
-  count?: number;
+  @Field({nullable:true})
+  count?: number
+
+  @Field()
+  hasMore?: boolean
 
   @Field({nullable:true})
-  hasMore?:boolean;
+  beforeCursor?:string;
+
+  @Field({nullable:true})
+  afterCursor?:string;
 }
 
 

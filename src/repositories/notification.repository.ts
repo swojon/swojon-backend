@@ -15,15 +15,16 @@ export class NotificationRepository{
   public async notificationList(userId, paging: PagingArgs, filters: NotificationFilterInput ): Promise<Notifications> {
 
     let sql = NotificationEntity.createQueryBuilder("ne")
-                    .select(["ne.id", "ne.content", "ne.context", "ne.dateCreated",
-                             "ne.type", "ne.read", 'ne.userId'])
+                    .select(["ne.id", "ne.content", "ne.dateCreated",
+                             "ne.type", "ne.read", 'ne.userId', 'ne.chatRoomId', 'ne.listingId'])
                     .leftJoinAndSelect('ne.user', 'user')
                     .orderBy('ne.id', 'ASC')
+                    .where(`ne.userId=${userId}`)
 
     if (paging.starting_after){
-      sql = sql.where("ne.id > :starting_after", {starting_after: paging.starting_after})
+      sql = sql.andWhere("ne.id > :starting_after", {starting_after: paging.starting_after})
     }else if (paging.ending_before){
-      sql = sql.where("ne.id < :ending_before", {ending_before: paging.ending_before} )
+      sql = sql.andWhere("ne.id < :ending_before", {ending_before: paging.ending_before} )
     }
 
     if (!!filters?.unreadOnly ){
@@ -67,5 +68,6 @@ export class NotificationRepository{
       items: []
     }
   }
+
 
 }

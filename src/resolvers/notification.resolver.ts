@@ -10,7 +10,7 @@ export class NotificationResolver extends NotificationRepository {
     
   // @Authorized()
   @Query(() => Notifications, {
-    description: 'List All Notifications0',
+    description: 'List All Notifications',
   })
   async listNotifications(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : NotificationFilterInput): Promise<Notifications> {
     const userId = ctx.user?.id;

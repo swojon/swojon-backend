@@ -38,6 +38,8 @@ export interface chatRoomList{
 
 export interface ChatMessageList{
   items: Chat[];
-  count: number;
-  hasMore?:boolean;
+  count?: number;
+  hasMore?: boolean;
+  beforeCursor?:string;
+  afterCursor?:string;
 }

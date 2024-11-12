@@ -1,5 +1,6 @@
 import { PagingArgs } from "@/dtos/category.dto";
 import { CreateMessageDTO, ListChatRoomArgs } from "@/dtos/chat.dto";
+import { NotificationEntity, NotificationType } from "@/entities/notification.entity";
 import { MyContext } from "@/interfaces/auth.interface";
 import { ChatMessageRepository } from "@/repositories/chat.repository";
 import { Chat, ChatRoomWithMessage, ChatRooms, ChatRoomsWithMessage, Chats, ChatRoom } from "@/typedefs/chat.type";
@@ -29,6 +30,20 @@ export class ChatResolver extends ChatMessageRepository {
     const senderId = chatData.senderId ??  ctx.user.id;
     const chatMessage = await this.messageSend(chatData, senderId);
     await publish(chatMessage); 
+    setTimeout(() => {
+        chatMessage.chatRoom.members.forEach(async member => {
+          if (member.userId != senderId){
+            const newNotification = await NotificationEntity.create({
+                userId: member.userId,
+                type: NotificationType.INFO,
+                content: `We've got new message from ${chatMessage.sender.username} : ${chatMessage.content}` ,
+                chatRoomId: chatMessage.chatRoom.id                
+            }).save()
+            console.log("publishing")
+            await notify(newNotification);
+          }
+        })
+    }, 1000)
     return chatMessage;
   }
  // @Authorized()

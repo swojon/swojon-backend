@@ -16,6 +16,8 @@ export interface User {
   createdAt?: Date;
   passwordResetToken?:string;
   passwordResetTokenExpiresAt?:Date;
+  emailVerificationToken?:string;
+  emailVerificationTokenExpiresAt?:Date;
 }
 
 export interface ResetStatus {

@@ -134,8 +134,6 @@ const wsServer = new WebSocketServer({
 const sessionContext: Record<string, unknown> = {};
 const getDynamicContext = async (ctx, msg, args) => {
   // ctx is the graphql-ws Context where connectionParams live
-  console.log("Getting dynamic context")
-  console.log(ctx.connectionParams)
  if (ctx.connectionParams?.headers?.Authorization || ctx.connectionParams?.Authorization) {
     try {
       const token = ctx.connectionParams?.headers?.Authorization ?? ctx.connectionParams?.Authorization;
@@ -162,7 +160,6 @@ const serverCleanup = useServer({
    return getDynamicContext(ctx, msg, args)
   },
   onConnect(ctx) {
-    console.log("connecting", ctx)
   }
   // context: async req => {
   //     // try to retrieve a user with the token

@@ -41,19 +41,19 @@ export class SubscriptionResolver {
     subscribe: withFilter((_, __, payload) => {
       // console.log("payload", payload)
       if (!payload?.currentUser) {
-        throw new Error("user not logged in");
+        throw new Error("You don't have permission to access this resource");
       }
-      return pubSub.asyncIterator(TOPICS_ENUM.NEW_CHAT_MESSAGE);
+      return pubSub.asyncIterator(TOPICS_ENUM.NEW_NOTIFICATION);
     },
     (payload, variables, context) => {
       console.log(payload)
-      console.log("context:-", context)
-      return payload.members.includes(context.currentUser.id);
+      console.log("notification context:-", context)
+      return payload.userId == context.currentUser.id;
     }
     )
   })
-  newNotifaction(@Root() payload: any): Notification {
-    // console.log("newMessageAdded():-", payload);
+  newNotification(@Root() payload: any): Notification {
+    
     return payload;
   }
 

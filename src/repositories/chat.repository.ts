@@ -9,6 +9,7 @@ import { ChatMessageList } from "@/interfaces/chat.interface";
 import { Chat, ChatRoom, ChatRooms, ChatRoomsWithMessage,  } from "@/typedefs/chat.type";
 
 import { EntityRepository } from "typeorm";
+import { buildPaginator } from "typeorm-cursor-pagination";
 
 
 @EntityRepository(ChatMessageEntity)
@@ -148,33 +149,46 @@ public async chatRoomMessageList(chatRoomId: number, paging: PagingArgs): Promis
 
     let sql = ChatMessageEntity.createQueryBuilder("chat_message_entity")
               .leftJoinAndSelect('chat_message_entity.sender', 'sender')
+              .leftJoinAndSelect('sender.profile', 'profile')
               .leftJoinAndSelect('chat_message_entity.chatRoom', "chatRoom")
               .leftJoinAndSelect('chatRoom.members', "members")
               .leftJoinAndSelect("members.user", 'user')
-              .leftJoinAndSelect("user.profile", 'profile')
               .where("chat_message_entity.chatRoomId = :id", { id: chatRoomId })
-              .orderBy('chat_message_entity.dateSent', 'DESC')
-              .addOrderBy('chat_message_entity.id', "DESC")
+             
               // .getManyAndCount()
-
-    if (paging.starting_after){
-      sql = sql.where("chat_message_entity.id > :starting_after", {starting_after: paging.starting_after})
-    }else if (paging.ending_before){
-      sql = sql.where("chat_message_entity.id < :ending_before", {ending_before: paging.ending_before} )
-    }
+    let orderCondition: {paginationKeys: any; order: "DESC" | "ASC"} =
+              {
+                paginationKeys : ['dateSent'],
+                order: "DESC"
+              }
     
-    const limit:number = Math.min(20, paging.limit? paging.limit: 20)
-    sql = sql.take(limit)
+    // sql = sql.orderBy('chat_message_entity.id', "DESC")
+    const limit: number = Math.min(30, paging.limit ?? 30);
+    const paginator = buildPaginator({
+      entity: ChatMessageEntity,
+      paginationKeys: orderCondition.paginationKeys,
+      alias:  "chat_message_entity",
+      query: {
+        limit: limit,
+        order: orderCondition.order,
+        afterCursor: paging?.starting_after ?  String(paging.starting_after) : null,
+        beforeCursor: paging?.ending_before ? String(paging.ending_before) : null
+      } 
+    })
     
-    const chatMessages = await sql.getManyAndCount()
-    // findAndCount({ where: { chatRoomId: chatRoomId }, relations:["sender"] });
-    const hasMore = chatMessages[0].length === limit;
+    const {data:chatMessages, cursor} = await paginator.paginate(sql);
+    console.log("messages", chatMessages[0])
+    const count = chatMessages.length;
+    const hasMore = chatMessages.length === limit;
+    const beforeCursor = cursor.beforeCursor;
+    const afterCursor = cursor.afterCursor;
     const chatMessageList: ChatMessageList = {
-      items: chatMessages[0],
-      count: chatMessages[1],
-      hasMore 
+      items: chatMessages,
+      count,
+      hasMore,
+      beforeCursor,
+      afterCursor 
     }
-
     return chatMessageList;
 
 }

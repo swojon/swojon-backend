@@ -24,7 +24,6 @@ export class SellerReviewRepository{
       if (!findListing) throw new HttpException(409, "Listing doesn't exist");
       findSellerId  = findListing.user;
     }else if (reviewData.sellerIdOrUsername ){
-   
       try {
         findSellerId = parseIntStrict(reviewData.sellerIdOrUsername)
       } catch (error) {
@@ -36,6 +35,14 @@ export class SellerReviewRepository{
       throw new HttpException(409, "Either Seller Id or Listing Id Must be provided. ")
     }
     
+    const existingSellerReviewData = await SellerReviewEntity.find({where: {
+      sellerId: findSellerId,
+      reviewerId :findReviewer.id, 
+      listingId: findListing?.id ?? null
+    }})
+    if (existingSellerReviewData.length > 0)  {
+      throw new HttpException(409, "You already reviewed the user");
+    }
     const createReviewData:SellerReviewEntity= await SellerReviewEntity.create(
                     {...reviewData, sellerId:findSellerId, reviewer:findReviewer, listing:findListing}
                     ).save()
@@ -53,6 +60,16 @@ export class SellerReviewRepository{
     if (!findListing) throw new HttpException(409, "Listing doesn't exist");
 
     const findSeller:UserEntity = findListing.user;
+    const existingSellerReviewData = await SellerReviewEntity.find({where: {
+      sellerId: findSeller.id,
+      reviewerId :findReviewer.id, 
+      listingId: findListing?.id ?? null
+    }})
+    
+    if (existingSellerReviewData.length > 0)  {
+      throw new HttpException(409, "You already reviewed the user");
+    }
+    
     const createReviewData:SellerReviewEntity= await SellerReviewEntity.create(
                     {...reviewData, seller:findSeller, reviewer:findReviewer, listing:findListing}
                     ).save()
