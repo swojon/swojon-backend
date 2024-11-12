@@ -2,6 +2,7 @@ import { PagingArgs } from "@/dtos/category.dto";
 import { CreateMessageDTO, ListChatRoomArgs } from "@/dtos/chat.dto";
 import { NotificationEntity, NotificationType } from "@/entities/notification.entity";
 import { MyContext } from "@/interfaces/auth.interface";
+import { sendFirstMessageMail } from "@/mail/sendMail";
 import { ChatMessageRepository } from "@/repositories/chat.repository";
 import { Chat, ChatRoomWithMessage, ChatRooms, ChatRoomsWithMessage, Chats, ChatRoom } from "@/typedefs/chat.type";
 import { Notification } from "@/typedefs/notification.type";
@@ -44,6 +45,10 @@ export class ChatResolver extends ChatMessageRepository {
           }
         })
     }, 1000)
+
+    setTimeout(() => {
+      sendFirstMessageMail(chatMessage.sender, chatMessage);
+    }, 1000 * 60)
     return chatMessage;
   }
  // @Authorized()

@@ -1,5 +1,7 @@
 import { mailConfig } from "@/config/mail"
+import { ChatMessageEntity } from "@/entities/chatMessage.entity"
 import { UserEntity } from "@/entities/users.entity"
+import { Chat } from "@/interfaces/chat.interface"
 import { User } from "@/interfaces/users.interface"
 import { Listing } from "@/typedefs/listing.type"
 import { createTransport } from "nodemailer"
@@ -19,7 +21,7 @@ const sendMail = async (mailOptions:any) => {
 
 export const sendSignUpMail = async (userData:User) => {
     const mailOptions = {
-        from: "care@swojon.com",
+        from: "Swojon <care@swojon.com>",
         to: userData.email,
         subject: "Welcome to Swojon! Please Verify Your Email",
         text: `
@@ -55,7 +57,7 @@ www.swojon.com
 
 export const sendPasswordResetMail = async (userData:User) => {
   const mailOptions = {
-    from: "care@swojon.com",
+    from: "Swojon <care@swojon.com>",
     to: userData.email,
     subject: "Password Reset Request",
     text: `Dear ${userData.username},
@@ -82,7 +84,7 @@ www.swojon.com`
 
 export const sendPasswordResetSuccessMail = async (userData:User) => {
   const mailOptions = {
-    from: "care@swojon.com",
+    from: "Swojon <care@swojon.com>",
     to: userData.email,
     subject: "Your Swojon Password Has Been Successfully Reset",
     text: `Dear ${userData.username},
@@ -105,7 +107,7 @@ www.swojon.com`
 
 export const listingApprovalMail = async (userData:User, listingData: Listing) => {
   const mailOptions = {
-    from: "care@swojon.com",
+    from: "Swojon <care@swojon.com>",
     to: userData.email,
     subject: "Your Listing Has Been Approved",
     text: `Dear ${userData.username},
@@ -133,7 +135,7 @@ www.swojon.com
 
 export const listingRejectionMail = async (userData:User, listingData: Listing, reason: string) => {
   const mailOptions = {
-    from: "care@swojon.com",
+    from: "Swojon <care@swojon.com>",
     to: userData.email,
     subject: "Your Listing Has Been Rejected",
     text: `Dear ${userData.username},
@@ -166,7 +168,7 @@ www.swojon.com
 
 export const submitListingAndWaitApprovalMail = async (userData:User, listingData: Listing) => {
   const mailOptions = {
-    from: "care@swojon.com",
+    from: "Swojon <care@swojon.com>",
     to: userData.email,
     subject: "Your Listing Is Under Review",
     text: `Dear ${userData.username},
@@ -189,3 +191,32 @@ www.swojon.com
   } 
   await sendMail(mailOptions);
 }
+
+
+export const sendFirstMessageMail = async (userData:User, messageData:Chat) => {
+    const mailOptions = {
+      from: "Swojon <care@swojon.com>",
+      to: userData.email,
+      subject: "New Message on Swojon",
+      text: `Dear ${userData.username},
+Great news! Someone's interested in connecting with you! A quick and friendly response can spark great conversations and lead to wonderful opportunities. We'd love to see you jump in and keep the momentum going!
+
+We are including the message in this email for your convenience.
+"${messageData.content}"
+
+To view and reply to this message, just click here:
+[ https://www.swojon.com/chat/${messageData.chatRoom.id} ]
+
+We are sending you this email because engaging with your potential buyers creates a welcoming atmosphere and helps build lasting relationships in our community. Your active participation makes Swojon a better place for everyone!
+
+Happy chatting!
+
+Best wishes,
+
+The Swojon Team
+www.swojon.com
+        `
+    }
+    await sendMail(mailOptions);
+}
+

@@ -6,8 +6,8 @@ export interface ChatRoomMember {
 
 export interface Chat {
   id?: number | null;
-  sender: User;
-  content: string ;
+  sender?: User;
+  content?: string ;
   chatRoom: ChatRoom;
   isDeleted?: boolean | null;
   dateSent?: Date | null;
