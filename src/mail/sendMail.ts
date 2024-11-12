@@ -193,19 +193,19 @@ www.swojon.com
 }
 
 
-export const sendFirstMessageMail = async (userData:User, messageData:Chat) => {
+export const sendFirstMessageMail = async (receiver:User, sender:User, chatRoomId:number, content:string) => {
     const mailOptions = {
       from: "Swojon <care@swojon.com>",
-      to: userData.email,
+      to: receiver.email,
       subject: "New Message on Swojon",
-      text: `Dear ${userData.username},
-Great news! Someone's interested in connecting with you! A quick and friendly response can spark great conversations and lead to wonderful opportunities. We'd love to see you jump in and keep the momentum going!
+      text: `Dear ${receiver.username},
+Great news! ${sender.username} interested in connecting with you! A quick and friendly response can spark great conversations and lead to wonderful opportunities. We'd love to see you jump in and keep the momentum going!
 
 We are including the message in this email for your convenience.
-"${messageData.content}"
+"${content}"
 
 To view and reply to this message, just click here:
-[ https://www.swojon.com/chat/${messageData.chatRoom.id} ]
+[ https://www.swojon.com/chat/${chatRoomId} ]
 
 We are sending you this email because engaging with your potential buyers creates a welcoming atmosphere and helps build lasting relationships in our community. Your active participation makes Swojon a better place for everyone!
 

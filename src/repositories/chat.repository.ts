@@ -6,6 +6,7 @@ import { ChatRoomEntity, ChatRoomMemberEntity } from "@/entities/userChats.entit
 import { UserEntity } from "@/entities/users.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { ChatMessageList } from "@/interfaces/chat.interface";
+import { sendFirstMessageMail } from "@/mail/sendMail";
 import { Chat, ChatRoom, ChatRooms, ChatRoomsWithMessage,  } from "@/typedefs/chat.type";
 
 import { EntityRepository } from "typeorm";
@@ -59,6 +60,9 @@ export class ChatMessageRepository{
           }).save();
           await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findSender}).save();
           await ChatRoomMemberEntity.create({chatRoom: findChatRoom, user: findReceiver}).save();
+          setTimeout(() => {
+            sendFirstMessageMail(findReceiver, findSender, findChatRoom.id, chatData.message);
+          }, 1000 * 20)
         }
     }else{
       findChatRoom = await ChatRoomEntity.findOne({ where: { id: chatData.chatRoomId }, relations: ["members", "members.user", "relatedListing"] });

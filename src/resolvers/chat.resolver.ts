@@ -46,9 +46,7 @@ export class ChatResolver extends ChatMessageRepository {
         })
     }, 1000)
 
-    setTimeout(() => {
-      sendFirstMessageMail(chatMessage.sender, chatMessage);
-    }, 1000 * 60)
+    
     return chatMessage;
   }
  // @Authorized()
