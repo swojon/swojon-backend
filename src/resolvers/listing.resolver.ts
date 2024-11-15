@@ -2,7 +2,7 @@ import { CategoryArgs, CategoryFilterInput, PagingArgs } from "@/dtos/category.d
 import { AdminListingUpdateDTO, ListingCommunityInputDTO, ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, MarkAsUnavailableDTO, SerachInputDTO } from "@/dtos/listing.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { ListingRepository } from "@/repositories/listing.repository";
-import { Listing, Listings } from "@/typedefs/listing.type";
+import { Listing, Listings, SitemapLists } from "@/typedefs/listing.type";
 import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 
 @Resolver()
@@ -17,6 +17,15 @@ export class ListingResolver extends ListingRepository{
     const listings: Listings = await this.listingList(userId, paging, filters);
     return listings;
   }
+
+  @Query(() => SitemapLists, {
+    description: "Get User by Id",
+  })
+  async generateListingsSitemap(): Promise<SitemapLists> {
+    const sitemaps: SitemapLists = await this.listingSitemapList();
+    return sitemaps;
+  }
+
   // @Authorized()
   @Query(() => Listing, {
     description: "Get Category by Id, slug or name",

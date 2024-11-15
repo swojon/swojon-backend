@@ -1,5 +1,5 @@
 import { IsNotEmpty } from "class-validator";
-import { BaseEntity, Column, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 
 export enum Status {
   PENDING = "pending",
@@ -11,6 +11,9 @@ export enum Status {
 export class CategoryEntity extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
+
+    @CreateDateColumn()
+    dateCreated: Date;
 
     //column for name, unique, not empty
     @Column()

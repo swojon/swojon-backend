@@ -3,6 +3,7 @@ import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserRepository } from '@repositories/users.repository';
 import { User, UserWithMeta } from '@typedefs/users.type';
 import { MyContext } from '@/interfaces/auth.interface';
+import { SitemapLists } from '@/typedefs/listing.type';
 
 @Resolver()
 export class UserResolver extends UserRepository {
@@ -13,6 +14,14 @@ export class UserResolver extends UserRepository {
   async listUsers(): Promise<UserWithMeta[]> {
     const users: UserWithMeta[] = await this.userList();
     return users;
+  } 
+
+  @Query(() => SitemapLists, {
+    description: "Get all sellers sitemap",
+  })
+  async generateSellersSitemap(): Promise<SitemapLists> {
+    const sitemaps: SitemapLists = await this.sellerSitemapList();
+    return sitemaps;
   }
 
   // @Authorized()

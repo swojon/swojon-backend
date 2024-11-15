@@ -14,6 +14,7 @@ import { ListingEntity } from '@/entities/listing.entity';
 import { PointRepository } from './point.repository';
 import { generateToken } from '@/utils/generateToken';
 import { parseIntStrict } from '@/utils/parseIntStrict';
+import { SitemapLists } from '@/typedefs/listing.type';
 
 @EntityRepository(UserEntity)
 export class UserRepository {
@@ -51,6 +52,26 @@ export class UserRepository {
     console.log("follow", followEntity);
     if (followEntity.length > 0) return true;
     return false;
+  }
+
+  public async sellerSitemapList(): Promise<SitemapLists> {
+    const users = await UserEntity.find({
+      where: {
+        isDeleted: false,
+        isEmailVerified: true,
+    }})
+    
+    const sitemaps = users.map((user) => {
+      return {
+        url: `${process.env.SITEMAP_BASE_URL}/sellers/${user.username}`,
+        lastmod: user.createdAt,
+        changefreq: "daily",
+        priority: 0.8
+      }
+    })
+
+    
+    return {items: sitemaps}
   }
 
   public async userList(): Promise<UserWithMeta[]> {

@@ -3,6 +3,7 @@ import { CategoryArgs, CategoryCreateDTO, CategoryFilterInput, CategoryRemoveDTO
 import { MyContext } from "@/interfaces/auth.interface";
 import { CategoryRepository } from "@/repositories/category.repository";
 import { Categories, Category } from "@/typedefs/category.type";
+import { SitemapLists } from "@/typedefs/listing.type";
 import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 
 @Resolver()
@@ -15,6 +16,14 @@ export class CategoryResolver extends CategoryRepository{
   async listCategories(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : CategoryFilterInput): Promise<Categories> {
     const categories: Categories = await this.categoryList(paging, filters);
       return categories;
+  }
+
+  @Query(() => SitemapLists, {
+    description: "Get all categories sitemap",
+  })
+  async generateCategoriesSitemap(): Promise<SitemapLists> {
+    const sitemaps: SitemapLists = await this.categorySitemapList();
+    return sitemaps;
   }
 
   // @Authorized()

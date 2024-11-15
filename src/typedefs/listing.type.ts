@@ -113,3 +113,26 @@ export class Listings {
   @Field({nullable:true})
   afterCursor?:string;
 }
+
+@ObjectType()
+export class Sitemap {
+  @Field()
+  url: string;
+
+  @Field({nullable:true})
+  lastmod?: Date;
+
+  @Field({nullable:true})
+  changefreq?: string;
+
+  @Field({nullable:true})
+  priority?: number;
+}
+
+@ObjectType()
+export class SitemapLists {
+  @Field(() => [Sitemap])
+  items?: Sitemap[];
+}
+
+

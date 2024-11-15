@@ -3,11 +3,29 @@ import { CommunityFilterInput } from "@/dtos/community.dto";
 import { CategoryEntity, Status } from "@/entities/category.entity";
 import { HttpException } from "@/exceptions/httpException";
 import { Categories, Category } from "@/interfaces/category.interface";
+import { SitemapLists } from "@/typedefs/listing.type";
 import { registerEnumType } from "type-graphql";
 import { EntityRepository, In, LessThan, MoreThan, UpdateResult } from "typeorm";
 
 @EntityRepository(CategoryEntity)
 export class CategoryRepository{
+  public async categorySitemapList(): Promise<SitemapLists> {
+    const categories = await CategoryEntity.find({
+      where: {
+        isDeleted: false
+      }
+    })
+    const sitemaps = categories.map((category) => {
+      return {
+        url: `${process.env.SITEMAP_BASE_URL}/categories/${category.slug}`,
+        changefreq: "weekly",
+        priority: 0.8, 
+        lastmod: category.dateCreated
+      }
+    })
+    return {items: sitemaps}
+  }
+  
 
   public async categoryList(paging: PagingArgs, filters: CategoryFilterInput ): Promise<Categories> {
 

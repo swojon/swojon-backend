@@ -16,6 +16,7 @@ import { EntityRepository, In } from 'typeorm';
 import {buildPaginator} from 'typeorm-cursor-pagination'
 import {Webhook, MessageBuilder} from 'discord-webhook-node'
 import { listingApprovalMail, submitListingAndWaitApprovalMail } from '@/mail/sendMail';
+import { SitemapLists } from '@/typedefs/listing.type';
 const getAllRelatedDependantSubCategories = (categories: any[], categoryId: any) => {
   let categoryIds = [categoryId];
 
@@ -116,6 +117,22 @@ export class ListingRepository {
       }
     }
 
+  }
+
+  public async listingSitemapList(): Promise<SitemapLists> {
+    const listings = await ListingEntity.find({where: {status: "approved", isDeleted: false}})
+    const sitemapListings = listings.map(listing => {
+      return {
+        url: `${process.env.SITEMAP_BASE_URL}/products/${listing.id}`,
+        lastmod: listing.dateCreated,
+        changefreq: "daily",
+        priority: 0.8
+      }
+    })
+
+    return {
+      items: sitemapListings
+    }
   }
 
   public async listingList(userId:any, paging: PagingArgs, filters: ListingFilterInput): Promise<Listings> {
