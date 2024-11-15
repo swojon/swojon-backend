@@ -61,17 +61,18 @@ export class FollowRepository{
 
     const following = await FollowEntity.createQueryBuilder('following_entity')
                       .select(['following_entity.userId', 'following_entity.followedUserId'])
-                      .where("following_entity.userId = :id", {id: userId}).printSql().getMany()
+                      .where("following_entity.userId = :id", {id: requestedUserId}).printSql().getMany()
+    console.log(following, requestedUserId);
 
     const findFollowers = follow[0].map((follow) => {
-      
       return  {
         id: follow.id,
         user: follow.user, 
-        followStatus: requestedUserId ? following.filter(fol => fol.userId === requestedUserId).length > 0 : false  }
+        followStatus: requestedUserId ? following.filter(fol => fol.followedUserId === follow.user.id).length > 0 : false  }
     });
+    console.log(findFollowers);
     const count: number = follow[1];
-    
+
     const followers: Followers = {
       count: count,
       items: findFollowers
@@ -94,14 +95,17 @@ export class FollowRepository{
             .leftJoinAndSelect('follow_entity.followedUser', 'followedUser')
             .leftJoinAndSelect('follow_entity.user', 'user')
            .where("follow_entity.userId = :id", { id: userId }).printSql().getManyAndCount()
+    
 
     const findFollowings :Follower[] = follow[0].map((fol) => {
           return {
               id: fol.id,
               user: fol.followedUser, 
-              followStatus: requestedUserId ?  true : false
+              //followStatus: check 
+              followStatus: requestedUserId === userId ? true : false
             }     
       });
+    
 
     const count: number = follow[1];
 

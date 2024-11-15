@@ -111,7 +111,7 @@ router.get(
 //   });
 router.post('/login', function (req, res, next) {
   passport.authenticate('local', {session: false}, (err, user, info) => {
-    console.log("Got user", user)
+    console.log("Got user", user, err)
       if (err || !user) {
           return res.status(400).json({
               message: 'Something is not right',
