@@ -1,6 +1,6 @@
 import { compare, hash } from 'bcrypt';
 import { EntityRepository } from 'typeorm';
-import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
+import { AdminUpdateUserDto, CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserEntity } from '@entities/users.entity';
 import { HttpException } from '@exceptions/httpException';
 import { ResetStatus, User, UserWithMeta } from '@interfaces/users.interface';
@@ -181,6 +181,40 @@ export class UserRepository {
     return createUserData;
   }
 
+  public async adminUserUpdate(userId: number, userData: AdminUpdateUserDto): Promise<User> {
+    const findUser: UserEntity = await UserEntity.findOne({ where: { id: userId } });
+    if (!findUser) throw new HttpException(409, "User doesn't exist");
+    if (userData.role == "MODERATOR"){
+      findUser.isModerator = true;
+    } else if (userData.role == "STAFF"){
+      findUser.isStaff = true;
+    }else if (userData.role == "USER"){
+      findUser.isAdmin = false;
+      findUser.isModerator = false;
+      findUser.isStaff = false;
+    }
+
+    if (userData.isSuspended){
+      findUser.isSuspended = userData.isSuspended;
+    }
+    if (userData.isVerified){
+      findUser.isVerified = userData.isVerified;
+    }
+    if (userData.isLocked) {
+      findUser.isLocked = userData.isLocked;
+    }
+    if (userData.isBanned){
+      findUser.isBanned = userData.isBanned;
+    }
+    if (userData.isApproved){
+      findUser.isApproved = userData.isApproved;
+    }
+    
+    await UserEntity.save(findUser);
+    const updatedUser: User = await UserEntity.findOne({ where: { id: userId }, relations: ['profile'] });
+    return updatedUser;
+  }
+  
 
   public async userUpdate(currentUser: number|any, userId: number, userData: UpdateUserDto): Promise<User> {
     if (!currentUser){
@@ -255,7 +289,7 @@ export class UserRepository {
     const updateUser: User = await UserEntity.findOne({ where: { id: userId }, relations: ['roles'] });
     return updateUser;
   }
-
+ 
   public async userDelete(userId: number): Promise<User> {
     const findUser: User = await UserEntity.findOne({ where: { id: userId } });
     if (!findUser) throw new HttpException(409, "User doesn't exist");

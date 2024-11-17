@@ -10,7 +10,14 @@ export interface User {
   password?: string;
   isApproved: boolean;
   isStaff: boolean;
+  isAdmin: boolean;
+
   isEmailVerified: boolean;
+  isBanned: boolean;
+  isLocked: boolean;
+  isSuspended: boolean;
+  isVerified: boolean;
+  isModerator: boolean;
   profile: Profile;
   roles: Role[];
   createdAt?: Date;

@@ -67,7 +67,7 @@ export class ListingCreateDTO {
   price: number;
   
   @Field({nullable:true})
-  deliveryCharge?: number;
+  courierDetails?: string;
 
   @Field(() => [NominatimLocationInput], {nullable:true})
   meetupLocations?: NominatimLocationInput[]
@@ -89,6 +89,9 @@ export class ListingUpdateDTO{
   @Field(() => [NominatimLocationInput], {nullable:true})
   meetupLocations?: NominatimLocationInput[]
   
+  @Field({nullable:true})
+  courierDetails?: string;
+
   @Field(()=>[String], {nullable:true})
   mediaUrls?: string[]
 

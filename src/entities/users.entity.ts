@@ -48,6 +48,18 @@ export class UserEntity extends BaseEntity implements User {
   @Column({ default: false })
   isEmailVerified: boolean;
 
+  @Column({ default: false })
+  isBanned: boolean;
+
+  @Column({ default: false })
+  isLocked: boolean;  
+
+  @Column({ default: false })
+  isSuspended: boolean;
+
+  @Column({ default: false })
+  isVerified: boolean;
+
   @Column({ nullable: true })
   emailVerificationToken: string;
 
@@ -70,6 +82,9 @@ export class UserEntity extends BaseEntity implements User {
   @Column({default: false})
   isStaff: boolean;
 
+  @Column({default: false})
+  isModerator: boolean;
+  
   @OneToOne(() => ProfileEntity, {cascade: true})
   @JoinColumn()
   profile: Relation<ProfileEntity>

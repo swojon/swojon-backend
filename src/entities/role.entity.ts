@@ -1,9 +1,6 @@
 //create table role
 import { IsNotEmpty } from 'class-validator';
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne, ManyToMany } from 'typeorm';
-import { User } from '@interfaces/users.interface';
-import { ProfileEntity } from './profile.entity';
-
 
 @Entity()
 export class RoleEntity extends BaseEntity  {

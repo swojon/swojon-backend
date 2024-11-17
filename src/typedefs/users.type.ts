@@ -26,9 +26,24 @@ export class User {
 
   @Field()
   isStaff: boolean;
+  
+  @Field()
+  isModerator: boolean;
 
   @Field()
   isEmailVerified: boolean;
+
+  @Field()
+  isVerified: boolean;
+  
+  @Field()
+  isBanned: boolean;
+
+  @Field()
+  isLocked: boolean;
+
+  @Field()
+  isSuspended: boolean;
 
   @Field(() => Profile, {nullable: true})
   profile: Profile;
@@ -36,7 +51,6 @@ export class User {
   @Field(() => [Role], {nullable: true})
   roles: Role[];
 
-  
   @Field({nullable:true})
   createdAt?: Date;
 }

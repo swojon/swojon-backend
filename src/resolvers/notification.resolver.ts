@@ -23,6 +23,7 @@ export class NotificationResolver extends NotificationRepository {
     description: 'Mark Notification as Read',
   })
   async markNotificationRead(@Arg('notificationId') notificationId: number): Promise<Notification> {
+  
     const notification: Notification = await this.notificationMarkRead(notificationId);
     return notification;
   }

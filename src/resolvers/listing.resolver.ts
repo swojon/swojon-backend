@@ -1,6 +1,7 @@
 import { CategoryArgs, CategoryFilterInput, PagingArgs } from "@/dtos/category.dto";
 import { AdminListingUpdateDTO, ListingCommunityInputDTO, ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, MarkAsUnavailableDTO, SerachInputDTO } from "@/dtos/listing.dto";
 import { MyContext } from "@/interfaces/auth.interface";
+import { isLoggedIn, isModerator, isStaffOrSelf } from "@/permission";
 import { ListingRepository } from "@/repositories/listing.repository";
 import { Listing, Listings, SitemapLists } from "@/typedefs/listing.type";
 import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
@@ -13,7 +14,7 @@ export class ListingResolver extends ListingRepository{
     description: 'List All Listings',
   })
   async listListings(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', {nullable:true}) filters?: ListingFilterInput): Promise<Listings> {
-    const userId= ctx.user?.id;  
+    const userId= ctx.user.id;  
     const listings: Listings = await this.listingList(userId, paging, filters);
     return listings;
   }
@@ -51,7 +52,9 @@ export class ListingResolver extends ListingRepository{
     description: 'Create Listing',
   })
   async createListing(@Arg('listingData') listingData : ListingCreateDTO,  @Ctx() ctx:MyContext): Promise<Listing> {
-    console.log("context", ctx)
+    if (!isLoggedIn(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const userId: number = ctx.user.id;
     // const userId: number = 5; //it is temporary
     const listing: Listing = await this.listingAdd(userId, listingData);
@@ -79,7 +82,10 @@ export class ListingResolver extends ListingRepository{
   @Mutation(()=> Listing, {
     description: "Only Admin will be able to update those information"
   })
-  async updateListingAdmin(@Arg('listingId') listingId: number, @Arg('adminlistingData') adminListingData: AdminListingUpdateDTO) : Promise <Listing> {
+  async updateListingAdmin(@Arg('listingId') listingId: number, @Arg('adminlistingData') adminListingData: AdminListingUpdateDTO, @Ctx() ctx:MyContext  ) : Promise <Listing> {
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const listing: Listing = await this.adminListingUpdate(listingId, adminListingData);
     return listing
   }

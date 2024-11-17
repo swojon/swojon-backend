@@ -145,7 +145,7 @@ export class ListingRepository {
     let sql = ListingEntity.createQueryBuilder('listing')
       .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 
         'listing.dateCreated', 'listing.meetupLocations', 'listing.quantity', 'listing.dealingMethod', 
-        'listing.deliveryCharge', 'listing.slug', "listing.condition", "listing.status", "listing.isSold", "listing.isAvailable"
+        'listing.courierDetails', 'listing.slug', "listing.condition", "listing.status", "listing.isSold", "listing.isAvailable"
       ])
       // .leftJoinAndSelect('listing.communities', 'community')
       .leftJoinAndSelect('listing.user', 'user')
@@ -281,7 +281,7 @@ export class ListingRepository {
     let sql = ListingEntity.createQueryBuilder('listing')
       .select(['listing.title', 'listing.id', 'listing.price', 
       'listing.description', 'listing.dateCreated', 'listing.meetupLocations', 'listing.quantity', 'listing.dealingMethod', 
-      'listing.deliveryCharge', 'listing.slug', "listing.condition", "listing.status", "listing.isSold", "listing.isAvailable"])
+      'listing.courierDetails', 'listing.slug', "listing.condition", "listing.status", "listing.isSold", "listing.isAvailable"])
       // .leftJoinAndSelect('listing.communities', 'community')
       .leftJoinAndSelect('listing.user', 'user')
       .leftJoinAndSelect('user.profile', 'profile')
@@ -396,7 +396,7 @@ export class ListingRepository {
       meetupLocations: listingData.meetupLocations,
       condition: listingData.condition,
       slug: listingData.slug,
-      deliveryCharge: listingData.deliveryCharge ?? 0,
+      courierDetails: listingData.courierDetails ?? "",
       user: findUser,
       media: listingMedia,
     }).save();

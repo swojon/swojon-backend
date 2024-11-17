@@ -89,9 +89,4 @@ export const getUser = (req: Express.Request, res: Express.Response) =>
       if (err) reject(err)
       resolve(user)
     })(req, res)
-  })
-
-
-
-
-//
+})

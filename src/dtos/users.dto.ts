@@ -47,6 +47,28 @@ export class UpdateUserDto implements Partial<User> {
   @MaxLength(32)
   oldPassword?: string;
   
+  @Field({nullable: true})
+  @IsString()
+  @MinLength(5)
+  @MaxLength(30)
+  username?: string;
+}
+
+@InputType()
+export class AdminUpdateUserDto implements Partial<User> {
+
+  @Field({nullable: true})
+  isBanned?: boolean;
+
+  @Field({nullable: true})
+  isLocked?: boolean;
+
+  @Field({nullable: true})
+  isSuspended?: boolean;
+
+  @Field({nullable: true})
+  role?: string;
+  
   //field for isApproved boolean
   @Field({nullable: true})
   isApproved?: boolean;
@@ -59,10 +81,9 @@ export class UpdateUserDto implements Partial<User> {
   @Field({nullable: true})
   isSuperAdmin?: boolean;
 
-
   @Field({nullable: true})
-  @IsString()
-  @MinLength(5)
-  @MaxLength(30)
-  username?: string;
+  isVerified?: boolean;
+
 }
+
+

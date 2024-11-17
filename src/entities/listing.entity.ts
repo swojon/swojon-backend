@@ -48,7 +48,7 @@ export class ListingEntity extends BaseEntity{
     dealingMethod: string;
 
     @Column({nullable: true})
-    deliveryCharge: number;
+    courierDetails: string;
 
     //column for price, not empty
     @Column()

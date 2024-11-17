@@ -41,7 +41,7 @@ router.post('/google/token', async ({ body: { tokenId } }, res)=> {
       where: [{googleId: user.googleId},
         {email: user.email}
       ],
-      select: ["id", "email", "username", "googleId"],
+      select: ["id", "email", "username", "googleId", "isStaff", "isModerator", "isAdmin", "isSuspended"],
       relations: ["roles"],
     });
     if (findUser && !findUser.googleId){
@@ -64,7 +64,7 @@ router.post('/google/token', async ({ body: { tokenId } }, res)=> {
 
       findUser = await UserEntity.findOne({
         where: {googleId: user.googleId},
-        select: ["id", "email", "username"],
+        select: ["id", "email", "username", "isStaff", "isModerator", "isAdmin", "isSuspended"],
         relations: ["roles"],
       });
       
@@ -114,7 +114,7 @@ router.post('/login', function (req, res, next) {
     console.log("Got user", user, err)
       if (err || !user) {
           return res.status(400).json({
-              message: 'Something is not right',
+              message: err || 'Something is not right',
               user   : user
           });
       }
@@ -157,7 +157,10 @@ router.get('/me', async (req, res) => {
     id: findUser.id,
     email: findUser.email,
     username: findUser.username,
-    roles: findUser.roles.map(item => item.name)
+    isStuff : findUser.isStaff,
+    isModerator : findUser.isModerator,
+    isAdmin : findUser.isAdmin,
+    isSuspended : findUser.isSuspended
   })
 
 })

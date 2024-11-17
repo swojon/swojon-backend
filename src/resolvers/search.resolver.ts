@@ -25,6 +25,7 @@ export class SearchResolver extends SearchRepository{
   })
   async getTrendingSearches(@Ctx() ctx:MyContext): Promise<TrendingSearches> {
     const req= ctx.req;
+    console.log("req", ctx.user)
     const searches: TrendingSearches = await this.trendingSearchGet(req);
     return searches;
   }

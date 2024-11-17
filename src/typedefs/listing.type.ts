@@ -44,6 +44,9 @@ export class Listing {
   dealingMethod?: string;
 
   @Field({nullable:true})
+  courierDetails?: string;
+
+  @Field({nullable:true})
   quantity?: number;
 
   @Field({nullable:true})

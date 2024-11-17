@@ -1,9 +1,10 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
+import { AdminUpdateUserDto, CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserRepository } from '@repositories/users.repository';
 import { User, UserWithMeta } from '@typedefs/users.type';
 import { MyContext } from '@/interfaces/auth.interface';
 import { SitemapLists } from '@/typedefs/listing.type';
+import { isStaff } from '@/permission';
 
 @Resolver()
 export class UserResolver extends UserRepository {
@@ -23,6 +24,7 @@ export class UserResolver extends UserRepository {
     const sitemaps: SitemapLists = await this.sellerSitemapList();
     return sitemaps;
   }
+
 
   // @Authorized()
   @Query(() => UserWithMeta, {
@@ -52,12 +54,27 @@ export class UserResolver extends UserRepository {
     return user;
   }
 
+  @Mutation(() => User, {
+    description: 'Admin user update',
+  })
+  async updateUserAdmin(@Arg('userId') userId: number, @Arg('userData') userData: AdminUpdateUserDto, @Ctx() ctx:MyContext): Promise<User> {
+    console.log(ctx.user)
+    if (!isStaff(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
+    const user: User = await this.adminUserUpdate(userId, userData);
+    return user;
+  }
+
   //Mutation for userRoleUpdate
   // @Authorized()
   @Mutation(() => User, {
     description: 'User update role',
   })
-  async addUserRole(@Arg('userId') userId: number, @Arg('roleId') roleId: number): Promise<User> {
+  async addUserRole(@Arg('userId') userId: number, @Arg('roleId') roleId: number, @Ctx() ctx:MyContext  ): Promise<User> {
+    if (!isStaff(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const user: User = await this.userRoleUpdate(userId, roleId);
     return user;
   }
@@ -65,8 +82,11 @@ export class UserResolver extends UserRepository {
   @Mutation(() => User, {
     description: 'User remove role',
   })
-  async removeUserRole(@Arg('userId') userId: number, @Arg('roleId') roleId: number): Promise<User> {
-    const user: User = await this.userRoleRemove(userId, roleId);
+  async removeUserRole(@Arg('userId') userId: number, @Arg('roleId') roleId: number, @Ctx() ctx:MyContext  ): Promise<User> {
+    if (!isStaff(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
+     const user: User = await this.userRoleRemove(userId, roleId);
     return user;
   }
 

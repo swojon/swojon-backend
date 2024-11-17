@@ -1,9 +1,11 @@
 
 import { BrandCategoryInput, BrandCreateDTO, BrandOptionsArgs, BrandRemoveDTO, BrandUpdateDTO } from "@/dtos/brand.dto";
 import { PagingArgs } from "@/dtos/category.dto";
+import { MyContext } from "@/interfaces/auth.interface";
+import { hasActionPermission, isModerator } from "@/permission";
 import { BrandRepository } from "@/repositories/brand.repository";
 import { Brand, Brands } from "@/typedefs/brand.type";
-import { Arg, Args, Authorized, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 
 @Resolver()
 export class BrandResolver extends BrandRepository{
@@ -30,7 +32,11 @@ export class BrandResolver extends BrandRepository{
   @Mutation(() => Brand, {
     description: 'Create Brand',
   })
-  async createBrand(@Arg('brandData') brandData : BrandCreateDTO): Promise<Brand> {
+  async createBrand(@Arg('brandData') brandData : BrandCreateDTO, @Ctx() ctx: MyContext): Promise<Brand> {
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
+
     const brand: Brand = await this.brandAdd(brandData);
     return brand;
   }
@@ -48,7 +54,11 @@ export class BrandResolver extends BrandRepository{
   @Mutation(()=>Brand, {
     description: "Add category of brand"
   })
-  async addBrandCategory(@Arg('inputData') inputData: BrandCategoryInput): Promise<Brand>{
+  async addBrandCategory(@Arg('inputData') inputData: BrandCategoryInput, @Ctx() ctx: MyContext): Promise<Brand>{
+    //moderator can add category to brand
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const brand: Brand = await this.brandCategoryAdd(inputData.brandId, inputData.categoryIds)
     return brand
   }
@@ -57,7 +67,11 @@ export class BrandResolver extends BrandRepository{
   @Mutation(()=>Brand, {
     description: "Remove category of brand"
   })
-  async removeBrandCategory(@Arg('inputData') inputData: BrandCategoryInput) : Promise<Brand>{
+  async removeBrandCategory(@Arg('inputData') inputData: BrandCategoryInput, @Ctx() ctx: MyContext) : Promise<Brand>{
+    //moderator can remove category from brand
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const brand: Brand = await this.brandCategoryRemove(inputData.brandId, inputData.categoryIds)
     return brand
   }
@@ -67,7 +81,11 @@ export class BrandResolver extends BrandRepository{
   @Mutation(() => Brand, {
     description: 'Remove Brand',
   })
-  async removeBrand(@Arg('brandId') brandId: number): Promise<Brand> {
+  async removeBrand(@Arg('brandId') brandId: number, @Ctx() ctx: MyContext): Promise<Brand> {
+    //moderator can remove brand
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const brand: Brand = await this.brandRemove(brandId);
     return brand;
   }
@@ -75,7 +93,11 @@ export class BrandResolver extends BrandRepository{
   @Mutation(() => Brands, {
     description: 'Remove Categories',
   })
-  async removeBrands(@Arg('brandData') brandData: BrandRemoveDTO): Promise<Brands> {
+  async removeBrands(@Arg('brandData') brandData: BrandRemoveDTO, @Ctx() ctx: MyContext): Promise<Brands> {
+    //moderator can remove brands
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const brands: Brands = await this.brandsRemove(brandData);
     return brands;
   }
@@ -85,7 +107,11 @@ export class BrandResolver extends BrandRepository{
   @Mutation(() => Brand, {
     description: 'Update Brand',
   })
-  async updateBrand(@Arg('brandId') brandId: number, @Arg('brandData') brandData: BrandUpdateDTO): Promise<Brand> {
+  async updateBrand(@Arg('brandId') brandId: number, @Arg('brandData') brandData: BrandUpdateDTO, @Ctx() ctx: MyContext): Promise<Brand> {
+    //moderator can update brand
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const brand: Brand = await this.brandUpdate(brandId, brandData);
     return brand;
   }

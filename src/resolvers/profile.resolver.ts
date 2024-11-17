@@ -1,7 +1,9 @@
-import { Resolver, Query, Mutation, Arg, Int } from 'type-graphql';
+import { Resolver, Query, Mutation, Arg, Int, Ctx } from 'type-graphql';
 import { Profile } from '@typedefs/profile.type';
 import { ProfileRepository } from '@repositories/profile.repository';
 import { UpdateProfileDto } from '@dtos/profile.dto';
+import { isStaffOrSelf } from '@/permission';
+import { MyContext } from '@/interfaces/auth.interface';
 
 
 @Resolver()
@@ -17,7 +19,10 @@ export class ProfileResolver extends ProfileRepository {
   @Mutation(() => Profile, {
     description: 'Profiile update',
   })
-  async updateProfile(@Arg('profileId') profileId: number, @Arg('profileData') profileData: UpdateProfileDto): Promise<Profile> {
+  async updateProfile(@Arg('profileId') profileId: number, @Arg('profileData') profileData: UpdateProfileDto, @Ctx() ctx:MyContext): Promise<Profile> {
+    if (!isStaffOrSelf(ctx.user, profileId)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const profile: Profile = await this.profileUpdate(profileId, profileData );
     return profile;
   }

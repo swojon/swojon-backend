@@ -1,6 +1,7 @@
 
 import { CategoryArgs, CategoryCreateDTO, CategoryFilterInput, CategoryRemoveDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
 import { MyContext } from "@/interfaces/auth.interface";
+import { isModerator } from "@/permission";
 import { CategoryRepository } from "@/repositories/category.repository";
 import { Categories, Category } from "@/typedefs/category.type";
 import { SitemapLists } from "@/typedefs/listing.type";
@@ -14,6 +15,7 @@ export class CategoryResolver extends CategoryRepository{
     description: 'List All Categories',
   })
   async listCategories(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : CategoryFilterInput): Promise<Categories> {
+
     const categories: Categories = await this.categoryList(paging, filters);
       return categories;
   }
@@ -30,7 +32,11 @@ export class CategoryResolver extends CategoryRepository{
   @Mutation(() => Category, {
     description: 'Create Category',
   })
-  async createCategory(@Arg('categoryData') categoryData : CategoryCreateDTO): Promise<Category> {
+  async createCategory(@Arg('categoryData') categoryData : CategoryCreateDTO, @Ctx() ctx: MyContext): Promise<Category> {
+    //moderator can create category
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const category: Category = await this.categoryAdd(categoryData);
     return category;
   }
@@ -48,7 +54,11 @@ export class CategoryResolver extends CategoryRepository{
   @Mutation(() => Category, {
     description: 'Remove Category',
   })
-  async removeCategory(@Arg('categoryId') categoryId: number): Promise<Category> {
+  async removeCategory(@Arg('categoryId') categoryId: number, @Ctx() ctx: MyContext): Promise<Category> {
+    //moderator can remove category
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const category: Category = await this.categoryRemove(categoryId);
     return category;
   }
@@ -57,7 +67,11 @@ export class CategoryResolver extends CategoryRepository{
   @Mutation(() => Categories, {
     description: 'Remove Categories',
   })
-  async removeCategories(@Arg('categoryData') categoryData: CategoryRemoveDTO): Promise<Categories> {
+  async removeCategories(@Arg('categoryData') categoryData: CategoryRemoveDTO, @Ctx() ctx: MyContext): Promise<Categories> {
+    //moderator can remove categories
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const categories: Categories = await this.categoriesRemove(categoryData);
     return categories;
   }
@@ -67,7 +81,11 @@ export class CategoryResolver extends CategoryRepository{
   @Mutation(() => Category, {
     description: 'Update Category',
   })
-  async updateCategory(@Arg('categoryId') categoryId: number, @Arg('categoryData') categoryData: CategoryUpdateDTO): Promise<Category> {
+  async updateCategory(@Arg('categoryId') categoryId: number, @Arg('categoryData') categoryData: CategoryUpdateDTO, @Ctx() ctx: MyContext): Promise<Category> {
+    //moderator can update category
+    if (!isModerator(ctx.user)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const category: Category = await this.categoryUpdate(categoryId, categoryData);
     return category;
   }

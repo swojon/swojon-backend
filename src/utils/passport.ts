@@ -44,11 +44,12 @@ passport.use(
 
         findUser = await UserEntity.findOne({
           where: {googleId: googleId},
-          select: ["id", "email", "username"],
+          select: ["id", "email", "username", "isAdmin", "isModerator", "isStaff", "isSuspended"],
           relations: ["roles"],
         });
       }
 
+      if (findUser.isSuspended) return done("This account is suspended", false)
       done(null, findUser);
     }
   )
@@ -59,13 +60,13 @@ passport.use(new LocalStrategy(
     //db call here
 
     const findUser = await UserEntity.findOne({
-              select: ["id", "email", "username", "password"],
-              relations: ["roles"],
-              where: { email:username }
+              select: ["id", "email", "username", "password", "isStaff", "isModerator", "isAdmin", "isSuspended"],
+              where: { email: username }
     });
 
-    if (!findUser) return done(null, false)
-
+    if (!findUser) return done("User not found", false)
+    if (findUser.isSuspended) return done("This account is suspended", false)
+    if (findUser.password == null) return done("Password is not set for this user. Please use other login method", false)
     const matched = await compare(password, findUser.password)
     if (!matched) { return done(null, false); }
 
@@ -88,8 +89,7 @@ async function (jwtPayload: {
   //find the user in db if needed. This functionality may be omitted if you store everything you'll need in JWT payload.
   const findUser = await  UserEntity.findOne({
     where: {id: jwtPayload.id},
-    select: ["id", "email", "username"],
-    relations: ["roles"]
+    select: ["id", "email", "username", "isAdmin", "isModerator", "isStaff", "isSuspended"]
   })
 
   if (!findUser) return cb("Something Went Wrong");

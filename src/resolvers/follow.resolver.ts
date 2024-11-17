@@ -6,6 +6,7 @@ import { MyContext } from '@/interfaces/auth.interface';
 import { TOPICS_ENUM } from './subscription.resolver';
 import { NotificationEntity, NotificationType } from '@/entities/notification.entity';
 import { Notification } from "@/typedefs/notification.type";
+import { isStaffOrSelf } from '@/permission';
 @Resolver()
 export class FollowResolver extends FollowRepository {
   // @Authorized()
@@ -33,7 +34,10 @@ export class FollowResolver extends FollowRepository {
   @Mutation(() => Follow, {
     description: 'Follow user',
   })
-  async addFollow(@Arg('userId') userId: number, @Arg('followedUserId') followedUserId: number, @PubSub(TOPICS_ENUM.NEW_NOTIFICATION) notify: Publisher<Notification>): Promise<Follow> {
+  async addFollow(@Arg('userId') userId: number, @Arg('followedUserId') followedUserId: number, @PubSub(TOPICS_ENUM.NEW_NOTIFICATION) notify: Publisher<Notification>, @Ctx() ctx:MyContext): Promise<Follow> {
+    if (!isStaffOrSelf(ctx.user, followedUserId)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const follow: Follow = await this.followAdd(userId, followedUserId);
     setTimeout(async () => {
           const newNotification = await NotificationEntity.create({
@@ -53,7 +57,10 @@ export class FollowResolver extends FollowRepository {
   @Mutation(() => Follow, {
     description: 'Unfollow user',
   })
-  async removeFollow(@Arg('userId') userId: number, @Arg('followedUserId') followedUserId: number): Promise<Follow> {
+  async removeFollow(@Arg('userId') userId: number, @Arg('followedUserId') followedUserId: number, @Ctx() ctx:MyContext): Promise<Follow> {
+    if (!isStaffOrSelf(ctx.user, followedUserId)) {
+      throw new Error("You don't have permission to access this resource");
+    }
     const follow: Follow = await this.followRemove(userId, followedUserId);
     return follow;
   }
