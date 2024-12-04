@@ -116,7 +116,7 @@ export class ChatMessageRepository{
                 )),
             count: chatRoomMembers[1]
         }
-      console.log(chatRooms);
+      // console.log(chatRooms);
       return chatRooms;
   }
  
@@ -130,7 +130,7 @@ export class ChatMessageRepository{
                                 .leftJoinAndSelect("members.user", "user")
                                 .getManyAndCount()
 
-    console.log("chatRoomMembers", chatRoomMembers)
+    // console.log("chatRoomMembers", chatRoomMembers)
 
     // const chatRoomMessages:any  = await ChatMessageEntity.find({ where: { chatRoom: In(chatRoomMembers) } }) //not efficient, what if a user have vast amount of message?
     const chatRooms: ChatRooms = {
@@ -181,7 +181,7 @@ public async chatRoomMessageList(chatRoomId: number, paging: PagingArgs): Promis
     })
     
     const {data:chatMessages, cursor} = await paginator.paginate(sql);
-    console.log("messages", chatMessages[0])
+    // console.log("messages", chatMessages[0])
     const count = chatMessages.length;
     const hasMore = chatMessages.length === limit;
     const beforeCursor = cursor.beforeCursor;

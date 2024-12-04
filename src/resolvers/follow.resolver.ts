@@ -35,7 +35,7 @@ export class FollowResolver extends FollowRepository {
     description: 'Follow user',
   })
   async addFollow(@Arg('userId') userId: number, @Arg('followedUserId') followedUserId: number, @PubSub(TOPICS_ENUM.NEW_NOTIFICATION) notify: Publisher<Notification>, @Ctx() ctx:MyContext): Promise<Follow> {
-    if (!isStaffOrSelf(ctx.user, followedUserId)) {
+    if (!isStaffOrSelf(ctx.user, followedUserId) && !isStaffOrSelf(ctx.user, userId)) {
       throw new Error("You don't have permission to access this resource");
     }
     const follow: Follow = await this.followAdd(userId, followedUserId);
@@ -58,8 +58,9 @@ export class FollowResolver extends FollowRepository {
     description: 'Unfollow user',
   })
   async removeFollow(@Arg('userId') userId: number, @Arg('followedUserId') followedUserId: number, @Ctx() ctx:MyContext): Promise<Follow> {
-    if (!isStaffOrSelf(ctx.user, followedUserId)) {
-      throw new Error("You don't have permission to access this resource");
+    console.log(ctx.user)
+    if (!isStaffOrSelf(ctx.user, followedUserId) && !isStaffOrSelf(ctx.user, userId)) {
+      throw new Error("You don't have permission to access this resourceas");
     }
     const follow: Follow = await this.followRemove(userId, followedUserId);
     return follow;

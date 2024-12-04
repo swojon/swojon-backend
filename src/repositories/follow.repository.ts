@@ -62,7 +62,7 @@ export class FollowRepository{
     const following = await FollowEntity.createQueryBuilder('following_entity')
                       .select(['following_entity.userId', 'following_entity.followedUserId'])
                       .where("following_entity.userId = :id", {id: requestedUserId}).printSql().getMany()
-    console.log(following, requestedUserId);
+    // console.log(following, requestedUserId);
 
     const findFollowers = follow[0].map((follow) => {
       return  {
@@ -70,7 +70,7 @@ export class FollowRepository{
         user: follow.user, 
         followStatus: requestedUserId ? following.filter(fol => fol.followedUserId === follow.user.id).length > 0 : false  }
     });
-    console.log(findFollowers);
+    // console.log(findFollowers);
     const count: number = follow[1];
 
     const followers: Followers = {

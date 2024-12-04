@@ -34,6 +34,7 @@ export const hasActionPermission = (user: User, action: string) => {
 }
 
 export const isStaffOrSelf = (requestingUser: User, onBehalfOfUserId: number) => {
+  console.log(requestingUser.id, onBehalfOfUserId)
   if (onBehalfOfUserId === requestingUser.id) {
     return true
   }

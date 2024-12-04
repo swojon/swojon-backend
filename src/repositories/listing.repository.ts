@@ -22,9 +22,9 @@ const getAllRelatedDependantSubCategories = (categories: any[], categoryId: any)
 
   const getChildrenCategories = (categories:any[], tartgetCategory:number|null) => {
     const children_categories = categories.filter(cat => cat.parentCategory?.id === tartgetCategory);
-    console.log("children Categroies", children_categories)
+    // console.log("children Categroies", children_categories)
     children_categories.forEach(childrenCat => {
-      console.log("now checking for children id, ", childrenCat.id)
+      // console.log("now checking for children id, ", childrenCat.id)
       categoryIds.push(childrenCat.id);
       getChildrenCategories(categories, childrenCat);
     });
@@ -51,11 +51,11 @@ const get_category_ids_to_filter = async (filters: ListingFilterInput) => {
       }) 
     }
     if (!!filters?.categoryIds) {
-      console.log('I am here');
+      // console.log('I am here');
       filters?.categoryIds.forEach(categoryId => {
-        console.log('catetgoryId', categoryId);
+        // console.log('catetgoryId', categoryId);
         const relatedCategories = getAllRelatedDependantSubCategories(categories, categoryId);
-        console.log('Got related subcategories', relatedCategories);
+        // console.log('Got related subcategories', relatedCategories);
         categoryIdsToFilter = categoryIdsToFilter.concat(relatedCategories);
       });
     }
@@ -96,7 +96,7 @@ const get_community_ids_to_filter = async (filters: ListingFilterInput) => {
 @EntityRepository(ListingEntity)
 export class ListingRepository {
   public async listingsFavoriteCount(listingIds: any[], userId: number|null){
-    console.log("Got User as an argument, ", userId)
+    // console.log("Got User as an argument, ", userId)
     const findFavorites = await FavoriteEntity.find({where: {listingId: In(listingIds)}, select: ["userId", "listingId"]})
     let favorites = Object()
     listingIds.forEach(listing => {

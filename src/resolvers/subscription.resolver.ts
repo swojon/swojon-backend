@@ -47,7 +47,7 @@ export class SubscriptionResolver {
     },
     (payload, variables, context) => {
       console.log(payload)
-      console.log("notification context:-", context)
+      // console.log("notification context:-", context)
       return payload.userId == context.currentUser.id;
     }
     )
