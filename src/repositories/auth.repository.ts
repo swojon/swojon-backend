@@ -107,6 +107,7 @@ export class AuthRepository {
     const expireAt = new Date(new Date().getTime() +1 * 3600 * 1000); //1 hour expirty time
     findUser.passwordResetToken = token;
     findUser.passwordResetTokenExpiresAt = expireAt;
+    console.log("password reset token", token);
     await findUser.save()
     setTimeout(() => {sendPasswordResetMail(findUser)}, 1000)
     return {
@@ -114,6 +115,18 @@ export class AuthRepository {
     }
   }
 
+  public async passwordResetTokenValidity(token:string):Promise<ResetStatus>{
+    const findUser: UserEntity = await UserEntity.findOne({where : {passwordResetToken : token}});
+    if (!findUser) throw new HttpException(409, "Invalid Token");
+    if (findUser.passwordResetTokenExpiresAt < new Date()){
+      findUser.passwordResetToken = null
+      await findUser.save()
+      throw new HttpException(409, "token expired")
+    }
+    return {
+      success: true
+    }
+  }
   public async passwordReset(resetData:ResetPasswordDTO): Promise<ResetStatus> {
     const findUser: UserEntity = await UserEntity.findOne({where : {passwordResetToken : resetData.token}});
     if (!findUser) throw new HttpException(409, "Invalid Token");

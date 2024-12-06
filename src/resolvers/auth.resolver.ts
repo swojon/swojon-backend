@@ -3,8 +3,6 @@ import { CreateUserDto, ResetPasswordDTO } from '@dtos/users.dto';
 import { AuthRepository } from '@repositories/auth.repository';
 import { ResetStatus, User } from '@typedefs/users.type';
 // import { TokenData } from '@/interfaces/auth.interface';
-import { TokenData, TokenUserData } from '@/typedefs/auth.type';
-import { MyContext } from '@/interfaces/auth.interface';
 
 @Resolver()
 export class AuthResolver extends AuthRepository {
@@ -56,6 +54,14 @@ export class AuthResolver extends AuthRepository {
   async resetRequest(@Arg('email') email: string): Promise<ResetStatus> {
     const status = await this.passwordResetRequest(email)
     return status 
+  }
+
+  @Query(()=> ResetStatus, {
+    description: "Check if token valid or not"
+  })
+  async checkPasswordResetToken(@Arg('token') token:string): Promise<ResetStatus> {
+    const status = await this.passwordResetTokenValidity(token);
+    return status;
   }
 
   @Mutation(() => ResetStatus, {
