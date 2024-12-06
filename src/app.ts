@@ -54,6 +54,7 @@ import { SearchResolver } from './resolvers/search.resolver';
 import { NotificationResolver } from './resolvers/notification.resolver';
 import Keyv from 'keyv';
 import { KeyvAdapter } from '@apollo/utils.keyvadapter';
+import { OrderRatioResolver } from './resolvers/orderRatio.resolver';
 
 const passportSetup = require('./utils/passport');
 
@@ -115,7 +116,7 @@ const schema = await buildSchema({
     AuthResolver, CategoryResolver, ProfileResolver, RoleResolver, FollowResolver,
     CommunityResolver, CommunityMemberResolver, CategoryResolver, LocationResolver, ChatResolver,
      SubscriptionResolver, UserResolver, BrandResolver, ListingResolver, FavoriteResolver,
-    SellerReviewResolver, PointResolver, SearchResolver, NotificationResolver
+    SellerReviewResolver, PointResolver, SearchResolver, NotificationResolver, OrderRatioResolver
   ],
   pubSub: pubSub,
   authChecker: AuthJWTMiddleware,
