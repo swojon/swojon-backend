@@ -14,6 +14,11 @@ export class NotificationResolver extends NotificationRepository {
   })
   async listNotifications(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : NotificationFilterInput): Promise<Notifications> {
     const userId = ctx.user?.id;
+    if (!userId){
+      throw new Error("User not logged In")
+    }
+    console.log("user logged in")
+
     const notifications:Notifications = await this.notificationList(userId, paging, filters);
     return notifications;
   }
