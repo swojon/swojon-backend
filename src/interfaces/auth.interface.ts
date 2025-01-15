@@ -20,6 +20,7 @@ export interface MyContext {
   req: Request;
   res: Response;
   user: any;
+  redis: any;
   // authorsLoader: ReturnType<typeof createAuthorsLoader>;
 }
 

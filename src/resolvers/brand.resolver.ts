@@ -1,10 +1,12 @@
 
+import { brandCacheKey } from "@/constants";
 import { BrandCategoryInput, BrandCreateDTO, BrandOptionsArgs, BrandRemoveDTO, BrandUpdateDTO } from "@/dtos/brand.dto";
 import { PagingArgs } from "@/dtos/category.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { hasActionPermission, isModerator } from "@/permission";
 import { BrandRepository } from "@/repositories/brand.repository";
 import { Brand, Brands } from "@/typedefs/brand.type";
+import { getFromCache, invalidateCache, setToCache } from "@/utils/cacheUtility";
 import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 
 @Resolver()
@@ -15,8 +17,16 @@ export class BrandResolver extends BrandRepository{
     description: 'List All Brands',
   })
   async listBrands(@Args() paging: PagingArgs): Promise<Brands> {
-      const brands: Brands = await this.brandList(paging);
-      return brands;
+    const cacheKey = `${brandCacheKey}:${JSON.stringify(paging)}}`;
+    
+    const cachedData = await getFromCache(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+ 
+    const brands: Brands = await this.brandList(paging);
+    await setToCache(cacheKey, brands);
+    return brands;
   }
 
    // @Authorized()
@@ -24,7 +34,15 @@ export class BrandResolver extends BrandRepository{
     description: 'List All Brands',
   })
   async listBrandOptions(@Args() option: BrandOptionsArgs): Promise<Brands> {
-      const brands: Brands = await this.brandOptionList(option);
+    const cacheKey = `${brandCacheKey}options:${JSON.stringify(option)}}`;
+    
+    const cachedData = await getFromCache(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+    
+    const brands: Brands = await this.brandOptionList(option);
+    await setToCache(cacheKey, brands);
       return brands;
   }
 
@@ -36,6 +54,7 @@ export class BrandResolver extends BrandRepository{
     if (!isModerator(ctx.user)) {
       throw new Error("You don't have permission to access this resource");
     }
+    await invalidateCache(`${brandCacheKey}*`)
 
     const brand: Brand = await this.brandAdd(brandData);
     return brand;
@@ -60,6 +79,7 @@ export class BrandResolver extends BrandRepository{
       throw new Error("You don't have permission to access this resource");
     }
     const brand: Brand = await this.brandCategoryAdd(inputData.brandId, inputData.categoryIds)
+    await invalidateCache(`${brandCacheKey}*`)
     return brand
   }
 //
@@ -73,6 +93,7 @@ export class BrandResolver extends BrandRepository{
       throw new Error("You don't have permission to access this resource");
     }
     const brand: Brand = await this.brandCategoryRemove(inputData.brandId, inputData.categoryIds)
+    await invalidateCache(`${brandCacheKey}*`)
     return brand
   }
 
@@ -87,6 +108,7 @@ export class BrandResolver extends BrandRepository{
       throw new Error("You don't have permission to access this resource");
     }
     const brand: Brand = await this.brandRemove(brandId);
+    await invalidateCache(`${brandCacheKey}*`)
     return brand;
   }
 
@@ -99,6 +121,7 @@ export class BrandResolver extends BrandRepository{
       throw new Error("You don't have permission to access this resource");
     }
     const brands: Brands = await this.brandsRemove(brandData);
+    await invalidateCache(`${brandCacheKey}*`)
     return brands;
   }
 
@@ -113,6 +136,7 @@ export class BrandResolver extends BrandRepository{
       throw new Error("You don't have permission to access this resource");
     }
     const brand: Brand = await this.brandUpdate(brandId, brandData);
+    await invalidateCache(`${brandCacheKey}*`)
     return brand;
   }
 }

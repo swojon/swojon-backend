@@ -10,6 +10,9 @@
     "entities": ["src/entity/**/*.ts"],
     "migrations": ["src/migrations/**/*.ts"],
     "subscribers": ["src/subscriber/**/*.ts"],
+    "cache": {
+        "type" : "redis", "duration" : 3600000
+    },
     "cli": {
     "entitiesDir": "src/entity",
     "migrationsDir": "src/migrations",

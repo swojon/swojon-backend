@@ -55,6 +55,8 @@ import { NotificationResolver } from './resolvers/notification.resolver';
 import Keyv from 'keyv';
 import { KeyvAdapter } from '@apollo/utils.keyvadapter';
 import { OrderRatioResolver } from './resolvers/orderRatio.resolver';
+import Redis from 'ioredis';
+import { categoryCacheKey } from './constants';
 
 const passportSetup = require('./utils/passport');
 
@@ -165,7 +167,6 @@ const serverCleanup = useServer({
   }
   // context: async req => {
   //     // try to retrieve a user with the token
-  //   console.log("I am", req, )
   //   // const user = await getUser(req, res);
   //   // return { req, res, connect, user };
   //   return req
@@ -207,7 +208,7 @@ const apolloServer = new ApolloServer({
     // try to retrieve a user with the token
     const user = await getUser(req, res);
     // console.log("user apollo", user)
-    return { req, res, connect, user };
+    return { req, res, connect, user, redis };
 
     // return { req, res, connect }
   }
@@ -226,6 +227,8 @@ const apolloServer = new ApolloServer({
     }
   },
 });
+
+
 app.use('/auth', router ) //auth route
 await apolloServer.start();
 apolloServer.applyMiddleware({ app, cors: false, path: '/graphql' });

@@ -1,10 +1,12 @@
 
+import { categoryCacheKey } from "@/constants";
 import { CategoryArgs, CategoryCreateDTO, CategoryFilterInput, CategoryRemoveDTO, CategoryUpdateDTO, PagingArgs } from "@/dtos/category.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { isModerator } from "@/permission";
 import { CategoryRepository } from "@/repositories/category.repository";
 import { Categories, Category } from "@/typedefs/category.type";
 import { SitemapLists } from "@/typedefs/listing.type";
+import { getFromCache, invalidateCache, setToCache } from "@/utils/cacheUtility";
 import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 
 @Resolver()
@@ -15,9 +17,16 @@ export class CategoryResolver extends CategoryRepository{
     description: 'List All Categories',
   })
   async listCategories(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', { nullable: true }) filters? : CategoryFilterInput): Promise<Categories> {
-
+    const cacheKey = `${categoryCacheKey}:${JSON.stringify(paging)}${JSON.stringify(filters)}`;
+    
+    const cachedData = await getFromCache(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+ 
     const categories: Categories = await this.categoryList(paging, filters);
-      return categories;
+    await setToCache(cacheKey, categories);
+    return categories;
   }
 
   @Query(() => SitemapLists, {
@@ -37,6 +46,7 @@ export class CategoryResolver extends CategoryRepository{
     if (!isModerator(ctx.user)) {
       throw new Error("You don't have permission to access this resource");
     }
+    await invalidateCache(`${categoryCacheKey}`)
     const category: Category = await this.categoryAdd(categoryData);
     return category;
   }
@@ -59,6 +69,7 @@ export class CategoryResolver extends CategoryRepository{
     if (!isModerator(ctx.user)) {
       throw new Error("You don't have permission to access this resource");
     }
+    await invalidateCache(`${categoryCacheKey}*`)
     const category: Category = await this.categoryRemove(categoryId);
     return category;
   }
@@ -72,6 +83,7 @@ export class CategoryResolver extends CategoryRepository{
     if (!isModerator(ctx.user)) {
       throw new Error("You don't have permission to access this resource");
     }
+    await invalidateCache(`${categoryCacheKey}*`)
     const categories: Categories = await this.categoriesRemove(categoryData);
     return categories;
   }
@@ -83,10 +95,11 @@ export class CategoryResolver extends CategoryRepository{
   })
   async updateCategory(@Arg('categoryId') categoryId: number, @Arg('categoryData') categoryData: CategoryUpdateDTO, @Ctx() ctx: MyContext): Promise<Category> {
     //moderator can update category
-    if (!isModerator(ctx.user)) {
-      throw new Error("You don't have permission to access this resource");
-    }
+    // if (!isModerator(ctx.user)) {
+    //   throw new Error("You don't have permission to access this resource");
+    // }
     const category: Category = await this.categoryUpdate(categoryId, categoryData);
+    await invalidateCache(`${categoryCacheKey}*`)
     return category;
   }
 }

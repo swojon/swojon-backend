@@ -1,9 +1,11 @@
+import { listingCacheKey, listingsCacheKey } from "@/constants";
 import { CategoryArgs, CategoryFilterInput, PagingArgs } from "@/dtos/category.dto";
 import { AdminListingUpdateDTO, ListingCommunityInputDTO, ListingCreateDTO, ListingFilterInput, ListingUpdateDTO, MarkAsUnavailableDTO, SerachInputDTO } from "@/dtos/listing.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { isLoggedIn, isModerator, isStaffOrSelf } from "@/permission";
 import { ListingRepository } from "@/repositories/listing.repository";
 import { Listing, Listings, SitemapLists } from "@/typedefs/listing.type";
+import { getFromCache, invalidateCache, setToCache } from "@/utils/cacheUtility";
 import { Arg, Args, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 
 @Resolver()
@@ -15,7 +17,14 @@ export class ListingResolver extends ListingRepository{
   })
   async listListings(@Ctx() ctx:MyContext, @Args() paging: PagingArgs, @Arg('filters', {nullable:true}) filters?: ListingFilterInput): Promise<Listings> {
     const userId= ctx.user.id;  
+    // const cacheKey = `${listingsCacheKey}:${String(userId)}${JSON.stringify(paging)}${JSON.stringify(filters)}`;
+    // const cachedData = await getFromCache(cacheKey);
+    // if (cachedData) {
+    //   return cachedData;
+    // }
+
     const listings: Listings = await this.listingList(userId, paging, filters);
+    // await setToCache(cacheKey, listings);
     return listings;
   }
 
@@ -29,12 +38,23 @@ export class ListingResolver extends ListingRepository{
 
   // @Authorized()
   @Query(() => Listing, {
-    description: "Get Category by Id, slug or name",
+    description: "Get listing by Id, slug or name",
   })
   async getListing(@Ctx() ctx:MyContext ,@Args(){id, slug, name}: CategoryArgs): Promise<Listing> {
     const userId = ctx.user?.id
-    const category: Listing = await this.listingFind(userId, {id, slug, name});
-    return category;
+    // if (!!id){
+    //   var cacheKey = `${listingCacheKey}:${String(id)}`;
+    //   const cachedData = await getFromCache(cacheKey);
+    //   if (cachedData) {
+    //     return cachedData;
+    //   }
+    // }
+
+    const listing: Listing = await this.listingFind(userId, {id, slug, name});
+    // var cacheKey = `${listingCacheKey}:${String(listing.id)}`;
+    // await setToCache(cacheKey, listing);
+    
+    return listing;
   }
 
   @Query(() => Listings, {
@@ -58,6 +78,7 @@ export class ListingResolver extends ListingRepository{
     const userId: number = ctx.user.id;
     // const userId: number = 5; //it is temporary
     const listing: Listing = await this.listingAdd(userId, listingData);
+    // await invalidateCache(`${listingsCacheKey}*`)
     
     return listing;
   }
@@ -67,6 +88,8 @@ export class ListingResolver extends ListingRepository{
   })
   async removeListing(@Arg('listingId') listingId: number): Promise<Listing> {
     const listing: Listing = await this.listingRemove(listingId);
+    // await invalidateCache(`${listingsCacheKey}*`)
+    // await invalidateCache(`${listingCacheKey}:${String(listing.id)}`)
     return listing;
   }
 
@@ -76,6 +99,8 @@ export class ListingResolver extends ListingRepository{
   })
   async updateListing(@Arg('listingId') listingId: number, @Arg('listingData') listingData: ListingUpdateDTO): Promise<Listing> {
     const listing: Listing = await this.listingUpdate(listingId, listingData);
+    // await invalidateCache(`${listingsCacheKey}*`)
+    // await invalidateCache(`${listingCacheKey}:${String(listingId)}`)
     return listing;
   }
 
@@ -87,6 +112,8 @@ export class ListingResolver extends ListingRepository{
       throw new Error("You don't have permission to access this resource");
     }
     const listing: Listing = await this.adminListingUpdate(listingId, adminListingData);
+    // await invalidateCache(`${listingsCacheKey}*`)
+    // await invalidateCache(`${listingCacheKey}:${String(listingId)}`)
     return listing
   }
 
@@ -96,6 +123,8 @@ export class ListingResolver extends ListingRepository{
   })
   async setListingAvailability(@Arg('listingId') listingId: number, @Arg('listingData') listingData: MarkAsUnavailableDTO) : Promise <Listing> {
     const listing: Listing = await this.listingAvailabilitySet(listingId, listingData);
+    // await invalidateCache(`${listingsCacheKey}*`)
+    // await invalidateCache(`${listingCacheKey}:${String(listingId)}`)
     return listing
   }
   
