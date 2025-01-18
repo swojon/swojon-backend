@@ -7,17 +7,33 @@ import axios from 'axios'
 import { OrderRatioCheckDTO } from "@/dtos/orderRatio.dto";
 import { OrderRatio } from "@/typedefs/orderRatio.type";
 
+function random_choose(choices) {
+  var index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
 
 export class OrderRatioRepository{
   public async orderRatioCheck(orderRatioQuery:OrderRatioCheckDTO): Promise<OrderRatio> {
-    const bdcourier_api = "SNj77WTg7Va4O1iohaHWjq6ITvwN7cVLoifEdafflILBFHsR2qb3wWb8STJZ"
+    const bdcourier_api_keys = ["nrDv6jKJTca9wLdfumbHYwjfdTzmxNeTofOpFcLc8zLk8IMHF3BaaTDUlvEf", 
+      "dEW0GdC0bS35JPXYM2JzxXnM69o2op0C23ZOhsUXEcrafSKWO22essXKvw7u",
+      "w3UmUtcTlcswP3TF5cO4OCpDBS9G9rubfK6AHSSvvgysFuc04a2tdyhlLnFM"
+    ]
     const {status, data} = await axios.get(`https://bdcourier.com/api/courier-check?phone=${orderRatioQuery.phone}`, {
       headers: {
-        "Authorization" : `Bearer ${bdcourier_api}`,
+        "Authorization" : `Bearer ${random_choose(bdcourier_api_keys)}`,
         "user-agent": "Swojon Web Application"
+      },
+      proxy: {
+        protocol: 'http',
+        host: 'p.webshare.io',
+        port: 80,
+        auth: {
+          username: 'mshbypwx-rotate',
+          password: 's3tfde0p16rs'
+        }
       }
     })
-
+    // console.log("data", data)
     // console.log(data)
     const isSuccess = data.status  === "success";
     const courierData = data.courierData
