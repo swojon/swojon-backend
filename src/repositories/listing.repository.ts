@@ -401,7 +401,7 @@ export class ListingRepository {
       media: listingMedia,
     }).save();
     setTimeout(() => this.notifyListingCreation(createListingData, listingData.mediaUrls), 500);
-    setTimeout(() => submitListingAndWaitApprovalMail(findUser, createListingData), 500);
+    // setTimeout(() => submitListingAndWaitApprovalMail(findUser, createListingData), 500);
     return createListingData;
   }
 
@@ -504,7 +504,7 @@ export class ListingRepository {
     });
     if (!!should_Status_change){
       setTimeout(() => this.notifyListingCreation(updatedListing, listingData.mediaUrls ?? []), 500);
-      setTimeout(() => submitListingAndWaitApprovalMail(updatedListing.user, updatedListing), 1000);
+      // setTimeout(() => submitListingAndWaitApprovalMail(updatedListing.user, updatedListing), 1000);
     }
     return updatedListing;
   }
