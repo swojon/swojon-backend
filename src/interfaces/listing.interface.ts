@@ -3,6 +3,7 @@ import { Category } from "./category.interface";
 import { Community } from "./community.interface";
 import { User } from "./users.interface";
 import { Location } from "./location.interface";
+import { Collection } from "./collection.interface";
 
 export interface Listing {
   id?: number;
@@ -22,11 +23,14 @@ export interface Listing {
   dateCreated?:Date;
   dateDeleted?:Date;
   isSold?:boolean;
-  media?: ListingMedia[]
+  media?: ListingMedia[],
+  collections?: Collection[]
   courierDetails?: string;
   favoriteCount?:number;
   favoriteStatus?:boolean;
 }
+
+
 export interface ListingMedia {
   url?:string;
   isPrimary?:boolean;

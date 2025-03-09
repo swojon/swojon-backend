@@ -188,8 +188,8 @@ export class ListingFilterInput{
   @Field(() => [Number],{ nullable: true})
   userIds?: number[];
 
-  @Field({nullable:true})
-  locationId?: number;
+  @Field(() => [Number],{ nullable: true})
+  collectionIds?: number[];
  
   @Field(() => [Number],{ nullable: true})
   communityIds?: number[];

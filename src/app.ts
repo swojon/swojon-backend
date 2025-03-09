@@ -57,6 +57,7 @@ import { KeyvAdapter } from '@apollo/utils.keyvadapter';
 import { OrderRatioResolver } from './resolvers/orderRatio.resolver';
 import Redis from 'ioredis';
 import { categoryCacheKey } from './constants';
+import { CollectionResolver } from './resolvers/collection.resolver';
 
 const passportSetup = require('./utils/passport');
 
@@ -119,7 +120,8 @@ const schema = await buildSchema({
     AuthResolver, CategoryResolver, ProfileResolver, RoleResolver, FollowResolver,
     CommunityResolver, CommunityMemberResolver, CategoryResolver, LocationResolver, ChatResolver,
      SubscriptionResolver, UserResolver, BrandResolver, ListingResolver, FavoriteResolver,
-    SellerReviewResolver, PointResolver, SearchResolver, NotificationResolver, OrderRatioResolver
+    SellerReviewResolver, PointResolver, SearchResolver, NotificationResolver, OrderRatioResolver,
+    CollectionResolver
   ],
   pubSub: pubSub,
   authChecker: AuthJWTMiddleware,

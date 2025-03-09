@@ -6,6 +6,7 @@ import { CategoryEntity } from "./category.entity";
 import { BrandEntity } from "./brand.entity";
 import { LocationEntity } from "./location.entity";
 import { ListingMediaEntity } from "./listingMedia.entity";
+import { CollectionEntity } from "./collection.entity";
 
 export enum Status {
   PENDING = "pending",
@@ -108,6 +109,10 @@ export class ListingEntity extends BaseEntity{
     @ManyToMany(()=>ListingMediaEntity, {cascade: true})
     @JoinTable()
     media: Relation<ListingMediaEntity>[]
+    
+    @ManyToMany(() => CollectionEntity, (collection) => collection.listings)
+    collections: CollectionEntity[];
+
 
     @Column("tsvector", { select: false, nullable: true })
     document_with_weights: any;

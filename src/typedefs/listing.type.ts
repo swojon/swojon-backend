@@ -4,6 +4,7 @@ import { User } from "./users.type";
 import { Community } from "./community.type";
 import { Brand } from "./brand.type";
 import { Location, NominatimLocation } from "./location.type";
+import { Collection } from "./collections.type";
 
 @ObjectType()
 export class ListingMedia {
@@ -57,6 +58,9 @@ export class Listing {
 
   @Field(()=> Category, {nullable: true})
   category?:Category
+
+  @Field(()=> [Collection], {nullable: true})
+  collections?:Collection[] 
 
   @Field(()=> Brand, {nullable: true})
   brand?:Brand

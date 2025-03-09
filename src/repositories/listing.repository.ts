@@ -153,6 +153,7 @@ export class ListingRepository {
       .leftJoinAndSelect('listing.brand', 'brand')
       .leftJoinAndSelect('listing.category', 'category')
       .leftJoinAndSelect('listing.media', 'media')
+      .leftJoinAndSelect('listing.collections', "collections")
       .where("listing.isDeleted = false")
       // .leftJoinAndSelect('listing.location', 'location')
     // let idOrder:"DESC" | "ASC" = "DESC"
@@ -202,6 +203,10 @@ export class ListingRepository {
     // if (filters?.locationIds) {
     //   sql = sql.andWhere('location.id IN (:...locationIds)', { locationIds: filters?.locationIds });
     // }
+
+    if (filters?.collectionIds){
+      sql =  sql.andWhere("collections.id IN (:...collectionIds)", { collectionIds: filters.collectionIds });
+    }
     if (filters?.userIds) {
       sql = sql.andWhere('user.id IN (:...userIds)', { userIds: filters?.userIds });
     }
