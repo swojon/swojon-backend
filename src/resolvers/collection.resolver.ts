@@ -1,7 +1,7 @@
 import { brandCacheKey as collectionCacheKey } from "@/constants";
 import { BrandCreateDTO } from "@/dtos/brand.dto";
 import { PagingArgs } from "@/dtos/category.dto";
-import { CollectionCreateDTO, CollectionListingInput, CollectionUpdateDTO, ListingCollectionInput } from "@/dtos/collection.dto";
+import { CollectionArgs, CollectionCreateDTO, CollectionListingInput, CollectionUpdateDTO, ListingCollectionInput } from "@/dtos/collection.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { isModerator } from "@/permission";
 import { CollectionRepository } from "@/repositories/collections.repository";
@@ -77,6 +77,13 @@ export class CollectionResolver extends CollectionRepository{
     return collection
   }
 
+  @Query(() => Collection, {
+    description: "Get Collection by Id, slug or name",
+  })
+  async getCollection(@Args(){id, slug, name}: CollectionArgs): Promise<Collection> {
+    const colleciton: Collection = await this.collectionFind({id, slug, name});
+    return colleciton;
+  }
   
   @Mutation(()=>Listing, {
     description: "Remove collection to listing"

@@ -3,7 +3,6 @@ import { Category } from "./category.type";
 import { User } from "./users.type";
 import { Community } from "./community.type";
 import { Brand } from "./brand.type";
-import { Location, NominatimLocation } from "./location.type";
 import { Collection } from "./collections.type";
 
 @ObjectType()
@@ -15,6 +14,53 @@ export class ListingMedia {
   isPrimary?: boolean;
 
 }
+
+@ObjectType()
+export class ProductOptionValue {
+  @Field({ nullable: true })
+  optionName: string;
+
+  @Field({ nullable: true })
+  value: string;
+}
+
+@ObjectType()
+export class ProductVariant {
+  @Field()
+  id: number;
+  
+  @Field({ nullable: true })
+  sku?: string;
+
+  @Field()
+  price: number;
+
+  @Field({ nullable: true })
+  salePrice?: number;
+
+  @Field({ nullable: true })
+  stock: number;
+
+  @Field(() => [ListingMedia], { nullable: true })
+  media?: ListingMedia[];
+
+  @Field(() => [ProductOptionValue])
+  optionValues: ProductOptionValue[];
+}
+
+@ObjectType()
+export class ProductOption {
+  @Field()
+  id: number;
+
+  @Field()
+  name: string;
+
+  @Field(() => [String])
+  values: string[];
+}
+
+
 @ObjectType()
 export class Listing {
   @Field()
@@ -38,8 +84,9 @@ export class Listing {
   @Field()
   price?: number
 
-  @Field(() => [NominatimLocation], {nullable:true})
-  meetupLocations?: NominatimLocation[];
+  @Field({nullable:true})
+  salePrice?: number;
+
 
   @Field({nullable:true})
   dealingMethod?: string;
@@ -48,7 +95,7 @@ export class Listing {
   courierDetails?: string;
 
   @Field({nullable:true})
-  quantity?: number;
+  stock?: number;
 
   @Field({nullable:true})
   slug?: string;
@@ -100,6 +147,15 @@ export class Listing {
 
   @Field({nullable:true})
   status?:string;
+
+  @Field({nullable: true})
+  videoUrl?: string;
+
+  @Field(() => [ProductOption], { nullable: true })
+  options?: ProductOption[];
+
+  @Field(() => [ProductVariant], { nullable: true })
+  variants?: ProductVariant[];
 }
 
 

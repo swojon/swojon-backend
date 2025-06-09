@@ -1,10 +1,8 @@
 
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation, Unique, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation, Unique, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "./users.entity";
-import { CommunityEntity } from "./community.entity";
 import { CategoryEntity } from "./category.entity";
 import { BrandEntity } from "./brand.entity";
-import { LocationEntity } from "./location.entity";
 import { ListingMediaEntity } from "./listingMedia.entity";
 import { CollectionEntity } from "./collection.entity";
 
@@ -36,29 +34,26 @@ export class ListingEntity extends BaseEntity{
     //column for description, not empty
     @Column({nullable:true})
     description: string;
+  
+    
+    @Column({ nullable: true })
+    sku: string; // e.g., "Red - Large", "Blue - Medium"
 
     // @Column({type: "jsonb"})
     // metadata: {};
     @Column({nullable:true, default: 'used'})
     condition: string;
 
-    @Column({default: 1})
-    quantity: number;
-
-    @Column({default: "meetup", nullable:true})
-    dealingMethod: string;
-
-    @Column({nullable: true})
-    courierDetails: string;
+    @Column({default: 0})
+    stock: number;
 
     //column for price, not empty
     @Column()
     price: number;
 
-    //column for location, not empty
-    @Column('jsonb', {nullable:true})
-    meetupLocations: object[];
-
+    @Column({nullable: true})
+    salePrice : number;
+    
     @Column({default: false})
     isLive: boolean;
 
@@ -109,13 +104,85 @@ export class ListingEntity extends BaseEntity{
     @ManyToMany(()=>ListingMediaEntity, {cascade: true})
     @JoinTable()
     media: Relation<ListingMediaEntity>[]
+
+    @Column({nullable: true})
+    videoUrl: string;
     
     @ManyToMany(() => CollectionEntity, (collection) => collection.listings)
     collections: CollectionEntity[];
 
-
     @Column("tsvector", { select: false, nullable: true })
     document_with_weights: any;
 
+    @OneToMany(() => ProductVariantEntity, variant => variant.listing, { cascade: true })
+    variants: ProductVariantEntity[];
+  
+    @OneToMany(() => ProductOptionEntity, option => option.listing, { cascade: true })
+    options: ProductOptionEntity[];
 
+}
+
+
+@Entity()
+export class ProductVariantEntity extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ nullable: true })
+  sku: string; // e.g., "Red - Large", "Blue - Medium"
+
+  @ManyToOne(() => ListingEntity, listing => listing.variants)
+  listing: ListingEntity;
+
+  @Column('decimal')
+  price: number;
+
+  @Column({ nullable: true, type: 'decimal' })
+  salePrice: number; // e.g., 19.99, null if not on sale
+
+  @Column('int')
+  stock: number;
+
+   @ManyToMany(()=>ListingMediaEntity, {cascade: true})
+  @JoinTable()
+  media: Relation<ListingMediaEntity>[]
+
+  @OneToMany(() => ProductOptionValueEntity, value => value.variant, { cascade: true })
+  optionValues: ProductOptionValueEntity[];
+}
+
+@Entity()
+export class ProductOptionEntity extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string; // e.g., "Color", "Size"
+
+  @ManyToOne(() => ListingEntity, listing => listing.options)
+  listing: ListingEntity;
+   
+  @Column("simple-array")
+  values: string[];
+  
+  @OneToMany(() => ProductOptionValueEntity, value => value.option, { cascade: true })
+  optionValues: ProductOptionValueEntity[];
+}
+
+@Entity()
+export class ProductOptionValueEntity extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ nullable: true })
+  optionName: string; // e.g., "Size", "Color"
+  
+  @Column()
+  value: string; // e.g., "Red", "XL"
+
+  @ManyToOne(() => ProductOptionEntity, option => option.optionValues, { onDelete: 'CASCADE' })
+  option: ProductOptionEntity;
+
+  @ManyToOne(() => ProductVariantEntity, variant => variant.optionValues, { onDelete: 'CASCADE' })
+  variant: ProductVariantEntity;
 }

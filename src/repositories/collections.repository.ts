@@ -1,4 +1,4 @@
-import { CollectionCreateDTO, CollectionUpdateDTO } from "@/dtos/collection.dto";
+import { CollectionArgs, CollectionCreateDTO, CollectionUpdateDTO } from "@/dtos/collection.dto";
 import { CollectionEntity } from "@/entities/collection.entity";
 import { ListingEntity } from "@/entities/listing.entity";
 import { HttpException } from "@/exceptions/httpException";
@@ -11,13 +11,18 @@ export class CollectionRepository {
     public async ListingCollectionAdd(listingId:number, collectionIds:number[]): Promise<Listing>{
         const findListing:ListingEntity = await ListingEntity.createQueryBuilder('listing')
                                 .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 
-        'listing.dateCreated', 'listing.meetupLocations', 'listing.quantity', 'listing.dealingMethod', 
-        'listing.courierDetails', 'listing.slug', "listing.condition", "listing.status", "listing.isSold", "listing.isAvailable"])
+        'listing.dateCreated', 'listing.stock', 
+       'listing.slug', "listing.condition", "listing.status", "listing.isSold", "listing.isAvailable",  "listing.salePrice"])
                                 .leftJoinAndSelect('listing.user', 'user')
                                 .leftJoinAndSelect('user.profile', 'profile')
                                 .leftJoinAndSelect('listing.brand', 'brand')
                                 .leftJoinAndSelect('listing.category', 'category')
                                 .leftJoinAndSelect('listing.media', 'media')
+                                .leftJoinAndSelect('listing.options', 'options')
+                                .leftJoinAndSelect('listing.variants', 'variants')
+                                .leftJoinAndSelect('variants.media', 'variantMedia')
+                                .leftJoinAndSelect('variants.optionValues', 'optionValues')
+                                .leftJoinAndSelect('optionValues.option', 'option')
                                 .leftJoinAndSelect('listing.collections', "collections")
                                 .where("listing.id = :id", { id: listingId })
                                 .getOne()
@@ -37,14 +42,19 @@ export class CollectionRepository {
     
       public async listingCollectionRemove(listingId: number, collectionIds:number[]):Promise<Listing>{
         const findListing:ListingEntity = await ListingEntity.createQueryBuilder('listing')
-        .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 
-          'listing.dateCreated', 'listing.meetupLocations', 'listing.quantity', 'listing.dealingMethod', 
-          'listing.courierDetails', 'listing.slug', "listing.condition", "listing.status", "listing.isSold", "listing.isAvailable"])
+         .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 
+        'listing.dateCreated', 'listing.stock', 
+       'listing.slug', "listing.condition", "listing.status", "listing.isSold", "listing.isAvailable",  "listing.salePrice"])
         .leftJoinAndSelect('listing.user', 'user')
         .leftJoinAndSelect('user.profile', 'profile')
         .leftJoinAndSelect('listing.brand', 'brand')
         .leftJoinAndSelect('listing.category', 'category')
         .leftJoinAndSelect('listing.media', 'media')
+        .leftJoinAndSelect('listing.options', 'options')
+        .leftJoinAndSelect('listing.variants', 'variants')
+        .leftJoinAndSelect('variants.media', 'variantMedia')
+        .leftJoinAndSelect('variants.optionValues', 'optionValues')
+        .leftJoinAndSelect('optionValues.option', 'option')
         .leftJoinAndSelect('listing.collections', "collections")
         .where("listing.id = :id", { id: listingId })
         .getOne()
@@ -97,6 +107,20 @@ export class CollectionRepository {
         const createCollectionData: CollectionEntity = await CollectionEntity.create(collectionData).save()
         return createCollectionData
     }
+
+    
+  public async collectionFind(collectionArgs: CollectionArgs): Promise<CollectionEntity> {
+    const findCategory: CollectionEntity = await CollectionEntity.findOne(
+                    {
+                      where: [
+                          {id: collectionArgs?.id},
+                          {slug: collectionArgs?.slug},
+                          {name: collectionArgs?.name}]
+                    },
+                  );
+    if (!findCategory) throw new HttpException(409, `Collection not found`);
+    return findCategory;
+  }
 
     
   public async collectionUpdate(collectionId:number, collectionData: CollectionUpdateDTO): Promise<Collection>{

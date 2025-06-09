@@ -12,6 +12,7 @@ export interface Listing {
   brand?:Brand|null;
   user?:User;
   price?:number;
+  salePrice?:number;
   location?:Location;
   latitude?:string;
   longitude?:string;
@@ -24,10 +25,15 @@ export interface Listing {
   dateDeleted?:Date;
   isSold?:boolean;
   media?: ListingMedia[],
+  videoUrl?: string;
   collections?: Collection[]
   courierDetails?: string;
   favoriteCount?:number;
   favoriteStatus?:boolean;
+
+  options?: ProductOptionPreview[];
+  variants?: ProductVariantPreview[];
+
 }
 
 
@@ -41,4 +47,21 @@ export interface Listings{
   hasMore?: boolean;
   beforeCursor?:string;
   afterCursor?:string;
+}
+
+export interface ProductVariantPreview {
+  id: string;
+  price: number;
+  quantity: number;
+  media?: ListingMedia[];
+  optionValues: {
+    option: string;        // e.g., "Size"
+    value: string;         // e.g., "Medium"
+  }[];
+}
+
+export interface ProductOptionPreview {
+  id: string;
+  name: string;            // e.g., "Size"
+  values: string[];        // e.g., ["Small", "Medium", "Large"]
 }
