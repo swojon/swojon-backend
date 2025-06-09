@@ -602,6 +602,8 @@ export class ListingRepository {
     if (!!listingData.price)  findListing.price = listingData.price;
     if (!!listingData.title) findListing.title = listingData.title;
     if (!!listingData.videoUrl) findListing.videoUrl = listingData.videoUrl;
+    if (!!listingData.stock) findListing.stock = listingData.stock;
+    if (!!listingData.salePrice) findListing.salePrice = listingData.salePrice;
     if (!!listingData.condition) findListing.condition = listingData.condition;
     await ListingEntity.save(findListing)
 
