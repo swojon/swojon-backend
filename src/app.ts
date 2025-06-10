@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { ApolloServerPluginLandingPageProductionDefault, ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import { ApolloServerPluginLandingPageProductionDefault, ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
@@ -8,26 +8,22 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
-import { Server, createServer } from 'http';
-import {GraphQLError, GraphQLSchema, execute, subscribe} from "graphql";
+import { createServer } from 'http';
 // import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import { makeExecutableSchema } from '@graphql-tools/schema';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
-import { NODE_ENV, SUBSCRIPTION_PORT,  PORT, ORIGIN, CREDENTIALS, COOKIE_NAME, COOKIE_SECRET } from '@config';
+import { NODE_ENV, PORT, ORIGIN, CREDENTIALS } from '@config';
 import { dbConnection } from '@database';
-import { AuthCheckerMiddleware, AuthJWTMiddleware, getUser } from '@middlewares/auth.middleware';
+import { AuthJWTMiddleware, getUser } from '@middlewares/auth.middleware';
 import { ErrorMiddleware } from '@middlewares/error.middleware';
 import { logger, responseLogger, errorLogger } from '@utils/logger';
-import session from "express-session";
 // import * as  Server from 'socket.io';
 // import Redis from 'ioredis';
-import jwt, { JwtPayload } from 'jsonwebtoken'
-import RedisStore from "connect-redis";
-import {redis} from "./redis"
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { redis } from "./redis";
 import router from './authentication/route';
 import { pubSub } from './pubsub';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core/dist/plugin/drainHttpServer';
@@ -55,9 +51,8 @@ import { NotificationResolver } from './resolvers/notification.resolver';
 import Keyv from 'keyv';
 import { KeyvAdapter } from '@apollo/utils.keyvadapter';
 import { OrderRatioResolver } from './resolvers/orderRatio.resolver';
-import Redis from 'ioredis';
-import { categoryCacheKey } from './constants';
 import { CollectionResolver } from './resolvers/collection.resolver';
+import { OrderResolver } from './resolvers/order.resolver';
 
 const passportSetup = require('./utils/passport');
 
@@ -121,7 +116,7 @@ const schema = await buildSchema({
     CommunityResolver, CommunityMemberResolver, CategoryResolver, LocationResolver, ChatResolver,
      SubscriptionResolver, UserResolver, BrandResolver, ListingResolver, FavoriteResolver,
     SellerReviewResolver, PointResolver, SearchResolver, NotificationResolver, OrderRatioResolver,
-    CollectionResolver
+    CollectionResolver, OrderResolver
   ],
   pubSub: pubSub,
   authChecker: AuthJWTMiddleware,

@@ -93,4 +93,5 @@ export class UserEntity extends BaseEntity implements User {
   @ManyToMany(() => RoleEntity, {cascade: true})
   @JoinTable()
   roles: Relation<RoleEntity>[];
+
 }

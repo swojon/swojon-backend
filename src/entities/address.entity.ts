@@ -1,54 +1,28 @@
 import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserEntity } from "./users.entity";
-import { CommunityEntity } from "./community.entity";
-import { ListingEntity } from "./listing.entity";
 
 
 //entity for saving the medias of a listing
 @Entity()
-export class AddressEntity extends BaseEntity{
-    //fields for Address
-
-    //column for id, primary key, generated
+export class AddressEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    //address line 1
     @Column()
-    addressLine1: string;
+    name: string;
 
-    //address line 2
     @Column()
-    addressLine2: string;
+    phoneNumber: string;
 
-    //city
     @Column()
-    city: string;
+    address: string;
 
-    //state
     @Column()
-    state: string;
+    policeStation: string;
 
-    //country
     @Column()
-    country: string;
+    district: string;
 
-    //postal code
-    @Column()
-    postalCode: string;
-
-    //column for isDeleted, not empty
-    @Column({default: false})
-    isDeleted: boolean;
-
-    //column for date created, not empty
-    @Column({nullable: true})
-    dateCreated: Date;
-
-    //column for date updated, not empty
-    @Column({nullable: true})
-    dateUpdated: Date;
-
-
-
+    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+    user: UserEntity;
 }
