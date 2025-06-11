@@ -44,7 +44,7 @@ export class ProductVariant {
   @Field(() => [ListingMedia], { nullable: true })
   media?: ListingMedia[];
 
-  @Field(() => [ProductOptionValue])
+  @Field(() => [ProductOptionValue], {nullable: true})
   optionValues: ProductOptionValue[];
 }
 

@@ -83,7 +83,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
     let sql = OrderEntity.createQueryBuilder('order')
       .select(['order.id', 'order.shippingAddress',  
         'order.totalAmount', 'order.finalAmount', 
-        'order.status', "order.createdAt",
+        'order.status', "order.createdAt", 'order.shipping'
       ])
       // .leftJoinAndSelect('order.communities', 'community')
       .leftJoinAndSelect('order.user', 'user')
@@ -91,6 +91,8 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
       .leftJoinAndSelect('order.items', 'items')
       .leftJoinAndSelect("items.listing", "listing")
       .leftJoinAndSelect('items.variant', "variant")
+      .leftJoinAndSelect("variant.optionValues", "optionValues")
+      .leftJoinAndSelect("variant.media", "media")
       .where("user.id = :userId", {userId: userId})
     
     let orderCondition: {
@@ -158,7 +160,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
                       relations: [
                         "user", "user.profile",
                         "coupon", "items", "items.variant",
-                        "variant.listing"
+                        "variant.listing", "items.variant.optionValues"
                         ],
                     },
                   );
@@ -225,7 +227,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
         });
     }
 
-    let finalAmount = totalAmount;
+    let finalAmount = totalAmount + orderData.shipping;
     if (appliedCoupon) {
         // Assume coupon has a discountType ('percentage' or 'fixed') and discountValue
         if (appliedCoupon.isParcentage) {
@@ -247,6 +249,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
         },
         totalAmount,
         finalAmount,
+        shipping:orderData.shipping,
         status: 'pending',
         coupon: appliedCoupon ?? null,
     }).save();

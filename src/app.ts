@@ -53,6 +53,7 @@ import { KeyvAdapter } from '@apollo/utils.keyvadapter';
 import { OrderRatioResolver } from './resolvers/orderRatio.resolver';
 import { CollectionResolver } from './resolvers/collection.resolver';
 import { OrderResolver } from './resolvers/order.resolver';
+import { CouponResolver } from './resolvers/coupon.resolver';
 
 const passportSetup = require('./utils/passport');
 
@@ -116,7 +117,7 @@ const schema = await buildSchema({
     CommunityResolver, CommunityMemberResolver, CategoryResolver, LocationResolver, ChatResolver,
      SubscriptionResolver, UserResolver, BrandResolver, ListingResolver, FavoriteResolver,
     SellerReviewResolver, PointResolver, SearchResolver, NotificationResolver, OrderRatioResolver,
-    CollectionResolver, OrderResolver
+    CollectionResolver, OrderResolver, CouponResolver
   ],
   pubSub: pubSub,
   authChecker: AuthJWTMiddleware,

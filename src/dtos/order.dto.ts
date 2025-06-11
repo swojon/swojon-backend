@@ -31,6 +31,9 @@ export class OrderCreateDTO {
   @Field()
   district: string;
 
+  @Field()
+  shipping: number;
+
   @Field(() => [OrderItemDTO])
   items: OrderItemDTO[];
 

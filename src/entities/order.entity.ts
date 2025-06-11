@@ -31,6 +31,9 @@ export class OrderEntity extends BaseEntity {
   @Column('decimal')
   totalAmount: number;
 
+  @Column('decimal', {default: 0})
+  shipping: number;
+  
   @Column('decimal')
   finalAmount: number;
 

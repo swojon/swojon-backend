@@ -7,6 +7,9 @@ export class Order {
   @Field(() => Int)
   id: number;
 
+  @Field(()=> Date)
+  createdAt: Date;
+
   @Field(() => GraphQLJSONObject)
   shippingAddress: any;
 
@@ -15,7 +18,12 @@ export class Order {
 
   @Field(() => Float)
   totalAmount: number;
-
+   @Field(() => Float)
+  finalAmount: number;
+  
+  @Field(() => Float)
+  shipping: number;
+  
   @Field({ nullable: true })
   couponCode?: string;
 

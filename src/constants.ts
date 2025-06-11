@@ -4,3 +4,5 @@ export const listingCacheKey = "listingCache"
 export const brandCacheKey = "brandCache";
 export const collectionCacheKey = "collectionCache"
 export const orderCacheKey = "orderCache";
+export const couponCacheKey = "couponCache";
+

@@ -4,7 +4,7 @@ import { OrderArgs, OrderCreateDTO, OrderUpdateDTO } from "@/dtos/order.dto";
 import { MyContext } from "@/interfaces/auth.interface";
 import { isLoggedIn } from "@/permission";
 import { OrderRepository } from "@/repositories/order.repository";
-import { Listing, Listings } from "@/typedefs/listing.type";
+import { Listings } from "@/typedefs/listing.type";
 import { Order, Orders } from "@/typedefs/order.type";
 import { getFromCache, invalidateCache, setToCache } from "@/utils/cacheUtility";
 import { Arg, Args, Ctx, Mutation, Query, Resolver } from "type-graphql";
@@ -16,16 +16,16 @@ export class OrderResolver extends OrderRepository{
   @Query(() => Orders, {
     description: 'List All Listings',
   })
-  async listOrders(@Ctx() ctx:MyContext, @Args() paging: PagingArgs): Promise<Listings> {
+  async listOrders(@Ctx() ctx:MyContext, @Args() paging: PagingArgs): Promise<Orders> {
     const userId= ctx.user.id;  
-    const cacheKey = `${orderCacheKey}:${String(userId)}${JSON.stringify(paging)}`;
-    const cachedData = await getFromCache(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
+    // const cacheKey = `${orderCacheKey}:${String(userId)}${JSON.stringify(paging)}`;
+    // const cachedData = await getFromCache(cacheKey);
+    // if (cachedData) {
+    //   return cachedData;
+    // }
 
     const orders: Orders = await this.orderList(userId, paging);
-    await setToCache(cacheKey, orders);
+    // await setToCache(cacheKey, orders);
     return orders;
   }
 
@@ -49,7 +49,7 @@ export class OrderResolver extends OrderRepository{
 
 
   // @Authorized()
-  @Query(() => Listing, {
+  @Query(() => Order, {
     description: "Get Order by Id, staus",
   })
   async getOrder(@Ctx() ctx:MyContext ,@Args(){id, status }: OrderArgs): Promise<Order> {
@@ -89,7 +89,7 @@ export class OrderResolver extends OrderRepository{
   @Mutation(() => Order, {
     description: 'Remove Order',
   })
-  async removeListing(@Arg('orderId') orderId: number): Promise<Order> {
+  async removeOrder(@Arg('orderId') orderId: number): Promise<Order> {
     const order: Order = await this.OrderRemove(orderId);
     await invalidateCache(`${orderCacheKey}*`)
     await invalidateCache(`${orderCacheKey}:${String(orderId)}`)
@@ -100,7 +100,7 @@ export class OrderResolver extends OrderRepository{
   @Mutation(() => Order, {
     description: 'Update Order',
   })
-  async updateListing(@Arg('orderId') orderId: number, @Arg('orderData') orderData: OrderUpdateDTO): Promise<Order> {
+  async updateOrder(@Arg('orderId') orderId: number, @Arg('orderData') orderData: OrderUpdateDTO): Promise<Order> {
     const order: Order = await this.orderUpdate(orderId, orderData);
     await invalidateCache(`${orderCacheKey}*`)
     await invalidateCache(`${orderCacheKey}:${String(orderId)}`)
