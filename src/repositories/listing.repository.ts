@@ -9,7 +9,7 @@ import { SearchEntity } from '@/entities/search.entity';
 import { UserEntity } from '@/entities/users.entity';
 import { HttpException } from '@/exceptions/httpException';
 import { Listing, Listings } from '@/interfaces/listing.interface';
-import { EntityRepository, In } from 'typeorm';
+import { EntityRepository, In, Not } from 'typeorm';
 import {buildPaginator} from 'typeorm-cursor-pagination'
 import {Webhook, MessageBuilder} from 'discord-webhook-node'
 import { listingApprovalMail } from '@/mail/sendMail';
@@ -389,7 +389,7 @@ export class ListingRepository {
     const collectionIds = findListing.collections? findListing.collections.map((c) => c.id) : [];
     if (!categoryIds.length && !collectionIds.length) {
       let listings = await ListingEntity.find({
-        where: { isDeleted: false, status: "approved" as unknown as Status, id: In([listingId]) },
+        where: { isDeleted: false, status: "approved" as unknown as Status, id: Not(listingId) },
         take: limit,
       })
       return {
@@ -409,11 +409,16 @@ export class ListingRepository {
       .leftJoinAndSelect('user.profile', 'profile')
       .leftJoinAndSelect('listing.brand', 'brand')
       .leftJoinAndSelect('listing.category', 'category')
+      .leftJoinAndSelect('listing.options', 'options')
+      .leftJoinAndSelect('listing.variants', 'variants')
       .leftJoinAndSelect('listing.media', 'media')
+      .leftJoinAndSelect('variants.media', 'variantMedia')
+      .leftJoinAndSelect('variants.optionValues', 'optionValues')
+      .leftJoinAndSelect('optionValues.option', 'option')
       .leftJoinAndSelect('listing.collections', "collections")
       .where("listing.isDeleted = false")
-      .andWhere("listing.status = :status", {status: "approved"})
       .andWhere("listing.id != :listingId", { listingId: listingId })
+      .andWhere("listing.status = :status", {status: "approved"})
       // .andWhere(
       //   "(category.id IN (:...categoryIds) OR collections.id IN (:...collectionIds))",
       //   { categoryIds, collectionIds }
