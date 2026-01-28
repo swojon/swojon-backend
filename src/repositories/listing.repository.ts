@@ -382,6 +382,62 @@ export class ListingRepository {
     };
   }
 
+  public async getRelatedLisitings(listingId: number, limit: number): Promise<Listings>{
+    const findListing: ListingEntity = await ListingEntity.findOne({ where: { id: listingId }, relations: ["category", "collections"] });
+    if (!findListing) throw new HttpException(409, `Listing with id ${listingId} does not exist`);
+    const categoryIds = [findListing.category.id];
+    const collectionIds = findListing.collections? findListing.collections.map((c) => c.id) : [];
+    if (!categoryIds.length && !collectionIds.length) {
+      let listings = await ListingEntity.find({
+        where: { isDeleted: false, status: "approved" as unknown as Status, id: In([listingId]) },
+        take: limit,
+      })
+      return {
+        items: listings as unknown as Listing[],
+        hasMore: false,
+        count: 0,
+      };
+    }
+    let sql = ListingEntity.createQueryBuilder('listing')
+      .select(['listing.title', 'listing.id', 'listing.price', 'listing.description', 
+        'listing.dateCreated', 'listing.stock', 'listing.slug', "listing.condition",
+
+          "listing.status", "listing.isSold", "listing.isAvailable",  
+          "listing.salePrice", "listing.videoUrl"
+      ])
+      .leftJoinAndSelect('listing.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('listing.brand', 'brand')
+      .leftJoinAndSelect('listing.category', 'category')
+      .leftJoinAndSelect('listing.media', 'media')
+      .leftJoinAndSelect('listing.collections', "collections")
+      .where("listing.isDeleted = false")
+      .andWhere("listing.status = :status", {status: "approved"})
+      .andWhere("listing.id != :listingId", { listingId: listingId })
+      // .andWhere(
+      //   "(category.id IN (:...categoryIds) OR collections.id IN (:...collectionIds))",
+      //   { categoryIds, collectionIds }
+      //   )
+    if (categoryIds.length > 0) {
+      sql = sql.andWhere('category.id IN (:...categoryIds)', { categoryIds: categoryIds });
+    }
+    if (collectionIds.length > 0) {
+      sql = sql.orWhere('collections.id IN (:...collectionIds)', { collectionIds: collectionIds });
+    }
+
+
+    sql = sql.orderBy('listing.dateCreated', 'DESC').limit(limit);  
+    const findListings = await sql.getManyAndCount();
+    const listingList = findListings[0];
+    const count = findListings[1];
+    return {
+      items: listingList as unknown as Listing[],
+      hasMore: false,
+      count,
+    };
+    
+  }
+  
   public async listingAdd(userId: number, listingData: ListingCreateDTO): Promise<Listing> {
     // let communities: CommunityEntity[] = [];
     let brand: BrandEntity | null = null;

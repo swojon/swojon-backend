@@ -18,14 +18,14 @@ export class OrderResolver extends OrderRepository{
   })
   async listOrders(@Ctx() ctx:MyContext, @Args() paging: PagingArgs): Promise<Orders> {
     const userId= ctx.user.id;  
-    // const cacheKey = `${orderCacheKey}:${String(userId)}${JSON.stringify(paging)}`;
-    // const cachedData = await getFromCache(cacheKey);
-    // if (cachedData) {
-    //   return cachedData;
-    // }
+    const cacheKey = `${orderCacheKey}:${String(userId)}${JSON.stringify(paging)}`;
+    const cachedData = await getFromCache(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
 
     const orders: Orders = await this.orderList(userId, paging);
-    // await setToCache(cacheKey, orders);
+    await setToCache(cacheKey, orders);
     return orders;
   }
 

@@ -67,6 +67,16 @@ export class ListingResolver extends ListingRepository{
     return listings
   }
 
+  @Query(() => Listings, {
+    description: "Related Listings",
+  })
+  async relatedListing(@Arg('listingId') listingId: number): Promise<Listings> {
+
+    const listings: Listings = await this.getRelatedLisitings(listingId, 10);
+    return listings
+  }
+
+
   // @Authorized()
   @Mutation(() => Listing, {
     description: 'Create Listing',
