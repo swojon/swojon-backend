@@ -1,4 +1,4 @@
-import { brandCacheKey as collectionCacheKey } from "@/constants";
+import { brandCacheKey as collectionCacheKey, listingCacheKey } from "@/constants";
 import { BrandCreateDTO } from "@/dtos/brand.dto";
 import { PagingArgs } from "@/dtos/category.dto";
 import { CollectionArgs, CollectionCreateDTO, CollectionListingInput, CollectionUpdateDTO, ListingCollectionInput } from "@/dtos/collection.dto";
@@ -74,6 +74,8 @@ export class CollectionResolver extends CollectionRepository{
     }
     const collection:Listing = await this.ListingCollectionAdd(inputData.listingId, inputData.collectionIds)
     await invalidateCache(`${collectionCacheKey}*`)
+    await invalidateCache(`${listingCacheKey}*`)
+
     return collection
   }
 
@@ -95,6 +97,7 @@ export class CollectionResolver extends CollectionRepository{
     }
     const collection:Listing = await this.listingCollectionRemove(inputData.listingId, inputData.collectionIds)
     await invalidateCache(`${collectionCacheKey}*`)
+    await invalidateCache(`${listingCacheKey}*`)
     return collection
   }
 
@@ -108,6 +111,7 @@ export class CollectionResolver extends CollectionRepository{
     }
     const collection:Collection = await this.collectionListingAdd(inputData.collectionId, inputData.listingIds)
     await invalidateCache(`${collectionCacheKey}*`)
+    await invalidateCache(`${listingCacheKey}*`)
     return collection
   }
 
@@ -123,6 +127,7 @@ export class CollectionResolver extends CollectionRepository{
     }
     const collection: Collection = await this.collectionListingRemove(inputData.collectionId, inputData.listingIds)
     await invalidateCache(`${collectionCacheKey}*`)
+    await invalidateCache(`${listingCacheKey}*`)
     return collection
   }
 
