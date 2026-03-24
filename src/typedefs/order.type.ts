@@ -7,6 +7,9 @@ export class Order {
   @Field(() => Int)
   id: number;
 
+  @Field({ nullable: true })
+  orderId?: string;
+
   @Field(()=> Date)
   createdAt: Date;
 
@@ -29,6 +32,10 @@ export class Order {
 
   @Field(() => [OrderItem])
   items: OrderItem[];
+
+  @Field({ nullable: true })
+  guestId?: string;
+  
 }
 
 @ObjectType()

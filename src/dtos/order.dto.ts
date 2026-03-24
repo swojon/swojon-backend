@@ -39,12 +39,15 @@ export class OrderCreateDTO {
 
   @Field({ nullable: true })
   couponCode?: string;
+
+  @Field({ nullable: true })
+  guestId?: string;
 }
 
 @ArgsType()
 export class OrderArgs {
   @Field({ nullable: true})
-  id?: number;
+  orderId?: string;
 
 @Field({ nullable: true})
   status?: string;

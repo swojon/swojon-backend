@@ -10,15 +10,25 @@ import { Order, Orders } from '@/typedefs/order.type';
 import { OrderArgs, OrderCreateDTO, OrderUpdateDTO } from '@/dtos/order.dto';
 import { CouponEntity } from '@/entities/coupon.entity';
 
+const CHARSET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+
 @EntityRepository(OrderEntity)
 export class OrderRepository {
+
+  private generateOrderCode(length = 6): string {
+    let result = "";
+    for (let i = 0; i < length; i++) {
+      result += CHARSET.charAt(Math.floor(Math.random() * CHARSET.length));
+    }
+    return result;
+  }
+
 public async adminOrderList(paging: PagingArgs): Promise<Orders> {
     let sql = OrderEntity.createQueryBuilder('order')
       .select(['order.id', 'order.shippingAddress',  
         'order.totalAmount', 'order.finalAmount', 
         'order.status', "order.createdAt",
       ])
-      // .leftJoinAndSelect('order.communities', 'community')
       .leftJoinAndSelect('order.user', 'user')
       .leftJoinAndSelect('order.coupon', 'coupon')
       .leftJoinAndSelect('order.items', 'items')
@@ -83,7 +93,8 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
     let sql = OrderEntity.createQueryBuilder('order')
       .select(['order.id', 'order.shippingAddress',  
         'order.totalAmount', 'order.finalAmount', 
-        'order.status', "order.createdAt", 'order.shipping'
+        'order.status', "order.createdAt", 'order.shipping',
+        'order.orderId'
       ])
       // .leftJoinAndSelect('order.communities', 'community')
       .leftJoinAndSelect('order.user', 'user')
@@ -149,18 +160,17 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
     };
   }
 
-  public async orderFind(userId:any,orderArgs: OrderArgs): Promise<Order> {
+  public async orderFind(orderArgs: OrderArgs): Promise<Order> {
     const findOrder: OrderEntity = await OrderEntity.findOne(
                     {
                       where: [
-                          {id: orderArgs?.id,},
-                          {status: orderArgs?.status},
+                          {orderId: orderArgs?.orderId}
                         ],
                       
                       relations: [
                         "user", "user.profile",
-                        "coupon", "items", "items.variant",
-                        "variant.listing", "items.variant.optionValues"
+                        "coupon", "items", "items.listing", "items.variant",
+                        "items.variant.optionValues"
                         ],
                     },
                   );
@@ -237,10 +247,17 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
         }
         if (finalAmount < 0) finalAmount = 0;
     }
+    let orderCode = this.generateOrderCode();
+    //check if order code already exists, if yes generate new one
+    while (
+      await OrderEntity.findOne({ where: { orderId: orderCode } })
+    ) {
+      orderCode = this.generateOrderCode();
+    }
 
-    const newOrder = await OrderEntity.create({
-        user: { id: userId },
-        shippingAddress: {
+    let orderDataToSave = {
+      orderId: orderCode,
+      shippingAddress: {
             name: orderData.name,
             phoneNumber: orderData.phoneNumber,
             address : orderData.address,
@@ -252,7 +269,17 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
         shipping:orderData.shipping,
         status: 'pending',
         coupon: appliedCoupon ?? null,
-    }).save();
+    };
+
+    if (userId) {
+        orderDataToSave['user'] = { id: userId };
+    }
+
+    if (orderData.guestId) {
+        orderDataToSave['guestId'] = orderData.guestId;
+    }
+
+    const newOrder = await OrderEntity.create(orderDataToSave).save();
 
     // Save order items
     for (const item of items) {

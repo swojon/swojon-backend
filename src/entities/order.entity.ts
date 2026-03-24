@@ -9,9 +9,15 @@ import { UserEntity } from "./users.entity";
 export class OrderEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @ManyToOne(() => UserEntity)
+  
+  @Column({ nullable: true })
+  orderId: string;
+  
+  @ManyToOne(() => UserEntity, {nullable: true})
   user: UserEntity;
+
+  @Column({nullable: true, update: false, default: null})
+  guestId: string;
 
   @Column({ type: 'jsonb' }) // Use 'jsonb' in Postgres
   shippingAddress: {
@@ -43,25 +49,25 @@ export class OrderEntity extends BaseEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-    @Column({ 
-        type: 'enum', 
-        enum: ['PENDING', 'PROCESSING', 'CANCELLED', 'SHIPPED', 'PACKED', 'DELIVERED'], 
-        default: 'PENDING' 
-    })
-    orderStatus: 'PENDING' | 'PROCESSING' | 'CANCELLED' | 'SHIPPED' | 'PACKED' | 'DELIVERED';
+  @Column({ 
+      type: 'enum', 
+      enum: ['PENDING', 'PROCESSING', 'CANCELLED', 'SHIPPED', 'PACKED', 'DELIVERED'], 
+      default: 'PENDING' 
+  })
+  orderStatus: 'PENDING' | 'PROCESSING' | 'CANCELLED' | 'SHIPPED' | 'PACKED' | 'DELIVERED';
 
-    @Column({ 
-        type: 'enum', 
-        enum: ['PENDING', 'PAID', 'FAILED', 'REFUNDED'], 
-        default: 'PENDING' 
-    })
-    paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+  @Column({ 
+      type: 'enum', 
+      enum: ['PENDING', 'PAID', 'FAILED', 'REFUNDED'], 
+      default: 'PENDING' 
+  })
+  paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 
-    @Column({ type: 'text', nullable: true })
-    notes?: string;
+  @Column({ type: 'text', nullable: true })
+  notes?: string;
 
-    @Column({ type: 'varchar', length: 255, nullable: true })
-    trackingNumber?: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  trackingNumber?: string;
 }
 
 

@@ -47,23 +47,22 @@ export class OrderResolver extends OrderRepository{
   }
 
 
-
   // @Authorized()
   @Query(() => Order, {
     description: "Get Order by Id, staus",
   })
-  async getOrder(@Ctx() ctx:MyContext ,@Args(){id, status }: OrderArgs): Promise<Order> {
-    const userId = ctx.user?.id
-    if (!!id){
-      var cacheKey = `${orderCacheKey}:${String(id)}`;
+  async getOrder(@Args(){orderId}: OrderArgs): Promise<Order> {
+   
+    if (!!orderId){
+      var cacheKey = `${orderCacheKey}:${String(orderId)}`;
       const cachedData = await getFromCache(cacheKey);
       if (cachedData) {
         return cachedData;
       }
     }
 
-    const order: Order = await this.orderFind(userId, {id , status});
-    var cacheKey = `${orderCacheKey}:${String(order.id)}`;
+    const order: Order = await this.orderFind({orderId});
+    var cacheKey = `${orderCacheKey}:${String(order.orderId)}`;
     await setToCache(cacheKey, order);
     
     return order;
@@ -75,9 +74,7 @@ export class OrderResolver extends OrderRepository{
     description: 'Create Order',
   })
   async createOrder(@Arg('orderData') orderData : OrderCreateDTO,  @Ctx() ctx:MyContext): Promise<Order> {
-    if (!isLoggedIn(ctx.user)) {
-      throw new Error("You don't have permission to access this resource");
-    }
+   
     const userId: number = ctx.user.id;
     // const userId: number = 5; //it is temporary
     const order: Order = await this.orderCreate(userId, orderData);
