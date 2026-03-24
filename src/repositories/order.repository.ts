@@ -319,7 +319,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
   }
 
   private async notifyOrderCreation(orderData: OrderEntity){
-    const webhook_link = process.env.NEW_LISTING_DISCORD_WEBHOOK;
+    const webhook_link = process.env.NEW_ORDER_DISCORD_WEBHOOK;
     if (!webhook_link) return 
     const hook = new Webhook(webhook_link);
     if (!orderData) return;
