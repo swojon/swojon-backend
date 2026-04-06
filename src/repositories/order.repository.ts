@@ -27,7 +27,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
     let sql = OrderEntity.createQueryBuilder('order')
       .select(['order.id', 'order.shippingAddress',  
         'order.totalAmount', 'order.finalAmount', 
-        'order.status', "order.createdAt", 
+        'order.status', "order.createdAt", 'order.shipping',
         'order.orderId', 'order.trackingNumber', 'order.carrier', 'order.pos_invoice'
       ])
       .leftJoinAndSelect('order.user', 'user')

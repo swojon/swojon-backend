@@ -36,7 +36,7 @@ export class Order {
    @Field(() => Float)
   finalAmount: number;
   
-  @Field(() => Float)
+  @Field(() => Float, {nullable:true})
   shipping: number;
   
   @Field({ nullable: true })
