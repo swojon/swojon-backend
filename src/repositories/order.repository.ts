@@ -27,7 +27,8 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
     let sql = OrderEntity.createQueryBuilder('order')
       .select(['order.id', 'order.shippingAddress',  
         'order.totalAmount', 'order.finalAmount', 
-        'order.status', "order.createdAt",
+        'order.status', "order.createdAt", 
+        'order.orderId', 'order.trackingNumber', 'order.carrier', 'order.pos_invoice'
       ])
       .leftJoinAndSelect('order.user', 'user')
       .leftJoinAndSelect('order.coupon', 'coupon')
@@ -94,7 +95,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
       .select(['order.id', 'order.shippingAddress',  
         'order.totalAmount', 'order.finalAmount', 
         'order.status', "order.createdAt", 'order.shipping',
-        'order.orderId'
+        'order.orderId', 'order.trackingNumber', 'order.carrier', 'order.pos_invoice'
       ])
       // .leftJoinAndSelect('order.communities', 'community')
       .leftJoinAndSelect('order.user', 'user')
@@ -267,7 +268,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
         totalAmount,
         finalAmount,
         shipping:orderData.shipping,
-        status: 'pending',
+        status: 'PENDING',
         coupon: appliedCoupon ?? null,
     };
 
@@ -324,7 +325,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
     const hook = new Webhook(webhook_link);
     if (!orderData) return;
 
-    const orderId = orderData.id;
+    const orderId = orderData.orderId;
     const user = orderData.user;
     const coupon = orderData.coupon;
     const items = orderData.items || [];
@@ -342,7 +343,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
 
     const title = `🛒 New Order #${orderId}`;
     
-    let description = `**Order ID:** ${orderId}\n`;
+    let description = `**Order ID:** ${orderId} - ${orderData.id}\n`;
     description += `**User:** ${user?.profile?.name || user?.email || "N/A"} (ID: ${user?.id})\n`;
     description += `**Status:** ${status}\n`;
     description += `**Created At:** ${createdAt?.toLocaleString?.() || createdAt}\n\n`;
@@ -399,6 +400,14 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
 
     if (orderData.trackingNumber) {
         order.trackingNumber = orderData.trackingNumber
+    }
+
+    if (orderData.carrier) {
+        order.carrier = orderData.carrier
+    }
+
+    if (orderData.pos_invoice) {
+      order.pos_invoice = orderData.pos_invoice
     }
 
     if (orderData.paymentStatus) order.paymentStatus  = orderData.paymentStatus

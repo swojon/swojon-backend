@@ -75,10 +75,16 @@ export class OrderUpdateDTO {
 
     @Field({ nullable: true })
     trackingNumber?: string;
+    
+    @Field({ nullable: true })
+    carrier?: string;
 
     @Field(() => OrderStatus, { nullable: true })
     status?: OrderStatus;
-
+    
+    @Field(() => OrderStatus, { nullable: true })
+    pos_invoice?: OrderStatus;
+    
     @Field(() => PaymentStatus, { nullable: true })
     paymentStatus?: PaymentStatus;
 

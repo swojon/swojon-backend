@@ -10,11 +10,23 @@ export class Order {
   @Field({ nullable: true })
   orderId?: string;
 
+  
   @Field(()=> Date)
   createdAt: Date;
 
   @Field(() => GraphQLJSONObject)
   shippingAddress: any;
+
+  
+  @Field({nullable: true})
+  pos_invoice?: string;
+
+  @Field({nullable: true})
+  trackingNumber?: string;
+
+  @Field({nullable: true})
+  carrier?: string;
+
 
   @Field()
   status: string;

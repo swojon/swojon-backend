@@ -68,6 +68,13 @@ export class OrderEntity extends BaseEntity {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   trackingNumber?: string;
+
+  
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  pos_invoice?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  carrier?: string;
 }
 
 
