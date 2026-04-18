@@ -16,6 +16,9 @@ export class OrderItemDTO {
 
 @InputType()
 export class OrderCreateDTO {
+  @Field({ nullable: true })
+  email?: string;
+
   @Field()
   name: string;
 

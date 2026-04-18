@@ -259,6 +259,7 @@ public async adminOrderList(paging: PagingArgs): Promise<Orders> {
     let orderDataToSave = {
       orderId: orderCode,
       shippingAddress: {
+            email: orderData.email,
             name: orderData.name,
             phoneNumber: orderData.phoneNumber,
             address : orderData.address,

@@ -33,11 +33,12 @@ export class Order {
 
   @Field(() => Float)
   totalAmount: number;
+
    @Field(() => Float)
   finalAmount: number;
   
   @Field(() => Float, {nullable:true})
-  shipping: number;
+  shipping?: number;
   
   @Field({ nullable: true })
   couponCode?: string;
